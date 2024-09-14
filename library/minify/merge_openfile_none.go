@@ -16,9 +16,9 @@ import (
 
 func openfile(asset string, file string) (http.File, error) {
 	if asset == `AssetsURL` {
-		file = filepath.Join(backend.AssetsDir, `backend`, file)
+		file = filepath.Join(backend.AssetsDir, file)
 	} else {
-		file = filepath.Join(frontend.AssetsDir, `frontend`, file)
+		file = filepath.Join(frontend.AssetsDir, file)
 	}
 	f, err := os.Open(file)
 	if err == nil {
@@ -26,7 +26,7 @@ func openfile(asset string, file string) (http.File, error) {
 	}
 	if asset == `AssetsURL` {
 		for _, fallback := range bindataBackend.StaticOptions.Fallback {
-			file = filepath.Join(fallback, `backend`, file)
+			file = filepath.Join(fallback, file)
 			f, err = os.Open(file)
 			if err == nil {
 				return f, err
@@ -35,7 +35,7 @@ func openfile(asset string, file string) (http.File, error) {
 		return f, err
 	}
 	for _, fallback := range bindataFrontend.StaticOptions.Fallback {
-		file = filepath.Join(fallback, `frontend`, file)
+		file = filepath.Join(fallback, file)
 		f, err = os.Open(file)
 		if err == nil {
 			return f, err

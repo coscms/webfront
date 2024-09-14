@@ -41,7 +41,7 @@ func (m *myMinify) doinit() {
 	m.minifyM = minify.New()
 	m.minifyM.AddFunc("text/css", css.Minify)
 	m.minifyM.AddFunc("application/javascript", js.Minify)
-	m.saveDir = filepath.Join(backend.AssetsDir, `backend`, `combined`)
+	m.saveDir = filepath.Join(backend.AssetsDir, `combined`)
 	m.buildTime = config.Version.BuildTime
 	if config.FromFile() == nil || config.FromFile().Extend == nil || !config.FromFile().Extend.GetStore(`minify`).Bool(`disableAutoClear`) {
 		os.RemoveAll(m.saveDir)

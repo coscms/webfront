@@ -36,7 +36,7 @@ import (
 const (
 	Name                  = `frontend`
 	DefaultTemplateDir    = `./template/` + Name
-	DefaultAssetsDir      = `./public/assets`
+	DefaultAssetsDir      = `./public/assets/frontend`
 	DefaultAssetsURLPath  = `/public/assets/frontend`
 	RouteDefaultExtension = `.html`
 )

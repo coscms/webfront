@@ -33,9 +33,9 @@ var (
 
 // Initialize 后台和前台模板等素材初始化配置
 func Initialize(callbacks ...func()) {
-	backend.AssetsDir = filepath.Join(NgingDir, `public/assets`)
+	backend.AssetsDir = filepath.Join(NgingDir, `public/assets/backend`)
 	backend.TemplateDir = filepath.Join(NgingDir, `template/backend`)
-	bindata.StaticOptions.AddFallback(filepath.Join(WebxDir, `public/assets`))
+	bindata.StaticOptions.AddFallback(filepath.Join(WebxDir, `public/assets/backend`))
 	if len(callbacks) > 0 && callbacks[0] != nil {
 		callbacks[0]()
 	}
@@ -57,17 +57,17 @@ func Initialize(callbacks ...func()) {
 		file = strings.TrimPrefix(file, backend.TemplateDir+`/`)
 		return selfBackend.TmplPathFixers.Handle(c, ``, file)
 	}
+	frontend.TemplateDir = filepath.Join(WebxDir, frontend.DefaultTemplateDir) //模板文件夹
+	frontend.AssetsDir = filepath.Join(WebxDir, frontend.DefaultAssetsDir)     //素材文件夹
 	//注册前台静态资源
 	if len(StaticOptions.Root) == 0 {
-		StaticOptions.Root = filepath.Join(WebxDir, `public/assets/frontend`)
+		StaticOptions.Root = frontend.AssetsDir
 	}
 	if len(StaticOptions.Path) == 0 {
 		StaticOptions.Path = frontend.Prefix + "/public/assets/frontend/"
 	}
 	StaticOptions.TrimPrefix = frontend.Prefix
 	frontend.StaticMW = middleware.Static(StaticOptions)
-	frontend.TemplateDir = filepath.Join(WebxDir, frontend.DefaultTemplateDir) //模板文件夹
-	frontend.AssetsDir = filepath.Join(WebxDir, frontend.DefaultAssetsDir)     //素材文件夹
 	frontendTemplateDir := filepath.Join(WebxDir, `template/frontend`)
 	frontend.TmplPathFixers.PathAliases.AddAllSubdir(frontendTemplateDir)
 	//frontend.TmplPathFixers.PathAliases.Add(`default`, frontendTemplateDir)

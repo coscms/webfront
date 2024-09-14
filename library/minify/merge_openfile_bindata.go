@@ -14,9 +14,9 @@ import (
 
 func openfile(asset string, file string) (http.File, error) {
 	if asset == `AssetsURL` {
-		file = path.Join(backend.AssetsDir, `backend`, file)
+		file = path.Join(backend.AssetsDir, file)
 	} else {
-		file = path.Join(frontend.AssetsDir, `frontend`, file)
+		file = path.Join(frontend.AssetsDir, file)
 	}
 	return bindata.StaticAssetFS.Open(file)
 }
