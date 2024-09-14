@@ -56,7 +56,7 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 	if !fileNoop {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
-	combinedPath := path.Join(backend.AssetsURLPath, `backend`, `combined`)
+	combinedPath := path.Join(backend.AssetsURLPath, `combined`)
 	var groups []string
 	files := map[string][]string{}
 	eqNextGroup := func(k int, group string) bool {
