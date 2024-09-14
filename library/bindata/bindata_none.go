@@ -31,6 +31,11 @@ var (
 	WebxDir  = `../webx`
 )
 
+func init() {
+	module.FrontendMisc.Template = frontend.TmplPathFixers.PathAliases
+	module.FrontendMisc.Assets = StaticOptions
+}
+
 // Initialize 后台和前台模板等素材初始化配置
 func Initialize(callbacks ...func()) {
 	backend.AssetsDir = filepath.Join(NgingDir, `public/assets/backend`)
