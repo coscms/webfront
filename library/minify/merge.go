@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/admpub/log"
@@ -18,14 +19,18 @@ import (
 func Merge(b []byte, fs http.FileSystem) []byte {
 	m := d.init()
 	s := engine.Bytes2str(b)
-	matches := m.relatedCSS.FindAllStringSubmatchIndex(s, -1)
-	s = mergeBy(s, matches, fs, `css`)
-	matches = m.relatedJS.FindAllStringSubmatchIndex(s, -1)
-	s = mergeBy(s, matches, fs, `js`)
+	s = m.mergeBy(s, fs, `css`)
+	s = m.mergeBy(s, fs, `js`)
 	return engine.Str2bytes(s)
 }
 
-func mergeBy(s string, matches [][]int, fs http.FileSystem, typ string) string {
+func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
+	var matches [][]int
+	if typ == `css` {
+		matches = m.relatedCSS.FindAllStringSubmatchIndex(s, -1)
+	} else {
+		matches = m.relatedJS.FindAllStringSubmatchIndex(s, -1)
+	}
 	if len(matches) == 0 {
 		return s
 	}
@@ -34,19 +39,26 @@ func mergeBy(s string, matches [][]int, fs http.FileSystem, typ string) string {
 	end := len(matches) - 1
 	var newContent string
 	var combinedContent string
-	buildTime := d.buildTime
-	savDir := d.saveDir + echo.FilePathSeparator + buildTime
+	buildTime := m.buildTime
+	savDir := m.saveDir + echo.FilePathSeparator + buildTime
 	if fs != nil {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
-	var files []string
+	var groups []string
+	var lastGroup string
+	files := map[string][]string{}
 	for k, v := range matches {
+		var group string
 		var asset string
 		var file string
-		com.GetMatchedByIndex(s, v, nil, &asset, &file)
+		com.GetMatchedByIndex(s, v, nil, &group, &asset, &file)
 		if len(file) > 0 && fs != nil {
 			file = strings.SplitN(file, `?`, 2)[0]
-			files = append(files, file)
+			if _, ok := files[group]; !ok {
+				files[group] = []string{}
+				groups = append(groups, group)
+			}
+			files[group] = append(files[group], file)
 			if asset == `AssetsURL` {
 				file = filepath.Join(echo.Wd(), backend.AssetsDir, file)
 			} else {
@@ -65,7 +77,7 @@ func mergeBy(s string, matches [][]int, fs http.FileSystem, typ string) string {
 				}
 			}
 		}
-		if k == end {
+		if k == end || lastGroup != group {
 			var err error
 			var ext string
 			switch typ {
@@ -81,7 +93,12 @@ func mergeBy(s string, matches [][]int, fs http.FileSystem, typ string) string {
 			if err != nil {
 				log.Errorf(`[minify][merge]%s: %v`, file, err)
 			}
-			newFile := com.Md5(strings.Join(files, `,`)) + ext
+			newFile := com.Md5(strings.Join(files[group], `,`)) + ext
+			if len(group) > 0 && com.StrIsAlphaNumeric(group) {
+				newFile = group + `-` + newFile
+			} else {
+				newFile = strconv.Itoa(len(groups)) + `-` + newFile
+			}
 			savFile := savDir + echo.FilePathSeparator + newFile
 			if fs != nil {
 				err = os.WriteFile(savFile, engine.Str2bytes(combinedContent), 0664)
@@ -98,6 +115,7 @@ func mergeBy(s string, matches [][]int, fs http.FileSystem, typ string) string {
 			}
 		}
 		repl(k, v, newContent)
+		lastGroup = group
 	}
 	return replaced
 }

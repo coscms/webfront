@@ -35,8 +35,8 @@ func (m *myMinify) init() *myMinify {
 }
 
 func (m *myMinify) doinit() {
-	m.relatedCSS = regexp.MustCompile(`[\s]*<link[\s]+combine[\s]+(?:[^>]+\s)?href=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*`)
-	m.relatedJS = regexp.MustCompile(`[\s]*<script[\s]+combine[\s]+(?:[^>]+\s)?src=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*</script>[\s]*`)
+	m.relatedCSS = regexp.MustCompile(`[\s]*<link[\s]+combine(?:=["']([^"']+)["'])?[\s]+(?:[^>]+\s)?href=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*`)
+	m.relatedJS = regexp.MustCompile(`[\s]*<script[\s]+combine(?:=["']([^"']+)["'])?[\s]+(?:[^>]+\s)?src=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*</script>[\s]*`)
 	m.minifyM = minify.New()
 	m.minifyM.AddFunc("text/css", css.Minify)
 	m.minifyM.AddFunc("application/javascript", js.Minify)
