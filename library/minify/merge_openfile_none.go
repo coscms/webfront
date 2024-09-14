@@ -15,19 +15,20 @@ import (
 )
 
 func openfile(asset string, file string) (http.File, error) {
+	var afile string
 	if asset == `AssetsURL` {
-		file = filepath.Join(backend.AssetsDir, file)
+		afile = filepath.Join(backend.AssetsDir, file)
 	} else {
-		file = filepath.Join(frontend.AssetsDir, file)
+		afile = filepath.Join(frontend.AssetsDir, file)
 	}
-	f, err := os.Open(file)
+	f, err := os.Open(afile)
 	if err == nil {
 		return f, err
 	}
 	if asset == `AssetsURL` {
 		for _, fallback := range bindataBackend.StaticOptions.Fallback {
-			file = filepath.Join(fallback, file)
-			f, err = os.Open(file)
+			afile = filepath.Join(fallback, file)
+			f, err = os.Open(afile)
 			if err == nil {
 				return f, err
 			}
@@ -35,8 +36,8 @@ func openfile(asset string, file string) (http.File, error) {
 		return f, err
 	}
 	for _, fallback := range bindataFrontend.StaticOptions.Fallback {
-		file = filepath.Join(fallback, file)
-		f, err = os.Open(file)
+		afile = filepath.Join(fallback, file)
+		f, err = os.Open(afile)
 		if err == nil {
 			return f, err
 		}
