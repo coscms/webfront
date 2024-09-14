@@ -5,55 +5,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/initialize/backend"
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/initialize/frontend"
-	"github.com/tdewolff/minify/v2"
-	"github.com/tdewolff/minify/v2/css"
-	"github.com/tdewolff/minify/v2/js"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
 )
-
-var d = newMinify()
-
-func newMinify() *myMinify {
-	return &myMinify{}
-}
-
-type myMinify struct {
-	relatedCSS *regexp.Regexp
-	relatedJS  *regexp.Regexp
-	minifyM    *minify.M
-	once       sync.Once
-	saveDir    string
-	buildTime  string
-}
-
-func (m *myMinify) init() *myMinify {
-	m.once.Do(m.doinit)
-	return m
-}
-
-func (m *myMinify) doinit() {
-	m.relatedCSS = regexp.MustCompile(`[\s]*<link[\s]+combine[\s]+(?:[^>]+\s)?href=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*`)
-	m.relatedJS = regexp.MustCompile(`[\s]*<script[\s]+combine[\s]+(?:[^>]+\s)?src=["']\{\{(AssetsURL|AssetsXURL)\}\}([^'"]+)["'][^>]*>[\s]*</script>[\s]*`)
-	m.minifyM = minify.New()
-	m.minifyM.AddFunc("text/css", css.Minify)
-	m.minifyM.AddFunc("application/javascript", js.Minify)
-	m.saveDir = filepath.Join(echo.Wd(), backend.AssetsDir, `combined`)
-	m.buildTime = config.Version.BuildTime
-	if len(m.buildTime) == 0 {
-		m.buildTime = `0`
-	}
-	os.RemoveAll(m.saveDir)
-}
 
 func Merge(b []byte, fs http.FileSystem) []byte {
 	m := d.init()
