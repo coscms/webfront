@@ -4,10 +4,13 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
 	"github.com/admpub/log"
+	"github.com/coscms/webcore/initialize/backend"
+	"github.com/coscms/webfront/library/frontend"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
@@ -41,6 +44,7 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 	if fs != nil {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
+	combinedPath := path.Join(backend.AssetsURLPath, `backend`, `combined`)
 	var groups []string
 	files := map[string][]string{}
 	eqNextGroup := func(k int, group string) bool {
@@ -73,7 +77,17 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 					if err != nil {
 						log.Errorf(`[minify][merge]%s: %v`, file, err)
 					} else {
-						combinedContent += engine.Bytes2str(b) + "\n"
+						content := engine.Bytes2str(b)
+						if typ == `css` {
+							var pageURL string
+							if asset == `AssetsURL` {
+								pageURL = path.Join(backend.AssetsURLPath, `backend`, file)
+							} else {
+								pageURL = path.Join(frontend.AssetsURLPath, `frontend`, file)
+							}
+							content = d.ReplaceCSSImportURL(content, pageURL, combinedPath)
+						}
+						combinedContent += content + "\n"
 					}
 				}
 			}
@@ -120,4 +134,53 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 		repl(k, v, newContent)
 	}
 	return replaced
+}
+
+func (m *myMinify) ReplaceCSSImportURL(content, pageURL, combinedPath string) string {
+	content = d.importCSS.ReplaceAllStringFunc(content, func(s string) string {
+		return replaceCSSImportURL(s, pageURL, combinedPath)
+	})
+	return content
+}
+
+func resolveURLPath(u string, targetPath string) string {
+	if len(targetPath) == 0 {
+		return u
+	}
+	if strings.HasPrefix(u, targetPath) {
+		u = strings.TrimPrefix(u, targetPath)
+		u = strings.TrimPrefix(u, `/`)
+		return u
+	}
+	var prefix string
+	tp := path.Dir(targetPath)
+	for len(tp) > 0 {
+		prefix += `../`
+		if strings.HasPrefix(u, tp) {
+			u = strings.TrimPrefix(u, tp)
+			return prefix + strings.TrimPrefix(u, `/`)
+		}
+		tp = path.Dir(tp)
+	}
+	return u
+}
+
+func replaceCSSImportURL(s string, pageURL string, combinedPath string) string {
+	s = strings.TrimPrefix(s, `url(`)
+	s = strings.TrimSuffix(s, `)`)
+	s = strings.Trim(s, `"'`)
+	if len(s) == 0 || strings.HasPrefix(s, `/`) || strings.Contains(s, `://`) {
+		return s
+	}
+	for strings.HasPrefix(s, `./`) {
+		s = strings.TrimPrefix(s, `./`)
+	}
+	urlPath := pageURL
+	for strings.HasPrefix(s, `../`) {
+		urlPath = path.Dir(pageURL)
+		s = strings.TrimPrefix(s, `../`)
+	}
+	s = path.Join(urlPath, s)
+	s = resolveURLPath(s, combinedPath)
+	return `url("` + s + `")`
 }
