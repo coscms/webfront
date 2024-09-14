@@ -183,7 +183,9 @@ func addMiddleware(e *echo.Echo) {
 		ErrorPages:           config.FromFile().Sys.ErrorPages,
 		ErrorProcessors:      common.ErrorProcessors,
 		FuncMapGlobal:        frontend.GlobalFuncMap(),
-		CustomParser:         TmplCustomParser,
+	}
+	if config.FromFile().Extend.GetStore(`minify`).Bool(`on`) {
+		renderOptions.CustomParser = TmplCustomParser
 	}
 	if RendererDo != nil {
 		renderOptions.AddRendererDo(RendererDo)

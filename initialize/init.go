@@ -5,9 +5,6 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/registry/navigate"
 	_ "github.com/coscms/webfront/initialize/backend"
-	"github.com/coscms/webfront/initialize/frontend"
-	"github.com/coscms/webfront/library/minify"
-	"github.com/webx-top/echo"
 )
 
 var nav = &navigate.List{}
@@ -18,10 +15,4 @@ func init() {
 	bootconfig.OfficialHomepage = `https://www.coscms.com`
 	navigate.ProjectGet(`nging`).Name = `其它功能`
 	navigate.ProjectAdd(1, Project)
-	frontend.TmplCustomParser = func(_ string, content []byte) []byte {
-		if echo.String(`LABEL`) == `dev` {
-			return content
-		}
-		return minify.Merge(content)
-	}
 }
