@@ -2,7 +2,6 @@ package minify
 
 import (
 	"io"
-	"net/http"
 	"os"
 	"path"
 	"strconv"
@@ -16,15 +15,19 @@ import (
 	"github.com/webx-top/echo/engine"
 )
 
-func Merge(b []byte, fs http.FileSystem) []byte {
+func Merge(b []byte, fileNoop ...bool) []byte {
 	m := d.init()
 	s := engine.Bytes2str(b)
-	s = m.mergeBy(s, fs, `css`)
-	s = m.mergeBy(s, fs, `js`)
+	var fnop bool
+	if len(fileNoop) > 0 {
+		fnop = fileNoop[0]
+	}
+	s = m.mergeBy(s, `css`, fnop)
+	s = m.mergeBy(s, `js`, fnop)
 	return engine.Str2bytes(s)
 }
 
-func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
+func (m *myMinify) mergeBy(s string, typ string, fileNoop bool) string {
 	var matches [][]int
 	if typ == `css` {
 		matches = m.relatedCSS.FindAllStringSubmatchIndex(s, -1)
@@ -41,7 +44,7 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 	var combinedContent string
 	buildTime := m.buildTime
 	savDir := m.saveDir + echo.FilePathSeparator + buildTime
-	if fs != nil {
+	if !fileNoop {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
 	combinedPath := path.Join(backend.AssetsURLPath, `backend`, `combined`)
@@ -67,7 +70,7 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 		if len(file) > 0 {
 			file = strings.SplitN(file, `?`, 2)[0]
 			files[group] = append(files[group], file)
-			if fs != nil {
+			if !fileNoop {
 				f, err := openfile(asset, file)
 				if err != nil {
 					log.Errorf(`[minify][merge]%s: %v`, file, err)
@@ -81,10 +84,11 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 						if typ == `css` {
 							var pageURL string
 							if asset == `AssetsURL` {
-								pageURL = path.Join(backend.AssetsURLPath, `backend`, file)
+								pageURL = path.Join(backend.AssetsURLPath, file)
 							} else {
-								pageURL = path.Join(frontend.AssetsURLPath, `frontend`, file)
+								pageURL = path.Join(frontend.AssetsURLPath, file)
 							}
+							pageURL = path.Dir(pageURL)
 							content = d.ReplaceCSSImportURL(content, pageURL, combinedPath)
 						}
 						combinedContent += content + "\n"
@@ -117,7 +121,7 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 				newFile = strconv.Itoa(len(groups)-1) + `-` + newFile
 			}
 			savFile := savDir + echo.FilePathSeparator + newFile
-			if fs != nil {
+			if !fileNoop {
 				err = os.WriteFile(savFile, engine.Str2bytes(combinedContent), 0664)
 				if err != nil {
 					log.Errorf(`[minify][merge]%s: %v`, file, err)

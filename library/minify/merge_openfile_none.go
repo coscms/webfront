@@ -21,7 +21,6 @@ func openfile(asset string, file string) (http.File, error) {
 	} else {
 		file = filepath.Join(echo.Wd(), frontend.AssetsDir, `frontend`, file)
 	}
-	println(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>`, asset, file)
 	f, err := os.Open(file)
 	if err == nil {
 		return f, err
