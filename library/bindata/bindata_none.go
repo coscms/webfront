@@ -16,6 +16,7 @@ import (
 	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/bindata"
 	"github.com/coscms/webcore/library/modal"
+	"github.com/coscms/webcore/library/module"
 	selfBackend "github.com/coscms/webfront/initialize/backend"
 	"github.com/coscms/webfront/initialize/frontend"
 )
