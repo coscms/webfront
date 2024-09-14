@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/coscms/webcore/initialize/backend"
+	"github.com/coscms/webcore/library/bindata"
 	"github.com/coscms/webfront/initialize/frontend"
 )
 
@@ -16,5 +18,5 @@ func openfile(asset string, file string) (http.File, error) {
 	} else {
 		file = path.Join(frontend.AssetsDir, `frontend`, file)
 	}
-	return backend.StaticAssetFS.Open(file)
+	return bindata.StaticAssetFS.Open(file)
 }
