@@ -45,39 +45,49 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
 	var groups []string
-	var lastGroup string
 	files := map[string][]string{}
+	eqNextGroup := func(k int, group string) bool {
+		if k >= end {
+			return false
+		}
+		var nextGroup string
+		com.GetMatchedByIndex(s, matches[k+1], nil, &nextGroup)
+		return group == nextGroup
+	}
 	for k, v := range matches {
 		var group string
 		var asset string
 		var file string
 		com.GetMatchedByIndex(s, v, nil, &group, &asset, &file)
-		if len(file) > 0 && fs != nil {
+		if _, ok := files[group]; !ok {
+			files[group] = []string{}
+			groups = append(groups, group)
+		}
+		if len(file) > 0 {
 			file = strings.SplitN(file, `?`, 2)[0]
-			if _, ok := files[group]; !ok {
-				files[group] = []string{}
-				groups = append(groups, group)
-			}
 			files[group] = append(files[group], file)
-			if asset == `AssetsURL` {
-				file = filepath.Join(echo.Wd(), backend.AssetsDir, file)
-			} else {
-				file = filepath.Join(echo.Wd(), frontend.AssetsDir, file)
-			}
-			f, err := fs.Open(file)
-			if err != nil {
-				log.Errorf(`[minify][merge]%s: %v`, file, err)
-			} else {
-				b, err := io.ReadAll(f)
-				f.Close()
+			if fs != nil {
+				if asset == `AssetsURL` {
+					file = filepath.Join(echo.Wd(), backend.AssetsDir, file)
+				} else {
+					file = filepath.Join(echo.Wd(), frontend.AssetsDir, file)
+				}
+				f, err := fs.Open(file)
 				if err != nil {
 					log.Errorf(`[minify][merge]%s: %v`, file, err)
 				} else {
-					combinedContent += engine.Bytes2str(b) + "\n"
+					b, err := io.ReadAll(f)
+					f.Close()
+					if err != nil {
+						log.Errorf(`[minify][merge]%s: %v`, file, err)
+					} else {
+						combinedContent += engine.Bytes2str(b) + "\n"
+					}
 				}
 			}
 		}
-		if k == end || lastGroup != group {
+		newContent = ``
+		if k == end || !eqNextGroup(k, group) {
 			var err error
 			var ext string
 			switch typ {
@@ -93,11 +103,12 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 			if err != nil {
 				log.Errorf(`[minify][merge]%s: %v`, file, err)
 			}
+			//com.Dump(map[string]interface{}{`files`: files[group], `group`: group})
 			newFile := com.Md5(strings.Join(files[group], `,`)) + ext
 			if len(group) > 0 && com.StrIsAlphaNumeric(group) {
 				newFile = group + `-` + newFile
 			} else {
-				newFile = strconv.Itoa(len(groups)) + `-` + newFile
+				newFile = strconv.Itoa(len(groups)-1) + `-` + newFile
 			}
 			savFile := savDir + echo.FilePathSeparator + newFile
 			if fs != nil {
@@ -115,7 +126,6 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 			}
 		}
 		repl(k, v, newContent)
-		lastGroup = group
 	}
 	return replaced
 }
