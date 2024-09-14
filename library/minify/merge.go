@@ -9,6 +9,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/initialize/backend"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/library/frontend"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -16,18 +17,26 @@ import (
 )
 
 func Merge(b []byte, fileNoop ...bool) []byte {
+	cdnCfg := config.Setting(`base`, `assetsCDN`)
+	backendCDN := cdnCfg.String(`backend`)
+	frontendCDN := cdnCfg.String(`frontend`)
+	hasBackendCDN := len(backendCDN) > 0
+	hasFrontendCDN := len(frontendCDN) > 0
+	if hasBackendCDN && hasFrontendCDN {
+		return b
+	}
 	m := d.init()
 	s := engine.Bytes2str(b)
 	var fnop bool
 	if len(fileNoop) > 0 {
 		fnop = fileNoop[0]
 	}
-	s = m.mergeBy(s, `css`, fnop)
-	s = m.mergeBy(s, `js`, fnop)
+	s = m.mergeBy(s, `css`, fnop, hasBackendCDN, hasFrontendCDN)
+	s = m.mergeBy(s, `js`, fnop, hasBackendCDN, hasFrontendCDN)
 	return engine.Str2bytes(s)
 }
 
-func (m *myMinify) mergeBy(s string, typ string, fileNoop bool) string {
+func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bool, hasFrontendCDN bool) string {
 	var matches [][]int
 	if typ == `css` {
 		matches = m.relatedCSS.FindAllStringSubmatchIndex(s, -1)
@@ -63,6 +72,17 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool) string {
 		var asset string
 		var file string
 		com.GetMatchedByIndex(s, v, nil, &group, &asset, &file)
+		if hasBackendCDN {
+			if asset == `AssetsURL` {
+				repl(k, v)
+				continue
+			}
+		} else if hasFrontendCDN {
+			if asset != `AssetsURL` {
+				repl(k, v)
+				continue
+			}
+		}
 		if _, ok := files[group]; !ok {
 			files[group] = []string{}
 			groups = append(groups, group)
