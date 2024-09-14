@@ -52,7 +52,7 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 	var newContent string
 	var combinedContent string
 	buildTime := m.buildTime
-	savDir := m.saveDir + echo.FilePathSeparator + buildTime
+	savDir := m.saveDir
 	if !fileNoop {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
@@ -147,7 +147,10 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 					log.Errorf(`[minify][merge]%s: %v`, file, err)
 				}
 			}
-			newContent = `{{AssetsURL}}/combined/` + buildTime + `/` + newFile
+			newContent = `{{AssetsURL}}/combined/` + newFile
+			if len(buildTime) > 0 {
+				newContent += `?t=` + buildTime
+			}
 			switch typ {
 			case `js`:
 				newContent = `<script src="` + newContent + `"></script>`

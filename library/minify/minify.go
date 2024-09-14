@@ -43,9 +43,6 @@ func (m *myMinify) doinit() {
 	m.minifyM.AddFunc("application/javascript", js.Minify)
 	m.saveDir = filepath.Join(backend.AssetsDir, `backend`, `combined`)
 	m.buildTime = config.Version.BuildTime
-	if len(m.buildTime) == 0 {
-		m.buildTime = `0`
-	}
 	os.RemoveAll(m.saveDir)
 }
 
