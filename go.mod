@@ -43,9 +43,9 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.4
-	github.com/webx-top/com v1.3.1
+	github.com/webx-top/com v1.3.2
 	github.com/webx-top/db v1.27.9
-	github.com/webx-top/echo v1.9.0
+	github.com/webx-top/echo v1.9.3
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1
 	github.com/webx-top/image v0.1.1
@@ -62,12 +62,13 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
-	github.com/coscms/webcore v0.0.3
+	github.com/coscms/webcore v0.0.4
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.27.2
 	github.com/nging-plugins/dbmanager v1.6.0
 	github.com/silenceper/wechat/v2 v2.1.6
+	github.com/tdewolff/minify/v2 v2.20.37
 	github.com/webx-top/restyclient v0.0.4
 	github.com/webx-top/validator v0.3.0
 )
@@ -239,6 +240,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/tdewolff/parse/v2 v2.7.15 // indirect
 	github.com/tidwall/gjson v1.17.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -291,6 +293,6 @@ require (
 	modernc.org/libc v1.60.1 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.33.0 // indirect
+	modernc.org/sqlite v1.33.1 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )

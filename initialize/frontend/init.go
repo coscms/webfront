@@ -49,6 +49,7 @@ var (
 	AssetsURLPath      = Prefix + DefaultAssetsURLPath
 	StaticRootURLPath  = Prefix + `/public/`
 	RendererDo         = func(driver.Driver) {}
+	TmplCustomParser   func(tmpl string, content []byte) []byte
 	DefaultMiddlewares = []interface{}{}
 )
 
@@ -182,6 +183,7 @@ func addMiddleware(e *echo.Echo) {
 		ErrorPages:           config.FromFile().Sys.ErrorPages,
 		ErrorProcessors:      common.ErrorProcessors,
 		FuncMapGlobal:        frontend.GlobalFuncMap(),
+		CustomParser:         TmplCustomParser,
 	}
 	if RendererDo != nil {
 		renderOptions.AddRendererDo(RendererDo)
