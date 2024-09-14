@@ -68,9 +68,9 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 			files[group] = append(files[group], file)
 			if fs != nil {
 				if asset == `AssetsURL` {
-					file = filepath.Join(echo.Wd(), backend.AssetsDir, file)
+					file = filepath.Join(echo.Wd(), backend.AssetsDir, `backend`, file)
 				} else {
-					file = filepath.Join(echo.Wd(), frontend.AssetsDir, file)
+					file = filepath.Join(echo.Wd(), frontend.AssetsDir, `frontend`, file)
 				}
 				f, err := fs.Open(file)
 				if err != nil {
