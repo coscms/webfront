@@ -108,7 +108,6 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 							} else {
 								pageURL = path.Join(frontend.AssetsURLPath, file)
 							}
-							pageURL = path.Dir(pageURL)
 							content = d.ReplaceCSSImportURL(content, pageURL, combinedPath)
 						}
 						combinedContent += content + "\n"
@@ -192,22 +191,27 @@ func resolveURLPath(u string, targetPath string) string {
 	return u
 }
 
-func replaceCSSImportURL(s string, pageURL string, combinedPath string) string {
-	s = strings.TrimPrefix(s, `url(`)
-	s = strings.TrimSuffix(s, `)`)
-	s = strings.Trim(s, `"'`)
+func absURLPath(s string, pageURL string) string {
 	if len(s) == 0 || strings.HasPrefix(s, `/`) || strings.Contains(s, `://`) {
 		return s
 	}
 	for strings.HasPrefix(s, `./`) {
 		s = strings.TrimPrefix(s, `./`)
 	}
-	urlPath := pageURL
+	urlPath := path.Dir(pageURL)
 	for strings.HasPrefix(s, `../`) {
-		urlPath = path.Dir(pageURL)
+		urlPath = path.Dir(urlPath)
 		s = strings.TrimPrefix(s, `../`)
 	}
 	s = path.Join(urlPath, s)
+	return s
+}
+
+func replaceCSSImportURL(s string, pageURL string, combinedPath string) string {
+	s = strings.TrimPrefix(s, `url(`)
+	s = strings.TrimSuffix(s, `)`)
+	s = strings.Trim(s, `"'`)
+	s = absURLPath(s, pageURL)
 	s = resolveURLPath(s, combinedPath)
 	return `url(` + s + `)`
 }

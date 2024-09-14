@@ -29,5 +29,25 @@ func TestResolveURLPath(t *testing.T) {
 	assert.Equal(t, `../../../a/b/c`, r)
 
 	r = replaceCSSImportURL(`url('../img/a.jpg')`, `/public/assets/backend/css/css.css`, `/public/assets/backend/combined`)
-	assert.Equal(t, `url(../css/img/a.jpg)`, r)
+	assert.Equal(t, `url(../img/a.jpg)`, r)
+
+	r = replaceCSSImportURL(`url('fonts/fontawesome-webfont.ttf?v=4.7.0')`, `/public/assets/backend/css/font-awesome.css`, `/public/assets/backend/combined`)
+	assert.Equal(t, `url(../css/fonts/fontawesome-webfont.ttf?v=4.7.0)`, r)
+
+	r = replaceCSSImportURL(`url("../fonts/ionicons.eot?v=2.0.0")`, `/public/assets/frontend/css/Ionicons/css/ionicons.css`, `/public/assets/backend/combined`)
+	assert.Equal(t, `url(../../frontend/css/Ionicons/fonts/ionicons.eot?v=2.0.0)`, r)
+}
+
+func TestAbsURLPath(t *testing.T) {
+	pageURL := absURLPath(`../download2/index`, `/system/download/index`)
+	assert.Equal(t, `/system/download2/index`, pageURL)
+
+	pageURL = absURLPath(`../../system2/download2/index`, `/system/download/index`)
+	assert.Equal(t, `/system2/download2/index`, pageURL)
+
+	pageURL = absURLPath(`/payment/index/index`, `/system/download/index`)
+	assert.Equal(t, `/payment/index/index`, pageURL)
+
+	pageURL = absURLPath(`./payment/index/index`, `/system/download/index`)
+	assert.Equal(t, `/system/download/payment/index/index`, pageURL)
 }
