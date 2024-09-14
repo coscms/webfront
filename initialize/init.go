@@ -5,6 +5,7 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/registry/navigate"
 	_ "github.com/coscms/webfront/initialize/backend"
+	_ "github.com/coscms/webfront/library/minify"
 )
 
 var nav = &navigate.List{}
