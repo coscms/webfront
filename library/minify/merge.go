@@ -206,5 +206,5 @@ func replaceCSSImportURL(s string, pageURL string, combinedPath string) string {
 	}
 	s = path.Join(urlPath, s)
 	s = resolveURLPath(s, combinedPath)
-	return `url("` + s + `")`
+	return `url(` + s + `)`
 }

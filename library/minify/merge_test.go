@@ -29,5 +29,5 @@ func TestResolveURLPath(t *testing.T) {
 	assert.Equal(t, `../../../a/b/c`, r)
 
 	r = replaceCSSImportURL(`url('../img/a.jpg')`, `/public/assets/backend/css/css.css`, `/public/assets/backend/combined`)
-	assert.Equal(t, `url("../css/img/a.jpg")`, r)
+	assert.Equal(t, `url(../css/img/a.jpg)`, r)
 }

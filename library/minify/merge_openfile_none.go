@@ -12,14 +12,13 @@ import (
 	bindataBackend "github.com/coscms/webcore/library/bindata"
 	"github.com/coscms/webfront/initialize/frontend"
 	bindataFrontend "github.com/coscms/webfront/library/bindata"
-	"github.com/webx-top/echo"
 )
 
 func openfile(asset string, file string) (http.File, error) {
 	if asset == `AssetsURL` {
-		file = filepath.Join(echo.Wd(), backend.AssetsDir, `backend`, file)
+		file = filepath.Join(backend.AssetsDir, `backend`, file)
 	} else {
-		file = filepath.Join(echo.Wd(), frontend.AssetsDir, `frontend`, file)
+		file = filepath.Join(frontend.AssetsDir, `frontend`, file)
 	}
 	f, err := os.Open(file)
 	if err == nil {

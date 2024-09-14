@@ -11,7 +11,6 @@ import (
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/css"
 	"github.com/tdewolff/minify/v2/js"
-	"github.com/webx-top/echo"
 )
 
 var d = newMinify()
@@ -42,7 +41,7 @@ func (m *myMinify) doinit() {
 	m.minifyM = minify.New()
 	m.minifyM.AddFunc("text/css", css.Minify)
 	m.minifyM.AddFunc("application/javascript", js.Minify)
-	m.saveDir = filepath.Join(echo.Wd(), backend.AssetsDir, `backend`, `combined`)
+	m.saveDir = filepath.Join(backend.AssetsDir, `backend`, `combined`)
 	m.buildTime = config.Version.BuildTime
 	if len(m.buildTime) == 0 {
 		m.buildTime = `0`
