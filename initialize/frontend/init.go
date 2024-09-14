@@ -184,7 +184,7 @@ func addMiddleware(e *echo.Echo) {
 		ErrorProcessors:      common.ErrorProcessors,
 		FuncMapGlobal:        frontend.GlobalFuncMap(),
 	}
-	if config.FromFile().Extend.GetStore(`minify`).Bool(`on`) {
+	if echo.String(`LABEL`) != `dev` && config.FromFile().Extend.GetStore(`minify`).Bool(`on`) {
 		renderOptions.CustomParser = TmplCustomParser
 	}
 	if RendererDo != nil {
