@@ -4,13 +4,10 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/initialize/backend"
-	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
@@ -67,12 +64,7 @@ func (m *myMinify) mergeBy(s string, fs http.FileSystem, typ string) string {
 			file = strings.SplitN(file, `?`, 2)[0]
 			files[group] = append(files[group], file)
 			if fs != nil {
-				if asset == `AssetsURL` {
-					file = filepath.Join(echo.Wd(), backend.AssetsDir, `backend`, file)
-				} else {
-					file = filepath.Join(echo.Wd(), frontend.AssetsDir, `frontend`, file)
-				}
-				f, err := fs.Open(file)
+				f, err := openfile(asset, file)
 				if err != nil {
 					log.Errorf(`[minify][merge]%s: %v`, file, err)
 				} else {

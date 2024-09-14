@@ -1,0 +1,46 @@
+//go:build !bindata
+// +build !bindata
+
+package minify
+
+import (
+	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/coscms/webcore/initialize/backend"
+	bindataBackend "github.com/coscms/webcore/library/bindata"
+	"github.com/coscms/webfront/initialize/frontend"
+	bindataFrontend "github.com/coscms/webfront/library/bindata"
+	"github.com/webx-top/echo"
+)
+
+func openfile(asset string, file string) (http.File, error) {
+	if asset == `AssetsURL` {
+		file = filepath.Join(echo.Wd(), backend.AssetsDir, `backend`, file)
+	} else {
+		file = filepath.Join(echo.Wd(), frontend.AssetsDir, `frontend`, file)
+	}
+	f, err := os.Open(file)
+	if err == nil {
+		return f, err
+	}
+	if asset == `AssetsURL` {
+		for _, fallback := range bindataBackend.StaticOptions.Fallback {
+			file = filepath.Join(fallback, `backend`, file)
+			f, err = os.Open(file)
+			if err == nil {
+				return f, err
+			}
+		}
+		return f, err
+	}
+	for _, fallback := range bindataFrontend.StaticOptions.Fallback {
+		file = filepath.Join(fallback, `frontend`, file)
+		f, err = os.Open(file)
+		if err == nil {
+			return f, err
+		}
+	}
+	return f, err
+}
