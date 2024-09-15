@@ -4,6 +4,7 @@
 package bindata
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/admpub/color"
@@ -45,8 +46,8 @@ func Initialize(callbacks ...func()) {
 		// StaticMW
 
 		fileSystems := xtemplate.NewFileSystems()
-		fileSystems.Register(xtemplate.NewStaticDir( /*backend.AssetsDir*/ "./public/assets", "/public/assets")) // 注册本地文件系统内的文件
-		fileSystems.Register(xtemplate.NewFileSystemTrimPrefix(frontend.Prefix, bindata.StaticAssetFS))          // 注册 bindata 打包的文件
+		fileSystems.Register(xtemplate.NewStaticDir(filepath.Join(echo.Wd(), "public/assets"), "/public/assets")) // 注册本地文件系统内的文件
+		fileSystems.Register(xtemplate.NewFileSystemTrimPrefix(frontend.Prefix, bindata.StaticAssetFS))           // 注册 bindata 打包的文件
 		bootconfig.StaticMW = mwBindata.Static(frontend.Prefix+"/public/assets", fileSystems)
 
 		// Template file manager
