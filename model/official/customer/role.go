@@ -109,6 +109,8 @@ func (u *Role) Exists(name string) (bool, error) {
 	return u.OfficialCustomerRole.Exists(nil, db.Cond{`name`: name})
 }
 
+var GetAgentRoleIDs = func(echo.Context, uint) (string, error) { return ``, nil }
+
 func (u *Role) ListRoleIDsByCustomer(customer *dbschema.OfficialCustomer) (roleIDs []uint) {
 	// 客户自身的角色
 	rolesString := customer.RoleIds
@@ -136,16 +138,10 @@ func (u *Role) ListRoleIDsByCustomer(customer *dbschema.OfficialCustomer) (roleI
 	}
 
 	// 客户代理等级的角色
-	if customer.AgentLevel > 0 {
-		levelM := dbschema.NewOfficialCustomerAgentLevel(u.Context())
-		err = levelM.Get(nil, db.And(
-			db.Cond{`id`: customer.AgentLevel},
-			db.Cond{`disabled`: `N`},
-		))
-		if err == nil {
-			if len(levelM.RoleIds) > 0 {
-				rolesString += `,` + levelM.RoleIds
-			}
+	if customer.AgentLevel > 0 && GetAgentRoleIDs != nil {
+		roleIDs, err := GetAgentRoleIDs(u.Context(), customer.AgentLevel)
+		if err == nil && len(roleIDs) > 0 {
+			rolesString += `,` + roleIDs
 		}
 	}
 

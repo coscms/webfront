@@ -2,6 +2,7 @@ package meilisearch
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/coscms/webfront/library/search"
 	"github.com/meilisearch/meilisearch-go"
@@ -12,23 +13,22 @@ import (
 // https://docs.meilisearch.com/learn/getting_started/quick_start.html#download-and-launch
 
 func New(cfg search.Config) (search.Searcher, error) {
-	client := meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:    cfg.Host,
-		APIKey:  cfg.Password,
-		Timeout: cfg.Timeout,
-	})
+	client := meilisearch.New(
+		cfg.Host,
+		meilisearch.WithAPIKey(cfg.Password),
+		meilisearch.WithCustomClient(&http.Client{Timeout: cfg.Timeout}),
+	)
 	return &MeiliSearch{
-		Client: client,
+		ServiceManager: client,
 	}, nil
 }
 
 type MeiliSearch struct {
-	*meilisearch.Client
+	meilisearch.ServiceManager
 }
 
-func (m *MeiliSearch) getIndex(index string) *meilisearch.Index {
-	indexInstance := m.Client.Index(index)
-	return indexInstance
+func (m *MeiliSearch) getIndex(index string) meilisearch.IndexManager {
+	return m.ServiceManager.Index(index)
 }
 
 func (m *MeiliSearch) Add(index string, primaryKey string, docs ...interface{}) error {
@@ -89,14 +89,14 @@ func (m *MeiliSearch) Flush() error {
 }
 
 func (m *MeiliSearch) DeleteIndex(index string) error {
-	_, err := m.Client.DeleteIndex(index)
+	_, err := m.ServiceManager.DeleteIndex(index)
 	return err
 }
 
 func (m *MeiliSearch) InitIndex(cfg *search.IndexConfig) error {
 	// m.DeleteIndex(cfg.Index)
 	if _, err := m.getIndex(cfg.Index).FetchInfo(); err != nil {
-		m.Client.CreateIndex(&meilisearch.IndexConfig{
+		m.ServiceManager.CreateIndex(&meilisearch.IndexConfig{
 			Uid:        cfg.Index,
 			PrimaryKey: cfg.PrimaryKey,
 		})

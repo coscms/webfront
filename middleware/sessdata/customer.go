@@ -12,12 +12,6 @@ func Customer(c echo.Context) *dbschema.OfficialCustomer {
 	return customer
 }
 
-// AgentLevel 前台会员客户代理登记信息
-func AgentLevel(c echo.Context) *dbschema.OfficialCustomerAgentLevel {
-	agentLevel, _ := c.Internal().Get(`agentLevel`).(*dbschema.OfficialCustomerAgentLevel)
-	return agentLevel
-}
-
 // IsAdmin 是否是后台管理员或与后台管理员关联的客户
 func IsAdmin(c echo.Context, onlyBackendAdmin ...bool) bool {
 	return AdminUID(c, onlyBackendAdmin...) > 0

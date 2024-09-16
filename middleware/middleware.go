@@ -242,9 +242,8 @@ func goToSignIn(c echo.Context) error {
 }
 
 var (
-	Customer   = sessdata.Customer
-	AgentLevel = sessdata.AgentLevel
-	URLFor     = sessdata.URLFor
+	Customer = sessdata.Customer
+	URLFor   = sessdata.URLFor
 )
 
 var Middlewares []interface{}

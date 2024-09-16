@@ -20,17 +20,6 @@ var Detail = map[string]param.Transfer{
 			`bgcolor`:     mp.Get(`Bgcolor`),
 		}
 	}),
-	`Agent`: param.Tf(`agent`, func(value interface{}, row param.Store) interface{} {
-		mp, ok := value.(param.Store)
-		if !ok {
-			return value
-		}
-		return param.Store{
-			`id`:          mp.Get(`Id`),
-			`name`:        mp.Get(`Name`),
-			`description`: mp.Get(`Description`),
-		}
-	}),
 	`Roles.Id`:          param.Tf(`roles.id`, nil),
 	`Roles.Name`:        param.Tf(`roles.name`, nil),
 	`Roles.Description`: param.Tf(`roles.description`, nil),
