@@ -31,6 +31,9 @@ var DefaultRenderDataWrapper = func(ctx echo.Context, data interface{}) interfac
 }
 
 func NewRenderData(ctx echo.Context, data interface{}) *RenderData {
+	if v, ok := data.(*RenderData); ok {
+		return v
+	}
 	return &RenderData{
 		ctx:        ctx,
 		RenderData: echo.NewRenderData(ctx, data),
