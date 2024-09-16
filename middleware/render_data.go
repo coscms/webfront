@@ -8,6 +8,7 @@ import (
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/logic/articlelogic"
+	"github.com/coscms/webfront/library/xtemplate"
 	"github.com/coscms/webfront/model/official"
 	modelAdvert "github.com/coscms/webfront/model/official/advert"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
@@ -111,4 +112,8 @@ func (r *RenderData) SoftwareName() string {
 
 func (r *RenderData) Advert(idents ...string) interface{} {
 	return modelAdvert.GetAdvertForHTML(r.ctx, idents...)
+}
+
+func (r *RenderData) ThemeInfo() *xtemplate.ThemeInfo {
+	return xtemplate.Frontend().ThemeInfo(r.ctx)
 }
