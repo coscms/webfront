@@ -41,6 +41,9 @@ func (f *Customer) SignUp(user, pass, mobile, email string, options ...CustomerO
 
 func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string, options ...CustomerOption) (err error) {
 	integral := config.Setting(`base`, `addExperience`).Float64(`register`)
+	if err = FireSignUp(f.OfficialCustomer); err != nil {
+		return err
+	}
 	if err = f.AddRewardOnSignUp(integral); err != nil {
 		return err
 	}

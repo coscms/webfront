@@ -16,9 +16,18 @@ func (e Events) Execute(customer *dbschema.OfficialCustomer) error {
 }
 
 var (
+	onSignUp  Events
 	onSignIn  Events
 	onSignOut Events
 )
+
+func OnSignUp(f Event) {
+	onSignUp = append(onSignUp, f)
+}
+
+func FireSignUp(customer *dbschema.OfficialCustomer) error {
+	return onSignUp.Execute(customer)
+}
 
 func OnSignIn(f Event) {
 	onSignIn = append(onSignIn, f)
