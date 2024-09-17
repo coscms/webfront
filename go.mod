@@ -45,7 +45,7 @@ require (
 	github.com/webx-top/client v0.9.4
 	github.com/webx-top/com v1.3.2
 	github.com/webx-top/db v1.27.10
-	github.com/webx-top/echo v1.9.9
+	github.com/webx-top/echo v1.9.11
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1
 	github.com/webx-top/image v0.1.1
@@ -62,7 +62,7 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
-	github.com/coscms/webcore v0.1.5
+	github.com/coscms/webcore v0.1.6
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.28.0
@@ -106,7 +106,7 @@ require (
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.3.0 // indirect
+	github.com/admpub/i18n v0.3.2 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/ini v1.38.2 // indirect
