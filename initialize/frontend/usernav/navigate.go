@@ -106,7 +106,7 @@ var LeftNavigate = &navigate.List{
 				Display:  true,
 				Name:     `我的短链接`,
 				Action:   `list`,
-				Icon:     `table`,
+				Icon:     `link`,
 				Children: &navigate.List{},
 			},
 		},
