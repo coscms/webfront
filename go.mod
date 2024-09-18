@@ -4,6 +4,8 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
+require github.com/coscms/webcore v0.1.8
+
 require (
 	github.com/RichardKnop/machinery v1.10.8
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
@@ -62,7 +64,6 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
-	github.com/coscms/webcore v0.1.7
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.28.0
