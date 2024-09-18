@@ -52,7 +52,7 @@ func AppendBackendAssetsDir(assetsDir string) {
 }
 
 func PrependFrontendAssetsDir(assetsDir string) {
-	oldRoot := bindata.StaticOptions.Root
+	oldRoot := StaticOptions.Root
 	StaticOptions.Root = assetsDir
 	if len(oldRoot) == 0 {
 		frontend.AssetsDir = filepath.Join(WebxDir, frontend.DefaultAssetsDir) //素材文件夹
