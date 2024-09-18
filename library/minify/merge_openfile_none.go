@@ -8,18 +8,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coscms/webcore/initialize/backend"
 	bindataBackend "github.com/coscms/webcore/library/bindata"
-	"github.com/coscms/webfront/initialize/frontend"
 	bindataFrontend "github.com/coscms/webfront/library/bindata"
 )
 
 func openfile(asset string, file string) (http.File, error) {
 	var afile string
 	if asset == `AssetsURL` {
-		afile = filepath.Join(backend.AssetsDir, file)
+		afile = filepath.Join(bindataBackend.StaticOptions.Root, file)
 	} else {
-		afile = filepath.Join(frontend.AssetsDir, file)
+		afile = filepath.Join(bindataFrontend.StaticOptions.Root, file)
 	}
 	f, err := os.Open(afile)
 	if err == nil {
