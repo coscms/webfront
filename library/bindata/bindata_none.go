@@ -37,6 +37,34 @@ func init() {
 	module.FrontendMisc.Assets = StaticOptions
 }
 
+func PrependBackendAssetsDir(assetsDir string) {
+	oldRoot := bindata.StaticOptions.Root
+	bindata.StaticOptions.Root = assetsDir
+	if len(oldRoot) == 0 {
+		backend.AssetsDir = filepath.Join(NgingDir, backend.DefaultAssetsDir) //素材文件夹
+		oldRoot = backend.AssetsDir
+	}
+	bindata.StaticOptions.AddFallback(oldRoot)
+}
+
+func AppendBackendAssetsDir(assetsDir string) {
+	bindata.StaticOptions.AddFallback(assetsDir)
+}
+
+func PrependFrontendAssetsDir(assetsDir string) {
+	oldRoot := bindata.StaticOptions.Root
+	StaticOptions.Root = assetsDir
+	if len(oldRoot) == 0 {
+		frontend.AssetsDir = filepath.Join(WebxDir, frontend.DefaultAssetsDir) //素材文件夹
+		oldRoot = frontend.AssetsDir
+	}
+	StaticOptions.AddFallback(oldRoot)
+}
+
+func AppendFrontendAssetsDir(assetsDir string) {
+	StaticOptions.AddFallback(assetsDir)
+}
+
 // Initialize 后台和前台模板等素材初始化配置
 func Initialize(callbacks ...func()) {
 	backend.AssetsDir = filepath.Join(NgingDir, `public/assets/backend`)
