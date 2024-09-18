@@ -211,6 +211,9 @@ func replaceCSSImportURL(s string, pageURL string, combinedPath string) string {
 	s = strings.TrimPrefix(s, `url(`)
 	s = strings.TrimSuffix(s, `)`)
 	s = strings.Trim(s, `"'`)
+	if strings.HasPrefix(s, `data:`) { // data:application/x-font-woff2;charset=utf-8;base64,
+		return s
+	}
 	s = absURLPath(s, pageURL)
 	s = resolveURLPath(s, combinedPath)
 	return `url(` + s + `)`
