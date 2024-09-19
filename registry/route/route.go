@@ -36,6 +36,14 @@ func IRegister() route.IRegister {
 	return routeRegister
 }
 
+func SetPrefix(prefix string) route.IRegister {
+	return routeRegister.SetPrefix(prefix)
+}
+
+func Prefix() string {
+	return routeRegister.Prefix()
+}
+
 func MetaHandler(handler interface{}, m echo.H, requests ...interface{}) echo.Handler {
 	return routeRegister.MetaHandler(m, handler, requests...)
 }

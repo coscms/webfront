@@ -42,12 +42,11 @@ const (
 )
 
 var (
-	Prefix             string = os.Getenv(`NGING_FRONTEND_URL_PREFIX`)
 	StaticMW           interface{}
 	TemplateDir        = DefaultTemplateDir //模板文件夹
 	AssetsDir          = DefaultAssetsDir   //素材文件夹
-	AssetsURLPath      = Prefix + DefaultAssetsURLPath
-	StaticRootURLPath  = Prefix + `/public/`
+	AssetsURLPath      = DefaultAssetsURLPath
+	StaticRootURLPath  = `/public/`
 	RendererDo         = func(driver.Driver) {}
 	TmplCustomParser   func(tmpl string, content []byte) []byte
 	DefaultMiddlewares = []interface{}{}
@@ -59,20 +58,18 @@ func init() {
 			c.Sys.ReloadRealIPConfig(&newConfig.Sys, IRegister().Echo().RealIPConfig())
 		})
 	})
-	echo.Set(`FrontendPrefix`, Prefix)
-	bootconfig.OnStart(1, start)
+	prefix := os.Getenv(`NGING_FRONTEND_URL_PREFIX`)
+	if len(prefix) > 0 {
+		SetPrefix(prefix)
+	}
+	bootconfig.OnStart(1, InitWebServer)
 }
 
 func SetPrefix(prefix string) {
-	Prefix = prefix
+	IRegister().SetPrefix(prefix)
 	AssetsURLPath = prefix + DefaultAssetsURLPath
 	StaticRootURLPath = prefix + `/public/`
 	frontend.AssetsURLPath = AssetsURLPath
-}
-
-func start() {
-	SetPrefix(echo.String(`FrontendPrefix`))
-	InitWebServer()
 }
 
 func InitWebServer() {
@@ -86,7 +83,7 @@ func InitWebServer() {
 			frontendDomain = info.Scheme + `://` + info.Host
 		}
 	}
-	e := IRegister().Echo().SetPrefix(Prefix)
+	e := IRegister().Echo()
 	config.FromFile().Sys.SetRealIPParams(IRegister().Echo().RealIPConfig())
 	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
 	e.SetDefaultExtension(RouteDefaultExtension)

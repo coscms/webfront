@@ -35,4 +35,5 @@ var (
 	RegisterToGroup    = route.RegisterToGroup
 	Host               = route.Host
 	Apply              = route.Apply
+	Prefix             = route.Prefix
 )

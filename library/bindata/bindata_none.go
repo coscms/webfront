@@ -98,9 +98,9 @@ func Initialize(callbacks ...func()) {
 		StaticOptions.Root = frontend.AssetsDir
 	}
 	if len(StaticOptions.Path) == 0 {
-		StaticOptions.Path = frontend.Prefix + "/public/assets/frontend/"
+		StaticOptions.Path = frontend.Prefix() + "/public/assets/frontend/"
 	}
-	StaticOptions.TrimPrefix = frontend.Prefix
+	StaticOptions.TrimPrefix = frontend.Prefix()
 	frontend.StaticMW = middleware.Static(StaticOptions)
 	frontendTemplateDir := filepath.Join(WebxDir, `template/frontend`)
 	frontend.TmplPathFixers.PathAliases.AddAllSubdir(frontendTemplateDir)
