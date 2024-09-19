@@ -200,8 +200,8 @@ func addMiddleware(e *echo.Echo) {
 		return nil
 	}, `clear-frontend-template-object-cache`)
 	echo.OnCallback(`webx.frontend.close`, func(_ echo.Event) error {
-		log.Debug(`close: Frontend Template Manager`)
 		if renderOptions.Renderer() != nil {
+			log.Debug(`close: Frontend Template Manager`)
 			renderOptions.Renderer().Close()
 		}
 		renderOptions = nil
