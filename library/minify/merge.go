@@ -101,6 +101,7 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 						log.Errorf(`[minify][merge]%s: %v`, file, err)
 					} else {
 						content := engine.Bytes2str(b)
+						content = strings.TrimSpace(content)
 						if typ == `css` {
 							var pageURL string
 							if asset == `AssetsURL` {
@@ -109,6 +110,10 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 								pageURL = path.Join(frontend.AssetsURLPath, file)
 							}
 							content = d.ReplaceCSSImportURL(content, pageURL, combinedPath)
+						} else {
+							if !strings.HasSuffix(content, `;`) {
+								content += `;`
+							}
 						}
 						combinedContent += content + "\n"
 					}
