@@ -37,6 +37,7 @@ func init() {
 	module.FrontendMisc.Assets = StaticOptions
 }
 
+// PrependBackendAssetsDir 往前插入后台素材文件夹
 func PrependBackendAssetsDir(assetsDir string) {
 	oldRoot := bindata.StaticOptions.Root
 	bindata.StaticOptions.Root = assetsDir
@@ -47,10 +48,12 @@ func PrependBackendAssetsDir(assetsDir string) {
 	bindata.StaticOptions.AddFallback(oldRoot)
 }
 
+// AppendBackendAssetsDir 追加后台素材文件夹
 func AppendBackendAssetsDir(assetsDir string) {
 	bindata.StaticOptions.AddFallback(assetsDir)
 }
 
+// PrependFrontendAssetsDir 往前插入前台素材文件夹
 func PrependFrontendAssetsDir(assetsDir string) {
 	oldRoot := StaticOptions.Root
 	StaticOptions.Root = assetsDir
@@ -61,6 +64,7 @@ func PrependFrontendAssetsDir(assetsDir string) {
 	StaticOptions.AddFallback(oldRoot)
 }
 
+// AppendFrontendAssetsDir 追加前台素材文件夹
 func AppendFrontendAssetsDir(assetsDir string) {
 	StaticOptions.AddFallback(assetsDir)
 }

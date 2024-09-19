@@ -35,21 +35,21 @@ import (
 
 const (
 	Name                  = `frontend`
-	DefaultTemplateDir    = `./template/` + Name
-	DefaultAssetsDir      = `./public/assets/frontend`
-	DefaultAssetsURLPath  = `/public/assets/frontend`
-	RouteDefaultExtension = `.html`
+	DefaultTemplateDir    = `./template/` + Name       // 前台模板路径默认值
+	DefaultAssetsDir      = `./public/assets/frontend` // 前台素材路径默认值
+	DefaultAssetsURLPath  = `/public/assets/frontend`  // 前台素材网址路径默认值
+	RouteDefaultExtension = `.html`                    // 前台网页扩展名默认值
 )
 
 var (
-	StaticMW           interface{}
-	TemplateDir        = DefaultTemplateDir //模板文件夹
-	AssetsDir          = DefaultAssetsDir   //素材文件夹
-	AssetsURLPath      = DefaultAssetsURLPath
-	StaticRootURLPath  = `/public/`
-	RendererDo         = func(driver.Driver) {}
-	TmplCustomParser   func(tmpl string, content []byte) []byte
-	DefaultMiddlewares = []interface{}{}
+	StaticMW           interface{}                              //前台静态文件中间件
+	TemplateDir        = DefaultTemplateDir                     //前台模板文件夹
+	AssetsDir          = DefaultAssetsDir                       //前台素材文件夹
+	AssetsURLPath      = DefaultAssetsURLPath                   //前台素材网址路径
+	StaticRootURLPath  = `/public/`                             //前台素材网址根路径
+	RendererDo         = func(driver.Driver) {}                 //前台模板引擎配置函数
+	TmplCustomParser   func(tmpl string, content []byte) []byte //前台模板自定义解析函数
+	DefaultMiddlewares = []interface{}{}                        //前台默认中间件
 )
 
 func init() {
