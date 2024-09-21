@@ -67,7 +67,7 @@ func NavigateList(ctx echo.Context, m *dbschema.OfficialCommonNavigate, navType 
 			db.Cond{`type`: navType},
 		))
 		for _, _nav := range nav {
-			_nav.SetContext(ctx)
+			_nav.Init().SetContext(ctx)
 		}
 		ctx.Internal().Set(internalKey, nav)
 	}

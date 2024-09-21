@@ -1,6 +1,8 @@
 package official
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/webx-top/com"
@@ -116,17 +118,32 @@ func (f *Navigate) ParentIds(parentID uint) []uint {
 	return result
 }
 
-func (f *Navigate) Add() (pk interface{}, err error) {
-	f.Context().Begin()
-	defer func() {
-		f.Context().End(err == nil)
-	}()
+func (f *Navigate) check() error {
+	var err error
+	if strings.HasPrefix(f.Ident, `regexp:`) {
+		expr := strings.TrimPrefix(f.Ident, `regexp:`)
+		_, err = regexp.Compile(expr)
+		if err != nil {
+			err = fmt.Errorf(expr+`: %w`, err)
+		}
+	}
 	if len(f.Type) == 0 {
 		f.Type = `default`
 	}
 	if len(f.LinkType) == 0 {
 		f.LinkType = `custom`
 	}
+	return err
+}
+
+func (f *Navigate) Add() (pk interface{}, err error) {
+	if err = f.check(); err != nil {
+		return
+	}
+	f.Context().Begin()
+	defer func() {
+		f.Context().End(err == nil)
+	}()
 	err = f.Exists(f.Title, f.Type)
 	if err != nil {
 		return
@@ -165,6 +182,9 @@ func (f *Navigate) Add() (pk interface{}, err error) {
 }
 
 func (f *Navigate) Edit(mw func(db.Result) db.Result, args ...interface{}) (err error) {
+	if err = f.check(); err != nil {
+		return
+	}
 	f.Context().Begin()
 	defer func() {
 		if err == nil {
@@ -172,12 +192,6 @@ func (f *Navigate) Edit(mw func(db.Result) db.Result, args ...interface{}) (err 
 		}
 		f.Context().End(err == nil)
 	}()
-	if len(f.Type) == 0 {
-		f.Type = `default`
-	}
-	if len(f.LinkType) == 0 {
-		f.LinkType = `custom`
-	}
 	if err = f.ExistsOther(f.Title, f.Type, f.Id); err != nil {
 		return err
 	}

@@ -41,7 +41,7 @@ func init() {
 				},
 				isActive: GenActiveDetector(`categoryId`, category.Id),
 			}
-			navExt.SetContext(ctx)
+			navExt.Init().SetContext(ctx)
 			if category.ParentId < 1 {
 				list = append(list, navExt)
 				continue
@@ -84,10 +84,33 @@ func GenActiveDetector(categoryKey string, categoryID uint) func(ctx echo.Contex
 
 type NavigateExt struct {
 	*dbschema.OfficialCommonNavigate
-	isInside null.Bool // 是否是内部链接
-	isActive func(echo.Context) bool
-	Children *[]*NavigateExt
-	Extra    echo.H
+	identRegexp *regexp.Regexp
+	isInside    null.Bool // 是否是内部链接
+	isActive    func(echo.Context) bool
+	Children    *[]*NavigateExt
+	Extra       echo.H
+}
+
+func (f *NavigateExt) initIdentRegexp() error {
+	if f.identRegexp != nil {
+		return nil
+	}
+	var err error
+	if strings.HasPrefix(f.Ident, `regexp:`) {
+		expr := strings.TrimPrefix(f.Ident, `regexp:`)
+		f.identRegexp, err = regexp.Compile(expr)
+		if err != nil {
+			log.Error(expr+`: `, err)
+		}
+	}
+	return err
+}
+
+func (f *NavigateExt) Init() *NavigateExt {
+	if len(f.Ident) > 0 {
+		f.initIdentRegexp()
+	}
+	return f
 }
 
 func (f *NavigateExt) IsInside() bool {
@@ -124,14 +147,12 @@ func (f *NavigateExt) IsActive() bool {
 		return true
 	}
 	if len(f.Ident) > 0 {
-		if strings.HasPrefix(f.Ident, `regexp:`) {
-			expr := strings.TrimPrefix(f.Ident, `regexp:`)
-			re, err := regexp.Compile(expr)
-			if err != nil {
-				log.Error(expr+`: `, err)
-				return false
-			}
-			return re.MatchString(currentPath)
+		err := f.initIdentRegexp()
+		if err != nil {
+			return false
+		}
+		if f.identRegexp != nil {
+			return f.identRegexp.MatchString(currentPath)
 		}
 		return strings.HasSuffix(currentPath, f.Ident)
 	}
