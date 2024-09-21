@@ -104,19 +104,23 @@ func GenOptions(ctx echo.Context, cacheSeconds int64) []x.GetOption {
 	return opts
 }
 
-func xNew(query x.Querier, ttlSeconds int64, args ...string) *x.Cachex {
+func xNewFromPool(query x.Querier, ttlSeconds int64, args ...string) *x.Cachex {
 	c := Cache(cacheRootContext, args...)
-	return x.New(c, query, ttlSeconds)
+	return x.NewFromPool(c, query, ttlSeconds)
 }
 
 // XQuery 获取缓存，如果不存在则执行函数获取数据并缓存【自动避免缓存穿透】
 func XQuery(ctx context.Context, key string, recv interface{}, query x.Querier, options ...x.GetOption) error {
-	return xNew(query, 0).Get(ctx, key, recv, options...)
+	a := xNewFromPool(query, 0)
+	defer a.Release()
+	return a.Get(ctx, key, recv, options...)
 }
 
 // XFunc 获取缓存，如果不存在则执行函数获取数据并缓存【自动避免缓存穿透】
 func XFunc(ctx context.Context, key string, recv interface{}, fn func() error, options ...x.GetOption) error {
-	return xNew(QueryFunc(fn), 0).Get(ctx, key, recv, options...)
+	a := xNewFromPool(QueryFunc(fn), 0)
+	defer a.Release()
+	return a.Get(ctx, key, recv, options...)
 }
 
 // Delete 删除缓存
