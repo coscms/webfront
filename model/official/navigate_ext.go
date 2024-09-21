@@ -10,11 +10,13 @@ import (
 	"github.com/admpub/null"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/middleware/sessdata"
+	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
 
 var NavigateLinkType = echo.NewKVData()
+var navigateIdentRegexps = lru.NewLRUCache[string, *regexp.Regexp](100)
 
 func init() {
 	NavigateLinkType.Add(`custom`, `自定义链接`)
@@ -91,6 +93,10 @@ type NavigateExt struct {
 	Extra       echo.H
 }
 
+func loader(ctx context.Context, s string) (*regexp.Regexp, error) {
+	return regexp.Compile(s)
+}
+
 func (f *NavigateExt) initIdentRegexp() error {
 	if f.identRegexp != nil {
 		return nil
@@ -98,7 +104,10 @@ func (f *NavigateExt) initIdentRegexp() error {
 	var err error
 	if strings.HasPrefix(f.Ident, `regexp:`) {
 		expr := strings.TrimPrefix(f.Ident, `regexp:`)
-		f.identRegexp, err = regexp.Compile(expr)
+		if len(expr) == 0 {
+			return err
+		}
+		f.identRegexp, err, _ = navigateIdentRegexps.GetOrLoad(context.Background(), expr, loader)
 		if err != nil {
 			log.Error(expr+`: `, err)
 		}

@@ -68,6 +68,7 @@ require (
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.28.0
 	github.com/nging-plugins/dbmanager v1.6.2
+	github.com/phuslu/lru v1.0.16
 	github.com/silenceper/wechat/v2 v2.1.6
 	github.com/tdewolff/minify/v2 v2.20.37
 	github.com/webx-top/restyclient v0.0.4
