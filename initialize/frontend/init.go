@@ -62,7 +62,17 @@ func init() {
 	if len(prefix) > 0 {
 		SetPrefix(prefix)
 	}
-	bootconfig.OnStart(1, InitWebServer)
+	bootconfig.OnStart(0, start)
+}
+
+func start() {
+	if len(config.FromCLI().BackendDomain) == 0 &&
+		len(config.FromCLI().FrontendDomain) == 0 &&
+		len(os.Getenv(`NGING_BACKTEND_URL_PREFIX`)) == 0 &&
+		len(Prefix()) == 0 {
+		backend.SetPrefix(`/admin`)
+	}
+	InitWebServer()
 }
 
 func SetPrefix(prefix string) {
@@ -100,7 +110,8 @@ func InitWebServer() {
 		}
 	}
 	if len(frontendDomain) == 0 {
-		if len(config.FromCLI().BackendDomain) == 0 {
+		if len(config.FromCLI().BackendDomain) == 0 &&
+			len(Prefix()) == 0 && len(backend.Prefix()) == 0 {
 			// 前后台都没有指定域名的时候，给前台强制指定一个域名
 			frontendDomain = `localhost:` + fmt.Sprintf(`%d`, config.FromCLI().Port)
 		}
