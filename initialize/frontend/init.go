@@ -60,7 +60,6 @@ func init() {
 }
 
 func start() {
-	httpserver.Frontend.GlobalFuncMap = frontend.GlobalFuncMap()
 	InitWebServer()
 }
 
@@ -133,6 +132,7 @@ func addMiddleware(e *echo.Echo) {
 	// Prometheus
 	xmetrics.Register(e)
 
+	httpserver.Frontend.GlobalFuncMap = frontend.GlobalFuncMap()
 	// 注册模板引擎
 	if httpserver.Frontend.Renderer() != nil {
 		httpserver.Frontend.Renderer().Close()
