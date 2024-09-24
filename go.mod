@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.3.1-0.20240924083711-cd7734d00a5d
+require github.com/coscms/webcore v0.3.1-0.20240924092716-5edff328751c
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -60,7 +60,6 @@ require (
 )
 
 require (
-	github.com/admpub/confl v0.2.4
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
@@ -91,6 +90,7 @@ require (
 	github.com/admpub/captcha-go v0.0.1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
 	github.com/admpub/checksum v1.1.0 // indirect
+	github.com/admpub/confl v0.2.4 // indirect
 	github.com/admpub/cron v0.1.1 // indirect
 	github.com/admpub/email v2.4.1+incompatible // indirect
 	github.com/admpub/events v1.3.6 // indirect

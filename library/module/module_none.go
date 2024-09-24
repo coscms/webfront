@@ -11,7 +11,7 @@ import (
 )
 
 func SetFrontendTemplate(key string, templatePath string) {
-	module.SetTemplate(bindataBackend.PathAliases, httpserver.Frontend.TmplPathFixers.PathAliases, key, templatePath)
+	module.SetTemplate(bindataBackend.PathAliases, httpserver.Frontend.Template.PathAliases, key, templatePath)
 }
 
 func SetFrontendAssets(assetsPath string) {

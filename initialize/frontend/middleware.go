@@ -17,7 +17,7 @@ func FrontendURLFuncMW() echo.MiddlewareFunc {
 
 func FrontendURLFunc(c echo.Context) error {
 	c.SetFunc(`ThemeInfo`, func() *ntemplate.ThemeInfo {
-		return httpserver.Frontend.TmplPathFixers.ThemeInfo(c)
+		return httpserver.Frontend.Template.ThemeInfo(c)
 	})
 	return nil
 }

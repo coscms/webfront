@@ -120,5 +120,5 @@ func (r *RenderData) Advert(idents ...string) interface{} {
 }
 
 func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
-	return httpserver.Frontend.TmplPathFixers.ThemeInfo(r.ctx)
+	return httpserver.Frontend.Template.ThemeInfo(r.ctx)
 }

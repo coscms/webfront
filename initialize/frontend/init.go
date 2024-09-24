@@ -168,7 +168,7 @@ func addMiddleware(e *echo.Echo) {
 		}
 		return nil
 	}, `close-frontend-template-manager`)
-	e.Use(xMW.UseTheme(httpserver.Frontend.TmplPathFixers.ThemeInfo))
+	e.Use(xMW.UseTheme(httpserver.Frontend.Template.ThemeInfo))
 	e.Use(FrontendURLFuncMW())
 	e.Use(ngingMW.FuncMap())
 	e.Use(xMW.FuncMap())

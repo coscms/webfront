@@ -79,29 +79,29 @@ func Initialize(callbacks ...func()) {
 		panic(err)
 	}
 	log.Debug(`[backend] `, `Template subfolder "official" is relocated to: `, backendTemplateDir)
-	httpserver.Backend.TmplPathFixers.AddDir(`official`, backendTemplateDir)
+	httpserver.Backend.Template.AddDir(`official`, backendTemplateDir)
 
 	// 应用后台模块的文件别名分组到后台模板路径修正器
-	httpserver.Backend.TmplPathFixers.ApplyAliases()
+	httpserver.Backend.Template.ApplyAliases()
 
 	httpserver.Backend.RendererDo = func(renderer driver.Driver) {
-		httpserver.Backend.TmplPathFixers.Register(renderer, backendTemplateDir)
+		httpserver.Backend.Template.Register(renderer, backendTemplateDir)
 	}
 	modal.PathFixer = func(c echo.Context, file string) string {
 		file = strings.TrimPrefix(file, httpserver.Backend.TemplateDir+`/`)
-		return httpserver.Backend.TmplPathFixers.Handle(c, ``, file)
+		return httpserver.Backend.Template.Handle(c, ``, file)
 	}
 	httpserver.Frontend.TemplateDir = filepath.Join(WebxDir, frontend.DefaultTemplateDir) //模板文件夹
 	httpserver.Frontend.AssetsDir = filepath.Join(WebxDir, frontend.DefaultAssetsDir)     //素材文件夹
 	//注册前台静态资源
 	frontendTemplateDir := filepath.Join(WebxDir, `template/frontend`)
-	httpserver.Frontend.TmplPathFixers.PathAliases.AddAllSubdir(frontendTemplateDir)
-	//httpserver.Frontend.TmplPathFixers.PathAliases.Add(`default`, frontendTemplateDir)
+	httpserver.Frontend.Template.PathAliases.AddAllSubdir(frontendTemplateDir)
+	//httpserver.Frontend.Template.PathAliases.Add(`default`, frontendTemplateDir)
 
 	// 应用前台模块的文件别名分组到前台模板路径修正器
-	httpserver.Frontend.TmplPathFixers.ApplyAliases()
+	httpserver.Frontend.Template.ApplyAliases()
 
 	httpserver.Frontend.RendererDo = func(renderer driver.Driver) {
-		httpserver.Frontend.TmplPathFixers.SetEnableTheme(true).Register(renderer)
+		httpserver.Frontend.Template.SetEnableTheme(true).Register(renderer)
 	}
 }
