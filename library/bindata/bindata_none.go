@@ -71,6 +71,7 @@ func AppendFrontendAssetsDir(assetsDir string) {
 
 // Initialize 后台和前台模板等素材初始化配置
 func Initialize(callbacks ...func()) {
+	frontend.AutoBackendPrefix()
 	backend.AssetsDir = filepath.Join(NgingDir, `public/assets/backend`)
 	backend.TemplateDir = filepath.Join(NgingDir, `template/backend`)
 	bindata.StaticOptions.AddFallback(filepath.Join(WebxDir, `public/assets/backend`))

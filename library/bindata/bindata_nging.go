@@ -24,6 +24,7 @@ import (
 )
 
 func Initialize(callbacks ...func()) {
+	frontend.AutoBackendPrefix()
 	bindata.BackendTmplAssetPrefix = "template"
 	bindata.FrontendTmplAssetPrefix = "template"
 	if len(callbacks) > 0 && callbacks[0] != nil {

@@ -66,12 +66,6 @@ func init() {
 }
 
 func start() {
-	if len(config.FromCLI().BackendDomain) == 0 &&
-		len(config.FromCLI().FrontendDomain) == 0 &&
-		len(os.Getenv(`NGING_BACKTEND_URL_PREFIX`)) == 0 &&
-		len(Prefix()) == 0 {
-		backend.SetPrefix(`/admin`)
-	}
 	InitWebServer()
 }
 
