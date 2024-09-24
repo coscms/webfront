@@ -1,7 +1,7 @@
 package userhome
 
 import (
-	"github.com/coscms/webcore/registry/dashboard"
+	"github.com/coscms/webcore/library/dashboard"
 	"github.com/webx-top/echo"
 )
 

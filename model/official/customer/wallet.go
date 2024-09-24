@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/xdatabase"
 	"github.com/coscms/webfront/middleware/sessdata"
@@ -89,7 +90,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		if flow.AmountType == `balance` { // 余额操作
 			if flow.Amount < 0 { // 扣款操作
 				f.Context().Rollback()
-				return common.ErrBalanceNoEnough.SetZone(`balance`)
+				return nerrors.ErrBalanceNoEnough.SetZone(`balance`)
 			}
 			// 加款操作
 			f.Balance = flow.Amount
@@ -138,7 +139,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 			if sessdata.User(f.Context()) != nil {
 				return f.Context().NewError(code.BalanceNoEnough, `扣除余额(%v)失败！客户(ID:%d)的余额不足`, flow.Amount, flow.CustomerId).SetZone(`balance`)
 			}
-			return common.ErrBalanceNoEnough
+			return nerrors.ErrBalanceNoEnough
 		}
 		err = f.UpdateFields(nil, kvset, cond)
 	}

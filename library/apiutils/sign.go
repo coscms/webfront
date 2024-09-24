@@ -3,8 +3,8 @@ package apiutils
 import (
 	"net/url"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 )
 
@@ -16,7 +16,7 @@ func SignString(raw string) string {
 // CheckSign 检查签名是否匹配
 func CheckSign(raw string, sign string) error {
 	if SignString(raw) != sign {
-		return common.ErrInvalidSign
+		return nerrors.ErrInvalidSign
 	}
 	return nil
 }

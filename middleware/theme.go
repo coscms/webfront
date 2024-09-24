@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/coscms/webfront/library/xtemplate"
+	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/webx-top/echo"
 )
 
@@ -16,7 +16,7 @@ func SetTheme(theme string) echo.MiddlewareFuncd {
 }
 
 // UseTheme 使用系统设置的主题
-func UseTheme(fn func(echo.Context) *xtemplate.ThemeInfo) echo.MiddlewareFuncd {
+func UseTheme(fn func(echo.Context) *ntemplate.ThemeInfo) echo.MiddlewareFuncd {
 	return func(h echo.Handler) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			themeCfg := fn(c)

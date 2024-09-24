@@ -14,6 +14,7 @@ import (
 	dbschemaNging "github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/top"
@@ -219,7 +220,7 @@ func (f *Message) AddData(customer *dbschema.OfficialCustomer, user *dbschemaNgi
 			}
 		} else {
 			f.Context().Rollback()
-			return nil, common.ErrUserNotLoggedIn
+			return nil, nerrors.ErrUserNotLoggedIn
 		}
 		if msgM.RootId > 0 {
 			f.RootId = msgM.RootId

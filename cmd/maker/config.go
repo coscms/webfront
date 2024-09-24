@@ -9,7 +9,7 @@ import (
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 
-	"github.com/coscms/webcore/registry/navigate"
+	"github.com/coscms/webcore/library/navigate"
 )
 
 // HandlerConfig Handler配置

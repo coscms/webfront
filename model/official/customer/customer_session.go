@@ -4,7 +4,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/webx-top/db"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/sessionguard"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/middleware/sessdata"
@@ -32,7 +32,7 @@ func (f *Customer) VerifySession(customers ...*dbschema.OfficialCustomer) error 
 		customer, _ = f.Context().Session().Get(`customer`).(*dbschema.OfficialCustomer)
 	}
 	if customer == nil {
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	detail, err := f.GetDetail(db.Cond{`id`: customer.Id})
 	if err != nil {
@@ -40,16 +40,16 @@ func (f *Customer) VerifySession(customers ...*dbschema.OfficialCustomer) error 
 			return err
 		}
 		f.UnsetSession()
-		return common.ErrUserNotFound
+		return nerrors.ErrUserNotFound
 	}
 	if detail.OfficialCustomer.SessionId != f.Context().Session().ID() {
 		f.UnsetSession()
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	if !sessionguard.Validate(f.Context(), ``, `customer`, detail.Id) {
 		log.Warn(f.Context().T(`客户“%s”的会话环境发生改变，需要重新登录`, detail.Name))
 		f.UnsetSession()
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	if detail.OfficialCustomer.Updated != customer.Updated {
 		f.SetSession(detail.OfficialCustomer)

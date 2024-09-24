@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/tplfunc"
@@ -269,7 +269,7 @@ func ParseEncodedURL(encodedURL string) (string, int64, error) {
 		jsonBytes := com.Str2bytes(rawURL)
 		err := json.Unmarshal(jsonBytes, &data)
 		if err != nil {
-			return rawURL, expiry, common.JSONBytesParseError(err, jsonBytes)
+			return rawURL, expiry, nerrors.JSONBytesParseError(err, jsonBytes)
 		}
 		rawURL = data.String(`url`)
 		if len(rawURL) == 0 {

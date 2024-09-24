@@ -3,8 +3,8 @@ package frontend
 import (
 	"sync"
 
-	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webfront/library/top"
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/webx-top/echo/middleware/tplfunc"
@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	AssetsURLPath = `/public/assets/frontend`
-	tplFuncMap    map[string]interface{}
-	tplOnce       sync.Once
+	tplFuncMap map[string]interface{}
+	tplOnce    sync.Once
 )
 
 func initTplFuncMap() {
@@ -50,7 +49,7 @@ func addGlobalFuncMap(fm map[string]interface{}) map[string]interface{} {
 }
 
 func getAssetsURL(paths ...string) (r string) {
-	r = backend.AssetsURLPath
+	r = httpserver.Backend.AssetsURLPath
 	if assetsCDN := config.Setting(`base`, `assetsCDN`).String(`backend`); len(assetsCDN) > 0 {
 		r = assetsCDN
 	}
@@ -61,7 +60,7 @@ func getAssetsURL(paths ...string) (r string) {
 }
 
 func getAssetsXURL(paths ...string) (r string) {
-	r = AssetsURLPath
+	r = httpserver.Frontend.AssetsURLPath
 	if assetsCDN := config.Setting(`base`, `assetsCDN`).String(`frontend`); len(assetsCDN) > 0 {
 		r = assetsCDN
 	}

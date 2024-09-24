@@ -11,6 +11,7 @@ import (
 
 	"github.com/admpub/errors"
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
 )
 
@@ -30,7 +31,7 @@ type PrepaidCard struct {
 func (f *PrepaidCard) check() error {
 	ctx := f.Context()
 	if f.Uid < 1 {
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	if f.Amount < 1 {
 		return ctx.NewError(code.InvalidParameter, `面值无效，必须大于0`).SetZone(`amount`)

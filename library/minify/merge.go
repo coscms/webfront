@@ -8,9 +8,8 @@ import (
 	"strings"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/config"
-	"github.com/coscms/webfront/library/frontend"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
@@ -56,7 +55,7 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 	if !fileNoop {
 		com.MkdirAll(savDir, os.ModePerm)
 	}
-	combinedPath := path.Join(backend.AssetsURLPath, `combined`)
+	combinedPath := path.Join(httpserver.Backend.AssetsURLPath, `combined`)
 	var groups []string
 	files := map[string][]string{}
 	eqNextGroup := func(k int, group string) bool {
@@ -105,9 +104,9 @@ func (m *myMinify) mergeBy(s string, typ string, fileNoop bool, hasBackendCDN bo
 						if typ == `css` {
 							var pageURL string
 							if asset == `AssetsURL` {
-								pageURL = path.Join(backend.AssetsURLPath, file)
+								pageURL = path.Join(httpserver.Backend.AssetsURLPath, file)
 							} else {
-								pageURL = path.Join(frontend.AssetsURLPath, file)
+								pageURL = path.Join(httpserver.Frontend.AssetsURLPath, file)
 							}
 							content = d.ReplaceCSSImportURL(content, pageURL, combinedPath)
 						} else {

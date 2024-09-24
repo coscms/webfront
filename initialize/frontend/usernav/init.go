@@ -1,8 +1,11 @@
 package usernav
 
-import "github.com/coscms/webcore/registry/navigate"
+import (
+	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webcore/library/navigate"
+)
 
 func init() {
-	navigate.Default.Frontend.Add(navigate.Left, LeftNavigate)
-	navigate.Default.Frontend.Add(navigate.Top, TopNavigate)
+	httpserver.Frontend.Navigate.Add(navigate.Left, LeftNavigate)
+	httpserver.Frontend.Navigate.Add(navigate.Top, TopNavigate)
 }

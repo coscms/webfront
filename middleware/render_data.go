@@ -4,11 +4,13 @@ import (
 	"html/template"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/captcha/captchabiz"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/license"
+	"github.com/coscms/webcore/library/nsql"
+	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/logic/articlelogic"
-	"github.com/coscms/webfront/library/xtemplate"
 	"github.com/coscms/webfront/model/official"
 	modelAdvert "github.com/coscms/webfront/model/official/advert"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
@@ -67,20 +69,20 @@ func (r *RenderData) CustomerNav(parentIDs ...uint) []*official.NavigateExt {
 	return NavigateList(r.ctx, dbschema.NewOfficialCommonNavigate(r.ctx), `userCenter`, parentIDs...)
 }
 
-func (r *RenderData) SQLQuery() *common.SQLQuery {
-	return common.NewSQLQuery(r.ctx)
+func (r *RenderData) SQLQuery() *nsql.SQLQuery {
+	return nsql.NewSQLQuery(r.ctx)
 }
 
-func (r *RenderData) SQLQueryLimit(offset int, limit int, linkID ...int) *common.SQLQuery {
-	return common.NewSQLQueryLimit(r.ctx, offset, limit, linkID...)
+func (r *RenderData) SQLQueryLimit(offset int, limit int, linkID ...int) *nsql.SQLQuery {
+	return nsql.NewSQLQueryLimit(r.ctx, offset, limit, linkID...)
 }
 
 func (r *RenderData) CaptchaForm(tmpl string, args ...interface{}) template.HTML {
-	return common.CaptchaForm(r.ctx, tmpl, args...)
+	return captchabiz.CaptchaForm(r.ctx, tmpl, args...)
 }
 
 func (r *RenderData) CaptchaFormWithType(typ string, tmpl string, args ...interface{}) template.HTML {
-	return common.CaptchaFormWithType(r.ctx, typ, tmpl, args...)
+	return captchabiz.CaptchaFormWithType(r.ctx, typ, tmpl, args...)
 }
 
 func (r *RenderData) TagList(group ...string) []*dbschema.OfficialCommonTags {
@@ -117,6 +119,6 @@ func (r *RenderData) Advert(idents ...string) interface{} {
 	return modelAdvert.GetAdvertForHTML(r.ctx, idents...)
 }
 
-func (r *RenderData) ThemeInfo() *xtemplate.ThemeInfo {
-	return xtemplate.Frontend().ThemeInfo(r.ctx)
+func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
+	return httpserver.Frontend.TmplPathFixers.ThemeInfo(r.ctx)
 }

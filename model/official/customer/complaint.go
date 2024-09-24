@@ -6,6 +6,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
 )
 
@@ -25,7 +26,7 @@ func (f *Complaint) check() error {
 		return f.Context().E(`请选择投诉类型`)
 	}
 	if f.CustomerId < 1 {
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	if f.TargetId < 1 && len(f.TargetIdent) == 0 {
 		return f.Context().E(`投诉对象id无效`)

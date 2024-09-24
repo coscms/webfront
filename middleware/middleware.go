@@ -15,8 +15,9 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/license"
+	nav "github.com/coscms/webcore/library/navigate"
+	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
-	nav "github.com/coscms/webcore/registry/navigate"
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend/usernav"
@@ -116,7 +117,7 @@ func userCenter(c echo.Context, customer *dbschema.OfficialCustomer) error {
 	m := modelCustomer.NewCustomer(c)
 	err := m.VerifySession(customer)
 	if err != nil {
-		if common.IsUserNotLoggedIn(err) {
+		if nerrors.IsUserNotLoggedIn(err) {
 			common.SendErr(c, err)
 			return goToSignIn(c)
 		}
@@ -176,7 +177,7 @@ func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, perm
 	}
 	route = strings.TrimPrefix(route, `/user/`)
 	if !permission.Check(ctx, route) {
-		return common.ErrUserNoPerm
+		return nerrors.ErrUserNoPerm
 	}
 	return nil
 }

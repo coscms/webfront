@@ -4,9 +4,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/cron"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
@@ -44,8 +45,8 @@ func EmailSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, titl
 		}
 	}
 	vm.Verification.Reset()
-	data := common.VerifyCaptcha(ctx, frontend.Name, `code`)
-	if common.IsFailureCode(data.GetCode()) {
+	data := captchabiz.VerifyCaptcha(ctx, frontend.Name, `code`)
+	if nerrors.IsFailureCode(data.GetCode()) {
 		return nil
 	}
 	if m.EmailBind != `Y` {

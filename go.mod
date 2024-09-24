@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.2.3
+require github.com/coscms/webcore v0.3.1-0.20240924083711-cd7734d00a5d
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -72,7 +72,6 @@ require (
 	github.com/silenceper/wechat/v2 v2.1.6
 	github.com/tdewolff/minify/v2 v2.20.37
 	github.com/webx-top/restyclient v0.0.4
-	github.com/webx-top/validator v0.3.0
 )
 
 require (
@@ -256,6 +255,7 @@ require (
 	github.com/webx-top/codec v0.3.0 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
+	github.com/webx-top/validator v0.3.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect

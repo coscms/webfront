@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -11,19 +10,14 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine/mock"
 	"github.com/webx-top/echo/handler/captcha"
-	"github.com/webx-top/echo/middleware"
-	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/render"
-	"github.com/webx-top/echo/middleware/render/driver"
-	"github.com/webx-top/echo/middleware/session"
 	"github.com/webx-top/echo/subdomains"
-	"github.com/webx-top/validator"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
 	backendLib "github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	ngingMW "github.com/coscms/webcore/middleware"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/frontend"
@@ -31,26 +25,19 @@ import (
 	"github.com/coscms/webfront/library/xmetrics"
 	xMW "github.com/coscms/webfront/middleware"
 	"github.com/coscms/webfront/model/official"
+
+	_ "github.com/coscms/webfront/library/formbuilder"
 )
 
 const (
 	Name                  = `frontend`
-	DefaultTemplateDir    = `./template/` + Name       // 前台模板路径默认值
+	DefaultTemplateDir    = `./template/frontend`      // 前台模板路径默认值
 	DefaultAssetsDir      = `./public/assets/frontend` // 前台素材路径默认值
 	DefaultAssetsURLPath  = `/public/assets/frontend`  // 前台素材网址路径默认值
 	RouteDefaultExtension = `.html`                    // 前台网页扩展名默认值
 )
 
-var (
-	StaticMW           interface{}                              //前台静态文件中间件
-	TemplateDir        = DefaultTemplateDir                     //前台模板文件夹
-	AssetsDir          = DefaultAssetsDir                       //前台素材文件夹
-	AssetsURLPath      = DefaultAssetsURLPath                   //前台素材网址路径
-	StaticRootURLPath  = `/public/`                             //前台素材网址根路径
-	RendererDo         = func(driver.Driver) {}                 //前台模板引擎配置函数
-	TmplCustomParser   func(tmpl string, content []byte) []byte //前台模板自定义解析函数
-	DefaultMiddlewares = []interface{}{}                        //前台默认中间件
-)
+var TmplCustomParser func(tmpl string, content []byte) []byte
 
 func init() {
 	config.AddConfigInitor(func(c *config.Config) {
@@ -62,18 +49,23 @@ func init() {
 	if len(prefix) > 0 {
 		SetPrefix(prefix)
 	}
+	httpserver.Frontend.SetRouter(IRegister())
+	httpserver.Frontend.RouteDefaultExtension = RouteDefaultExtension
+	httpserver.Frontend.HostCheckerRegexpKey = `frontend.hostRuleRegexp`
+	httpserver.Frontend.FuncSetters = []func(echo.Context) error{
+		FrontendURLFunc,
+		xMW.SetFunc,
+	}
 	bootconfig.OnStart(0, start)
 }
 
 func start() {
+	httpserver.Frontend.GlobalFuncMap = frontend.GlobalFuncMap()
 	InitWebServer()
 }
 
 func SetPrefix(prefix string) {
-	IRegister().SetPrefix(prefix)
-	AssetsURLPath = prefix + DefaultAssetsURLPath
-	StaticRootURLPath = prefix + `/public/`
-	frontend.AssetsURLPath = AssetsURLPath
+	httpserver.Frontend.SetPrefix(prefix)
 }
 
 func InitWebServer() {
@@ -87,10 +79,9 @@ func InitWebServer() {
 			frontendDomain = info.Scheme + `://` + info.Host
 		}
 	}
-	e := IRegister().Echo()
+	e := httpserver.Frontend.Router.Echo()
 	config.FromFile().Sys.SetRealIPParams(IRegister().Echo().RealIPConfig())
 	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
-	e.SetDefaultExtension(RouteDefaultExtension)
 	if len(config.FromCLI().BackendDomain) > 0 {
 		// 如果指定了后台域名则只能用该域名访问后台。此时将其它域名指向前台
 		subdomains.Default.Default = Name // 设置默认(没有匹配到域名的时候)访问的域名别名
@@ -139,61 +130,27 @@ func addMiddleware(e *echo.Echo) {
 	} else {
 		e.SetDebug(true)
 	}
-	e.Use(middleware.Recover())
-	e.Use(xMW.HostChecker())
-	e.Use(ngingMW.MaxRequestBodySize)
-	if len(DefaultMiddlewares) == 0 {
-		if !config.FromFile().Sys.DisableHTTPLog {
-			e.Use(middleware.Log())
-		}
-	} else {
-		e.Use(DefaultMiddlewares...)
-	}
-	if StaticMW != nil {
-		e.Use(StaticMW)
-	}
-	e.Use(bootconfig.StaticMW) //后台静态资源(在bindata模式下也包含了前台静态资源)
-
 	// Prometheus
 	xmetrics.Register(e)
 
-	// 启用session
-	e.Use(session.Middleware(config.SessionOptions))
-
-	// 启用多语言支持
-	i18n := language.New(&config.FromFile().Language)
-	e.Use(i18n.Middleware())
-
-	// 启用Validation
-	e.Use(validator.Middleware())
-
-	// 事物支持
-	e.Use(ngingMW.Transaction())
-
 	// 注册模板引擎
-	if renderOptions != nil && renderOptions.Renderer() != nil {
-		renderOptions.Renderer().Close()
-	}
-	renderOptions = &render.Config{
-		TmplDir: TemplateDir,
-		Engine:  `standard`,
-		ParseStrings: map[string]string{
-			`__TMPL__`: TemplateDir,
-		},
-		DefaultHTTPErrorCode: http.StatusOK,
-		Reload:               true,
-		ErrorPages:           config.FromFile().Sys.ErrorPages,
-		ErrorProcessors:      common.ErrorProcessors,
-		FuncMapGlobal:        frontend.GlobalFuncMap(),
+	if httpserver.Frontend.Renderer() != nil {
+		httpserver.Frontend.Renderer().Close()
 	}
 	if echo.String(`LABEL`) != `dev` && config.FromFile().Extend.GetStore(`minify`).Bool(`on`) {
-		renderOptions.CustomParser = TmplCustomParser
+		httpserver.Frontend.SetTmplCustomParser(TmplCustomParser)
+	} else {
+		httpserver.Frontend.SetTmplCustomParser(nil)
 	}
-	if RendererDo != nil {
-		renderOptions.AddRendererDo(RendererDo)
+	keepExtensionPrefixes := []string{httpserver.Frontend.StaticRootURLPath}
+	if config.IsInstalled() {
+		ctx := echo.NewContext(mock.NewRequest(), mock.NewResponse(), e)
+		routeM := official.NewRoutePage(ctx)
+		routes, _ := routeM.ListWithExtensionRoutes(RouteDefaultExtension)
+		keepExtensionPrefixes = append(keepExtensionPrefixes, routes...)
 	}
-	renderOptions.AddFuncSetter(FrontendURLFunc, ngingMW.ErrorPageFunc, xMW.SetFunc)
-	renderOptions.ApplyTo(e, bootconfig.FrontendTmplMgr)
+	httpserver.Frontend.SetKeepExtensionPrefixes(keepExtensionPrefixes)
+	httpserver.Frontend.Apply()
 	echo.OnCallback(`nging.renderer.cache.clear`, func(_ echo.Event) error {
 		log.Debug(`clear: Frontend Template Object Cache`)
 		renderOptions.Renderer().ClearCache()
@@ -201,32 +158,21 @@ func addMiddleware(e *echo.Echo) {
 	}, `clear-frontend-template-object-cache`)
 	echo.OnCallback(`webx.renderer.cache.clear`, func(_ echo.Event) error {
 		log.Debug(`clear: Frontend Template Object Cache`)
-		renderOptions.Renderer().ClearCache()
+		httpserver.Frontend.Renderer().ClearCache()
 		return nil
 	}, `clear-frontend-template-object-cache`)
 	echo.OnCallback(`webx.frontend.close`, func(_ echo.Event) error {
-		if renderOptions.Renderer() != nil {
+		if httpserver.Frontend.Renderer() != nil {
 			log.Debug(`close: Frontend Template Manager`)
-			renderOptions.Renderer().Close()
+			httpserver.Frontend.Renderer().Close()
 		}
-		renderOptions = nil
 		return nil
 	}, `close-frontend-template-manager`)
-	e.Use(xMW.UseTheme(TmplPathFixers.ThemeInfo))
+	e.Use(xMW.UseTheme(httpserver.Frontend.TmplPathFixers.ThemeInfo))
 	e.Use(FrontendURLFuncMW())
 	e.Use(ngingMW.FuncMap())
 	e.Use(xMW.FuncMap())
 	e.Use(render.Auto())
-
-	keepExtensionPrefixes := []string{StaticRootURLPath}
-	if config.IsInstalled() {
-		ctx := echo.NewContext(mock.NewRequest(), mock.NewResponse(), e)
-		routeM := official.NewRoutePage(ctx)
-		routes, _ := routeM.ListWithExtensionRoutes(RouteDefaultExtension)
-		keepExtensionPrefixes = append(keepExtensionPrefixes, routes...)
-	}
-	e.Pre(xMW.TrimPathSuffix(keepExtensionPrefixes...))
-
 	// - verifier or guard -
 
 	// RateLimiter
@@ -243,7 +189,7 @@ func addMiddleware(e *echo.Echo) {
 	captcha.New(``).Wrapper(e)
 	e.Route("GET", `/qrcode`, backendLib.QrCode)
 
-	i18n.Handler(e, `App.i18n`)
+	httpserver.Frontend.I18n().Handler(e, `App.i18n`)
 }
 
 func URLFor(purl string) string {

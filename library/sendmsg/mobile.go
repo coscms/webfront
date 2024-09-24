@@ -12,8 +12,9 @@ import (
 	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/param"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	uploadChecker "github.com/coscms/webcore/registry/upload/checker"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -38,8 +39,8 @@ func MobileSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, mes
 		}
 	}
 	vm.Verification.Reset()
-	data := common.VerifyCaptcha(ctx, frontend.Name, `code`)
-	if common.IsFailureCode(data.GetCode()) {
+	data := captchabiz.VerifyCaptcha(ctx, frontend.Name, `code`)
+	if nerrors.IsFailureCode(data.GetCode()) {
 		return nil
 	}
 	if m.MobileBind != `Y` {

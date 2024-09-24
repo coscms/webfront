@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/css"
 	"github.com/tdewolff/minify/v2/js"
@@ -41,7 +41,7 @@ func (m *myMinify) doinit() {
 	m.minifyM = minify.New()
 	m.minifyM.AddFunc("text/css", css.Minify)
 	m.minifyM.AddFunc("application/javascript", js.Minify)
-	m.saveDir = filepath.Join(backend.AssetsDir, `combined`)
+	m.saveDir = filepath.Join(httpserver.Backend.AssetsDir, `combined`)
 	m.buildTime = config.Version.BuildTime
 	if config.FromFile() == nil || config.FromFile().Extend == nil || !config.FromFile().Extend.GetStore(`minify`).Bool(`disableAutoClear`) {
 		os.RemoveAll(m.saveDir)

@@ -3,9 +3,8 @@ package xcommon
 import (
 	"strings"
 
-	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/common"
-	"github.com/coscms/webfront/library/frontend"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/webx-top/echo"
 )
 
@@ -40,7 +39,7 @@ func SiteSlogan() string {
 func FrontendAssetsURL(ctx echo.Context) string {
 	assetsURL := common.Setting(`base`, `assetsCDN`).String(`frontend`)
 	if len(assetsURL) == 0 {
-		assetsURL = FrontendURL(ctx) + frontend.AssetsURLPath
+		assetsURL = FrontendURL(ctx) + httpserver.Frontend.AssetsURLPath
 	}
 	return assetsURL
 }
@@ -48,7 +47,7 @@ func FrontendAssetsURL(ctx echo.Context) string {
 func BackendAssetsURL(ctx echo.Context) string {
 	assetsURL := common.Setting(`base`, `assetsCDN`).String(`backend`)
 	if len(assetsURL) == 0 {
-		assetsURL = BackendURL(ctx) + backend.AssetsURLPath
+		assetsURL = BackendURL(ctx) + httpserver.Backend.AssetsURLPath
 	}
 	return assetsURL
 }

@@ -3,8 +3,8 @@ package initialize
 import (
 	_ "github.com/coscms/webcore"
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/registry/navigate"
-	_ "github.com/coscms/webfront/initialize/backend"
+	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webcore/library/navigate"
 	_ "github.com/coscms/webfront/library/minify"
 )
 
@@ -14,6 +14,6 @@ var Project = navigate.NewProject(`内容管理`, `webx`, `/official/customer/in
 
 func init() {
 	bootconfig.OfficialHomepage = `https://www.coscms.com`
-	navigate.ProjectGet(`nging`).Name = `其它功能`
-	navigate.ProjectAdd(1, Project)
+	httpserver.Backend.Navigate.Projects.Get(`nging`).Name = `其它功能`
+	httpserver.Backend.Navigate.AddProject(1, Project)
 }

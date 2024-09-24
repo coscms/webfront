@@ -14,9 +14,9 @@ import (
 	"github.com/webx-top/echo/middleware/render/driver"
 	"github.com/webx-top/echo/middleware/render/manager"
 
-	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/bindata"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
 	selfBackend "github.com/coscms/webfront/initialize/backend"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -32,13 +32,13 @@ func Initialize(callbacks ...func()) {
 	}
 	bindata.Initialize()
 
-	backend.AssetsDir = backend.DefaultAssetsDir
-	backend.TemplateDir = backend.DefaultTemplateDir
-	backend.RendererDo = func(renderer driver.Driver) {
+	httpserver.Backend.AssetsDir = backend.DefaultAssetsDir
+	httpserver.Backend.TemplateDir = backend.DefaultTemplateDir
+	httpserver.Backend.RendererDo = func(renderer driver.Driver) {
 		selfBackend.TmplPathFixers.SetCustomFS(bindata.BackendTmplAssetFS).Register(renderer)
 	}
-	frontend.RendererDo = func(renderer driver.Driver) {
-		frontend.TmplPathFixers.SetEnableTheme(true).SetCustomFS(bindata.FrontendTmplAssetFS).Register(renderer)
+	httpserver.Frontend.RendererDo = func(renderer driver.Driver) {
+		httpserver.Frontend.TmplPathFixers.SetEnableTheme(true).SetCustomFS(bindata.FrontendTmplAssetFS).Register(renderer)
 	}
 
 	if echo.String(`LABEL`) != `dev` { // 在开发环境下不启用，避免无法测试 bindata 真实效果
@@ -49,33 +49,31 @@ func Initialize(callbacks ...func()) {
 		fileSystems := xtemplate.NewFileSystems()
 		fileSystems.Register(xtemplate.NewStaticDir(filepath.Join(echo.Wd(), "public/assets"), "/public/assets")) // 注册本地文件系统内的文件
 		fileSystems.Register(xtemplate.NewFileSystemTrimPrefix(frontend.Prefix(), bindata.StaticAssetFS))         // 注册 bindata 打包的文件
-		bootconfig.StaticMW = mwBindata.Static(frontend.Prefix()+"/public/assets", fileSystems)
+		httpserver.Frontend.StaticMW = mwBindata.Static(frontend.Prefix()+"/public/assets", fileSystems)
 
 		// Template file manager
 
 		// 后台
 		backendManagers := []driver.Manager{
-			manager.New(),             // 本地文件系统内的模板文件
-			bootconfig.BackendTmplMgr, // bindata 打包的模板文件
+			manager.New(),              // 本地文件系统内的模板文件
+			httpserver.Backend.TmplMgr, // bindata 打包的模板文件
 		}
-		backendMultiManager := xtemplate.NewMultiManager(backend.TemplateDir, backendManagers...)
+		backendMultiManager := xtemplate.NewMultiManager(httpserver.Backend.TemplateDir, backendManagers...)
 		log.Debugf(`%s Enabled MultiManager (num: %d)`, color.GreenString(`[backend.renderer]`), len(backendManagers))
-		bootconfig.BackendTmplMgr = backendMultiManager
+		httpserver.Backend.TmplMgr = backendMultiManager
 
 		// 前台
 		frontendManagers := []driver.Manager{
-			manager.New(),              // 本地文件系统内的模板文件
-			bootconfig.FrontendTmplMgr, // bindata 打包的模板文件
+			manager.New(),               // 本地文件系统内的模板文件
+			httpserver.Frontend.TmplMgr, // bindata 打包的模板文件
 		}
-		frontendMultiManager := xtemplate.NewMultiManager(frontend.TemplateDir, frontendManagers...)
+		frontendMultiManager := xtemplate.NewMultiManager(httpserver.Frontend.TemplateDir, frontendManagers...)
 		log.Debugf(`%s Enabled MultiManager (num: %d)`, color.GreenString(`[frontend.renderer]`), len(frontendManagers))
-		bootconfig.FrontendTmplMgr = frontendMultiManager
+		httpserver.Frontend.TmplMgr = frontendMultiManager
 	}
 
-	frontend.StaticMW = nil
-
 	modal.PathFixer = func(c echo.Context, file string) string {
-		file = strings.TrimPrefix(file, backend.TemplateDir+`/`)
-		return selfBackend.TmplPathFixers.Handle(c, ``, file)
+		file = strings.TrimPrefix(file, httpserver.Backend.TemplateDir+`/`)
+		return httpserver.Backend.TmplPathFixers.Handle(c, ``, file)
 	}
 }

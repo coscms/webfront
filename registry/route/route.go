@@ -21,6 +21,7 @@ package route
 import (
 	"github.com/webx-top/echo"
 
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/route"
 )
 
@@ -29,11 +30,11 @@ var (
 )
 
 func init() {
-	route.Default.Frontend = routeRegister
+	httpserver.Frontend.SetRouter(routeRegister)
 }
 
 func IRegister() route.IRegister {
-	return routeRegister
+	return httpserver.Frontend.Router
 }
 
 func SetPrefix(prefix string) route.IRegister {
