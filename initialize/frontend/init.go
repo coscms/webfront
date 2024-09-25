@@ -10,6 +10,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine/mock"
 	"github.com/webx-top/echo/handler/captcha"
+	"github.com/webx-top/echo/middleware"
 	"github.com/webx-top/echo/middleware/render"
 	"github.com/webx-top/echo/subdomains"
 
@@ -131,6 +132,16 @@ func addMiddleware(e *echo.Echo) {
 	}
 	// Prometheus
 	xmetrics.Register(e)
+
+	backendStaticMW := httpserver.Backend.GetStaticMW()
+	if backendStaticMW != nil && interface{}(httpserver.Backend.GetStaticMW()) != interface{}(httpserver.Frontend.GetStaticMW()) {
+		middlewares := []interface{}{}
+		if !config.FromFile().Sys.DisableHTTPLog {
+			middlewares = append(middlewares, middleware.Log())
+		}
+		middlewares = append(middlewares, backendStaticMW)
+		httpserver.Frontend.Middlewares = middlewares
+	}
 
 	httpserver.Frontend.GlobalFuncMap = frontend.GlobalFuncMap()
 	// 注册模板引擎
