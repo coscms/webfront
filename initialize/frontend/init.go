@@ -65,6 +65,7 @@ func start() {
 }
 
 func SetPrefix(prefix string) {
+	config.FromFile().Language.SetFSFunc(bootconfig.LangFSFunc)
 	httpserver.Frontend.SetPrefix(prefix)
 }
 
