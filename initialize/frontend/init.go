@@ -58,7 +58,7 @@ func init() {
 		FrontendURLFunc,
 		xMW.SetFunc,
 	}
-	bootconfig.OnStart(0, start)
+	bootconfig.OnStart(-1, start)
 }
 
 func start() {
