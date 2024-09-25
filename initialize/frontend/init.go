@@ -27,7 +27,9 @@ import (
 	xMW "github.com/coscms/webfront/middleware"
 	"github.com/coscms/webfront/model/official"
 
-	_ "github.com/coscms/webfront/library/formbuilder"
+	// 执行 init()
+	_ "github.com/coscms/webfront/library/formbuilder" // 引入表单模板文件
+	_ "github.com/coscms/webfront/registry/route"      //初始化前台服务路由
 )
 
 const (
@@ -50,7 +52,6 @@ func init() {
 	if len(prefix) > 0 {
 		SetPrefix(prefix)
 	}
-	httpserver.Frontend.SetRouter(IRegister())
 	httpserver.Frontend.RouteDefaultExtension = RouteDefaultExtension
 	httpserver.Frontend.HostCheckerRegexpKey = `frontend.hostRuleRegexp`
 	httpserver.Frontend.FuncSetters = []func(echo.Context) error{
@@ -65,11 +66,19 @@ func start() {
 }
 
 func SetPrefix(prefix string) {
-	config.FromFile().Language.SetFSFunc(bootconfig.LangFSFunc)
 	httpserver.Frontend.SetPrefix(prefix)
 }
 
 func InitWebServer() {
+	e := httpserver.Frontend.Router.Echo()
+	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
+	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
+
+	// 子域名设置
+	if len(config.FromCLI().BackendDomain) > 0 {
+		// 如果指定了后台域名则只能用该域名访问后台。此时将其它域名指向前台
+		subdomains.Default.Default = Name // 设置默认(没有匹配到域名的时候)访问的域名别名
+	}
 	var frontendDomain string
 	siteURL := config.Setting(`base`).String(`siteURL`)
 	if len(siteURL) > 0 {
@@ -79,13 +88,6 @@ func InitWebServer() {
 		} else {
 			frontendDomain = info.Scheme + `://` + info.Host
 		}
-	}
-	e := httpserver.Frontend.Router.Echo()
-	config.FromFile().Sys.SetRealIPParams(IRegister().Echo().RealIPConfig())
-	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
-	if len(config.FromCLI().BackendDomain) > 0 {
-		// 如果指定了后台域名则只能用该域名访问后台。此时将其它域名指向前台
-		subdomains.Default.Default = Name // 设置默认(没有匹配到域名的时候)访问的域名别名
 	}
 	if len(frontendDomain) == 0 {
 		frontendDomain = config.FromCLI().FrontendDomain
@@ -112,6 +114,8 @@ func InitWebServer() {
 		frontendDomain = strings.Join(domains, `,`)
 	}
 	subdomains.Default.Add(Name+`@`+frontendDomain, e)
+
+	// 前台服务设置
 	addMiddleware(e)
 	log.Infof(`Registered host: %s@%s`, Name, frontendDomain)
 	e.Get(`/favicon.ico`, faviconHandler)
