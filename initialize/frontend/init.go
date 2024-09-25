@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"reflect"
 	"strings"
 
 	"github.com/admpub/log"
@@ -135,7 +134,7 @@ func addMiddleware(e *echo.Echo) {
 	xmetrics.Register(e)
 
 	backendStaticMW := httpserver.Backend.GetStaticMW()
-	if backendStaticMW != nil && reflect.ValueOf(backendStaticMW).Pointer() != reflect.ValueOf(httpserver.Frontend.GetStaticMW()).Pointer() {
+	if backendStaticMW != nil {
 		middlewares := []interface{}{}
 		if !config.FromFile().Sys.DisableHTTPLog {
 			middlewares = append(middlewares, middleware.Log())

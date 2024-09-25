@@ -39,7 +39,6 @@ func Initialize(callbacks ...func()) {
 	httpserver.Frontend.RendererDo = func(renderer driver.Driver) {
 		httpserver.Frontend.Template.SetEnableTheme(true).SetCustomFS(bindata.FrontendTmplAssetFS).Register(renderer)
 	}
-
 	if echo.String(`LABEL`) != `dev` { // 在开发环境下不启用，避免无法测试 bindata 真实效果
 		// 在 bindata 模式，支持优先读取本地的静态资源文件和模板文件，在没有找到的情况下才读取 bindata 内的文件
 
@@ -49,6 +48,10 @@ func Initialize(callbacks ...func()) {
 		fileSystems.Register(ntemplate.NewStaticDir(filepath.Join(echo.Wd(), "public/assets"), "/public/assets")) // 注册本地文件系统内的文件
 		fileSystems.Register(ntemplate.NewFileSystemTrimPrefix(frontend.Prefix(), bindata.StaticAssetFS))         // 注册 bindata 打包的文件
 		httpserver.Frontend.StaticMW = mwBindata.Static(frontend.Prefix()+"/public/assets", fileSystems)
+		if frontend.Prefix() == backend.Prefix() {
+			httpserver.Backend.StaticMW = httpserver.Frontend.StaticMW
+			httpserver.Frontend.StaticMW = nil
+		}
 
 		// Template file manager
 
