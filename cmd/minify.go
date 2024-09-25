@@ -60,4 +60,5 @@ func minifyRunE(cmd *cobra.Command, args []string) error {
 
 func init() {
 	cmd.Add(minifyCmd)
+	minifyCmd.Flags().IntVar(&minifyIMGOptions.Quality, `quality`, minifyIMGOptions.Quality, `图片保留质量`)
 }
