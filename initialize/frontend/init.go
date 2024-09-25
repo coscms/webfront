@@ -33,7 +33,6 @@ import (
 )
 
 const (
-	Name                  = `frontend`
 	DefaultTemplateDir    = `./template/frontend`      // 前台模板路径默认值
 	DefaultAssetsDir      = `./public/assets/frontend` // 前台素材路径默认值
 	DefaultAssetsURLPath  = `/public/assets/frontend`  // 前台素材网址路径默认值
@@ -77,7 +76,7 @@ func InitWebServer() {
 	// 子域名设置
 	if len(config.FromCLI().BackendDomain) > 0 {
 		// 如果指定了后台域名则只能用该域名访问后台。此时将其它域名指向前台
-		subdomains.Default.Default = Name // 设置默认(没有匹配到域名的时候)访问的域名别名
+		subdomains.Default.Default = httpserver.KindFrontend // 设置默认(没有匹配到域名的时候)访问的域名别名
 	}
 	var frontendDomain string
 	siteURL := config.Setting(`base`).String(`siteURL`)
@@ -113,8 +112,8 @@ func InitWebServer() {
 
 		frontendDomain = strings.Join(domains, `,`)
 	}
-	subdomains.Default.Add(Name+`@`+frontendDomain, e)
-	log.Infof(`Registered host: %s@%s`, Name, frontendDomain)
+	subdomains.Default.Add(httpserver.KindFrontend+`@`+frontendDomain, e)
+	log.Infof(`Registered host: %s@%s`, httpserver.KindFrontend, frontendDomain)
 
 	// 前台服务设置
 	addMiddleware(e)

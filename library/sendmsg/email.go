@@ -7,6 +7,7 @@ import (
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/cron"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/com"
@@ -15,7 +16,6 @@ import (
 	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/param"
 
-	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/coscms/webfront/library/xcommon"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
@@ -45,7 +45,7 @@ func EmailSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, titl
 		}
 	}
 	vm.Verification.Reset()
-	data := captchabiz.VerifyCaptcha(ctx, frontend.Name, `code`)
+	data := captchabiz.VerifyCaptcha(ctx, httpserver.KindFrontend, `code`)
 	if nerrors.IsFailureCode(data.GetCode()) {
 		return nil
 	}

@@ -14,10 +14,10 @@ import (
 
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	uploadChecker "github.com/coscms/webcore/registry/upload/checker"
-	"github.com/coscms/webfront/initialize/frontend"
 	xMW "github.com/coscms/webfront/middleware"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
@@ -39,7 +39,7 @@ func MobileSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, mes
 		}
 	}
 	vm.Verification.Reset()
-	data := captchabiz.VerifyCaptcha(ctx, frontend.Name, `code`)
+	data := captchabiz.VerifyCaptcha(ctx, httpserver.KindFrontend, `code`)
 	if nerrors.IsFailureCode(data.GetCode()) {
 		return nil
 	}

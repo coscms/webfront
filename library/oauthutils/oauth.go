@@ -12,9 +12,9 @@ import (
 	"github.com/coscms/oauth2s/client/goth/providers"
 	dbschemaNging "github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	oauthLibrary "github.com/coscms/webcore/library/oauth"
 	"github.com/coscms/webcore/registry/settings"
-	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/coscms/webfront/library/xcommon"
 )
 
@@ -50,7 +50,7 @@ func InitOauth(e *echo.Echo) {
 	}
 	host := xcommon.SiteURL(nil)
 	if len(host) == 0 {
-		host = subdomains.Default.URL(``, frontend.Name)
+		host = subdomains.Default.URL(``, httpserver.KindFrontend)
 	}
 	oauth2Config := oauth2.NewConfig()
 	RegisterProvider(oauth2Config)
