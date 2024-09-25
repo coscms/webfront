@@ -114,10 +114,10 @@ func InitWebServer() {
 		frontendDomain = strings.Join(domains, `,`)
 	}
 	subdomains.Default.Add(Name+`@`+frontendDomain, e)
+	log.Infof(`Registered host: %s@%s`, Name, frontendDomain)
 
 	// 前台服务设置
 	addMiddleware(e)
-	log.Infof(`Registered host: %s@%s`, Name, frontendDomain)
 	e.Get(`/favicon.ico`, faviconHandler)
 	e.Use(xMW.SessionInfo)
 	if config.IsInstalled() {
