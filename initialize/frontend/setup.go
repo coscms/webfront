@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 
@@ -22,11 +23,23 @@ func init() {
 	})
 }
 
+var cmdArgs map[string]string
+
+func parseCmdArgs() map[string]string {
+	if cmdArgs != nil {
+		return cmdArgs
+	}
+	cmdArgs = com.ParseCmdArgs()
+	return cmdArgs
+}
+
 func AutoBackendPrefix() {
 	if len(config.FromCLI().BackendDomain) == 0 &&
 		len(config.FromCLI().FrontendDomain) == 0 &&
 		len(os.Getenv(`NGING_BACKTEND_URL_PREFIX`)) == 0 &&
-		len(Prefix()) == 0 {
+		len(Prefix()) == 0 &&
+		len(parseCmdArgs()[`backend.domain`]) == 0 &&
+		len(parseCmdArgs()[`frontend.domain`]) == 0 {
 		backend.SetPrefix(`/admin`)
 	}
 }
