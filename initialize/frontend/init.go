@@ -100,7 +100,7 @@ func getFrontendDomain() string {
 	} else {
 		var domains []string
 		for _, domain := range backend.MakeSubdomains(frontendDomain, []string{}) {
-			if _, ok := subdomains.Default.Hosts[domain]; !ok { // 排除后台指定的域名
+			if _, ok := subdomains.Default.Hosts.GetOk(domain); !ok { // 排除后台指定的域名
 				domains = append(domains, domain)
 			}
 		}
