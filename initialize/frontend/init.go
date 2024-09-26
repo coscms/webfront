@@ -61,6 +61,11 @@ func init() {
 }
 
 func start() {
+	// 如果指定了后台域名则只能用该域名访问后台，此时将其它域名指向前台；如果前台域名和后台域名均未设置则代表使用指定路径访问后台，默认指向前台
+	if len(config.FromCLI().BackendDomain) > 0 || len(config.FromCLI().FrontendDomain) == 0 {
+		subdomains.Default.Default = httpserver.KindFrontend // 设置默认(没有匹配到域名的时候)访问的服务别名
+	}
+	// 初始化前台服务
 	InitWebServer()
 }
 
@@ -68,16 +73,7 @@ func SetPrefix(prefix string) {
 	httpserver.Frontend.SetPrefix(prefix)
 }
 
-func InitWebServer() {
-	e := httpserver.Frontend.Router.Echo()
-	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
-	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
-
-	// 子域名设置
-	if len(config.FromCLI().BackendDomain) > 0 {
-		// 如果指定了后台域名则只能用该域名访问后台。此时将其它域名指向前台
-		subdomains.Default.Default = httpserver.KindFrontend // 设置默认(没有匹配到域名的时候)访问的域名别名
-	}
+func getFrontendDomain() string {
 	var frontendDomain string
 	siteURL := config.Setting(`base`).String(`siteURL`)
 	if len(siteURL) > 0 {
@@ -98,8 +94,7 @@ func InitWebServer() {
 	}
 	if len(frontendDomain) == 0 {
 		if len(config.FromCLI().BackendDomain) == 0 &&
-			len(Prefix()) == 0 && len(backend.Prefix()) == 0 {
-			// 前后台都没有指定域名的时候，给前台强制指定一个域名
+			len(Prefix()) == 0 && len(backend.Prefix()) == 0 { // 前后台都没有指定域名和路径前缀的时候，给前台强制指定一个域名
 			frontendDomain = `localhost:` + fmt.Sprintf(`%d`, config.FromCLI().Port)
 		}
 	} else {
@@ -112,6 +107,16 @@ func InitWebServer() {
 
 		frontendDomain = strings.Join(domains, `,`)
 	}
+	return frontendDomain
+}
+
+func InitWebServer() {
+	e := httpserver.Frontend.Router.Echo()
+	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
+	e.SetRenderDataWrapper(xMW.DefaultRenderDataWrapper)
+
+	// 子域名设置
+	frontendDomain := getFrontendDomain()
 	subdomains.Default.Add(httpserver.KindFrontend+`@`+frontendDomain, e)
 	log.Infof(`Registered host: %s@%s`, httpserver.KindFrontend, frontendDomain)
 
@@ -125,8 +130,6 @@ func InitWebServer() {
 	}
 	Apply()
 }
-
-var renderOptions *render.Config
 
 func addMiddleware(e *echo.Echo) {
 	if bootconfig.Bindata {
@@ -168,7 +171,7 @@ func addMiddleware(e *echo.Echo) {
 	httpserver.Frontend.Apply()
 	echo.OnCallback(`nging.renderer.cache.clear`, func(_ echo.Event) error {
 		log.Debug(`clear: Frontend Template Object Cache`)
-		renderOptions.Renderer().ClearCache()
+		httpserver.Frontend.Renderer().ClearCache()
 		return nil
 	}, `clear-frontend-template-object-cache`)
 	echo.OnCallback(`webx.renderer.cache.clear`, func(_ echo.Event) error {
