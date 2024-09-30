@@ -36,3 +36,35 @@ func TestMakeEncodedURL(t *testing.T) {
 	assert.Equal(t, _rawURL, rawURL)
 	assert.Equal(t, _expiry, expiry)
 }
+
+func TestTrimOverflowTextSlice(t *testing.T) {
+	v := TrimOverflowTextSlice([]string{`100000`, `20000`, `300000`}, 10, `,`)
+	assert.Equal(t, []string{`100000`}, v)
+	v = TrimOverflowTextSlice([]string{`100000`, `20000`, `300000`}, 15, `,`)
+	assert.Equal(t, []string{`100000`, `20000`}, v)
+	v = TrimOverflowTextSlice([]string{`100000`, `20000`, `300000`}, 5, `,`)
+	assert.Equal(t, []string{}, v)
+}
+
+func TestTrimOverflowText(t *testing.T) {
+	v := TrimOverflowText(`100000,20000,300000`, 10, `,`)
+	assert.Equal(t, `100000`, v)
+	v = TrimOverflowText(`100000,20000,300000`, 15, `,`)
+	assert.Equal(t, `100000,20000`, v)
+	v = TrimOverflowText(`100000,20000,300000`, 7, `,`)
+	assert.Equal(t, `100000`, v)
+	v = TrimOverflowText(`100000,20000,300000`, 6, `,`)
+	assert.Equal(t, `100000`, v)
+	v = TrimOverflowText(`100000,20000,300000`, 5, `,`)
+	assert.Equal(t, ``, v)
+	v = TrimOverflowText(`哈哈哈`, 5)
+	assert.Equal(t, `哈`, v)
+	v = TrimOverflowText(`哈12345`, 5)
+	assert.Equal(t, `哈12`, v)
+	v = TrimOverflowText(`12哈345`, 5)
+	assert.Equal(t, `12哈`, v)
+	v = TrimOverflowText(`1😊哈345`, 5)
+	assert.Equal(t, `1😊`, v)
+	v = TrimOverflowText(`1哈哈345`, 5)
+	assert.Equal(t, `1哈`, v)
+}

@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/nerrors"
@@ -18,6 +19,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
+// TrimOverflowText 裁剪溢出长度的文本
 func TrimOverflowText(text string, maxLength int, seperators ...string) string {
 	var seperator string
 	if len(seperators) > 0 {
@@ -26,13 +28,65 @@ func TrimOverflowText(text string, maxLength int, seperators ...string) string {
 	if len(text) <= maxLength {
 		return text
 	}
-	text = text[:maxLength]
 	if len(seperator) > 0 {
+		index := strings.Index(text, seperator)
+		text = text[:maxLength]
 		if p := strings.LastIndex(text, seperator); p > 0 {
 			text = text[0:p]
+		} else if len(text) < index {
+			text = ``
+		}
+		return text
+	}
+	text = text[:maxLength]
+	return FixedClippedString(text)
+}
+
+// FixedClippedString 修正被裁减的字符串避免出现乱码
+func FixedClippedString(text string) string {
+	//println(text, len(text))
+	b := com.Str2bytes(text)
+	max := len(b) - 1
+	lastUTF8Start := max - 2
+	lastEmojStart := lastUTF8Start - 1
+	for i := max; i >= 0; i-- {
+		if utf8.RuneStart(b[i]) {
+			//println(`start:`, i)
+			if i == max || i == lastUTF8Start || i == lastEmojStart {
+				if r, _ := utf8.DecodeRune(b[i:]); r != utf8.RuneError {
+					return text
+				}
+			}
+			text = text[0:i]
+			return text
 		}
 	}
 	return text
+}
+
+// TrimOverflowTextSlice 裁剪溢出长度的文本（textSlice为待join的字符串切片）
+func TrimOverflowTextSlice(textSlice []string, maxLength int, seperators ...string) []string {
+	var seperator string
+	if len(seperators) > 0 {
+		seperator = seperators[0]
+	}
+	text := strings.Join(textSlice, seperator)
+	if len(text) <= maxLength {
+		return textSlice
+	}
+	text = ``
+	sep := ``
+	for i, v := range textSlice {
+		if i > 0 {
+			sep = seperator
+		}
+		txt := text + sep + v
+		if len(txt) > maxLength {
+			return textSlice[0:i]
+		}
+		text = txt
+	}
+	return textSlice[0:0]
 }
 
 func OutputContent(content string, contypes ...string) interface{} {
