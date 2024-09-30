@@ -94,7 +94,30 @@ func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, ex
 		cond.Add(extraConds...)
 	}
 	f.ListByOffset(nil, queryMW, 0, -1, cond.And())
+	if maxLevel > 0 {
+		return SortCategoryByParent(f.Objects())
+	}
 	return f.Objects()
+}
+
+func SortCategoryByParent(list []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
+	mp := map[uint][]*dbschema.OfficialCommonCategory{} // {parent_id:[]}
+	for _, row := range list {
+		if _, ok := mp[row.ParentId]; !ok {
+			mp[row.ParentId] = []*dbschema.OfficialCommonCategory{}
+		}
+		mp[row.ParentId] = append(mp[row.ParentId], row)
+	}
+	rows := make([]*dbschema.OfficialCommonCategory, 0, len(list))
+	var appendFn func(children []*dbschema.OfficialCommonCategory)
+	appendFn = func(children []*dbschema.OfficialCommonCategory) {
+		for _, row := range children {
+			rows = append(rows, row)
+			appendFn(mp[row.Id])
+		}
+	}
+	appendFn(mp[0])
+	return rows
 }
 
 func (f *Category) ListIndent(categoryList []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
