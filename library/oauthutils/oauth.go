@@ -44,7 +44,7 @@ func Default() *oauth2.OAuth {
 }
 
 // InitOauth 第三方登录
-func InitOauth(e *echo.Echo) {
+func InitOauth(e *echo.Echo, middlewares ...interface{}) {
 	if config.IsInstalled() {
 		settings.Init(nil)
 	}
@@ -66,7 +66,7 @@ func InitOauth(e *echo.Echo) {
 	defaultOAuth = oauth2.New(host, oauth2Config)
 	defaultOAuth.SetSuccessHandler(SuccessHandler)
 	defaultOAuth.SetBeginAuthHandler(BeginAuthHandler)
-	defaultOAuth.Wrapper(e)
+	defaultOAuth.Wrapper(e, middlewares...)
 }
 
 func Accounts() []oauth2.Account {
