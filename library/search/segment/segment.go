@@ -25,6 +25,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/once"
+	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
 )
 
@@ -141,6 +142,27 @@ func DoFilter(v string) bool {
 
 func AddFilter(filter Filter) {
 	Filters = append(Filters, filter)
+}
+
+func ApplySegmentConfig() {
+	segmentCfg := config.FromFile().Extend.GetStore(`segment`)
+	segmentEngine := segmentCfg.String(`engine`)
+	if len(segmentEngine) == 0 {
+		return
+	}
+	if DefaultEngine != segmentEngine {
+		DefaultEngine = segmentEngine
+	}
+	switch segmentEngine {
+	case `api`:
+		segmentApiURL := segmentCfg.String(`apiURL`)
+		segmentApiKey := segmentCfg.String(`apiKey`)
+		a := NewAPI(segmentApiURL, segmentApiKey)
+		Register(segmentEngine, func() Segment {
+			return a
+		})
+	default:
+	}
 }
 
 // Segment interface

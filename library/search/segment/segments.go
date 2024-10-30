@@ -18,37 +18,42 @@
 
 package segment
 
-import "github.com/admpub/log"
+import (
+	"github.com/admpub/log"
+	"github.com/webx-top/com"
+)
 
 var (
-	segments   = make(map[string]func() Segment)
-	defaultNop = &nopSegment{}
+	segments           = com.NewSafeMap[string, func() Segment]()
+	defaultNop Segment = &nopSegment{}
 )
 
 func Register(name string, c func() Segment) {
-	segments[name] = c
+	segments.Set(name, c)
 }
 
 func IsNop(segment Segment) bool {
 	return defaultNop == segment
 }
 
+func defaultNopSegment() Segment {
+	return defaultNop
+}
+
 func Get(name string) Segment {
-	fn, ok := segments[name]
+	fn, ok := segments.GetOk(name)
 	if !ok || fn == nil {
 		log.Error(`[segment]Not found engine:`, name)
-		fn = func() Segment {
-			return defaultNop
-		}
+		fn = defaultNopSegment
 	}
 	return fn()
 }
 
 func Has(name string) bool {
-	_, ok := segments[name]
+	_, ok := segments.GetOk(name)
 	return ok
 }
 
 func Unregister(name string) {
-	delete(segments, name)
+	segments.Delete(name)
 }
