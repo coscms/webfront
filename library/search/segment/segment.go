@@ -157,10 +157,19 @@ func ApplySegmentConfig() {
 	case `api`:
 		segmentApiURL := segmentCfg.String(`apiURL`)
 		segmentApiKey := segmentCfg.String(`apiKey`)
-		a := NewAPI(segmentApiURL, segmentApiKey)
-		Register(segmentEngine, func() Segment {
-			return a
-		})
+		seg := Get(segmentEngine)
+		reg := true
+		if !IsNop(seg) {
+			if apiSeg, ok := seg.(*apiSegment); ok {
+				reg = apiSeg.apiKey != segmentApiKey || apiSeg.apiURL != segmentApiURL
+			}
+		}
+		if reg {
+			a := NewAPI(segmentApiURL, segmentApiKey)
+			Register(segmentEngine, func() Segment {
+				return a
+			})
+		}
 	default:
 	}
 }
