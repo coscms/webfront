@@ -56,6 +56,9 @@ func Default() Segment {
 }
 
 func ResetSegment() {
+	if defaultSegment != nil {
+		defaultSegment.Close()
+	}
 	onceSegment.Reset()
 }
 
@@ -151,6 +154,9 @@ func ApplySegmentConfig(c *config.Config) {
 		return
 	}
 	if DefaultEngine != segmentEngine {
+		if defaultSegment != nil {
+			defaultSegment.Close()
+		}
 		DefaultEngine = segmentEngine
 	}
 	switch segmentEngine {
@@ -169,6 +175,7 @@ func ApplySegmentConfig(c *config.Config) {
 			Register(segmentEngine, func() Segment {
 				return a
 			})
+			ResetSegment()
 		}
 	default:
 	}
