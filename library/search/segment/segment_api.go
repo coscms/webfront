@@ -47,7 +47,7 @@ func (s *apiSegment) request(text string, mode string, args ...string) []string 
 		return nil
 	}
 	if response.IsError() {
-		log.Errorf(`%s: [%d] %v`, s.apiURL, response.StatusCode(), com.Bytes2str(response.Body()))
+		log.Errorf(`%s: [%d] %v`, s.apiURL, response.StatusCode(), com.StripTags(com.Bytes2str(response.Body())))
 		return nil
 	}
 	result := response.String()
