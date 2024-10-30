@@ -144,8 +144,8 @@ func AddFilter(filter Filter) {
 	Filters = append(Filters, filter)
 }
 
-func ApplySegmentConfig() {
-	segmentCfg := config.FromFile().Extend.GetStore(`segment`)
+func ApplySegmentConfig(c *config.Config) {
+	segmentCfg := c.Extend.GetStore(`segment`)
 	segmentEngine := segmentCfg.String(`engine`)
 	if len(segmentEngine) == 0 {
 		return

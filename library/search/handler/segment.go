@@ -11,7 +11,6 @@ import (
 
 func RegisterRoute(e echo.RouteRegister) {
 	e.Post(`/segment`, segmentHandler, checkToken)
-	segment.ApplySegmentConfig()
 }
 
 func segmentHandler(ctx echo.Context) error {
