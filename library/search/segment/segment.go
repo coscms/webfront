@@ -27,37 +27,39 @@ import (
 	"github.com/admpub/once"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
+	"go.uber.org/atomic"
 )
 
 type Filter func(string) bool
 
 var (
-	DefaultEngine  = `sego` // gojieba / sego / jiebago
+	DefaultEngine  = atomic.NewString(`sego`) // gojieba / sego / jiebago
 	stopWords      []string
 	stopWordsMap   map[string]bool
 	Filters        []Filter
-	defaultSegment Segment
+	defaultSegment atomic.Value
 	onceSegment    once.Once
 	onceStopword   once.Once
 )
 
 func initDefaultSegment() {
 	log.Debug("[segment]Default engine:", DefaultEngine)
-	defaultSegment = Get(DefaultEngine)
+	defaultSegment.Store(Get(DefaultEngine.Load()))
 }
 
 func IsInitialized() bool {
-	return defaultSegment != nil
+	return defaultSegment.Load() != nil
 }
 
 func Default() Segment {
 	onceSegment.Do(initDefaultSegment)
-	return defaultSegment
+	return defaultSegment.Load().(Segment)
 }
 
 func ResetSegment() {
-	if defaultSegment != nil {
-		defaultSegment.Close()
+	seg := defaultSegment.Load()
+	if seg != nil {
+		seg.(Segment).Close()
 	}
 	onceSegment.Reset()
 }
@@ -153,11 +155,12 @@ func ApplySegmentConfig(c *config.Config) {
 	if len(segmentEngine) == 0 {
 		return
 	}
-	if DefaultEngine != segmentEngine {
-		if defaultSegment != nil {
-			defaultSegment.Close()
+	if DefaultEngine.Load() != segmentEngine {
+		seg := defaultSegment.Load()
+		if seg != nil {
+			seg.(Segment).Close()
 		}
-		DefaultEngine = segmentEngine
+		DefaultEngine.Store(segmentEngine)
 	}
 	switch segmentEngine {
 	case `api`:

@@ -71,6 +71,7 @@ require (
 	github.com/silenceper/wechat/v2 v2.1.7
 	github.com/tdewolff/minify/v2 v2.20.37
 	github.com/webx-top/restyclient v0.0.5
+	go.uber.org/atomic v1.11.0
 )
 
 require (
