@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.3.25
+require github.com/coscms/webcore v0.3.26
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -40,14 +40,14 @@ require (
 	github.com/gosimple/slug v1.14.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
-	github.com/prometheus/client_golang v1.20.4
+	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.11
 	github.com/webx-top/db v1.27.15
-	github.com/webx-top/echo v1.12.2
+	github.com/webx-top/echo v1.12.3
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1
 	github.com/webx-top/image v0.1.1
@@ -150,7 +150,7 @@ require (
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fynelabs/selfupdate v0.2.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.19.2 // indirect
@@ -174,7 +174,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
-	github.com/google/pprof v0.0.0-20241009165004-a3522334989c // indirect
+	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -216,7 +216,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/onsi/ginkgo/v2 v2.20.2 // indirect
+	github.com/onsi/ginkgo/v2 v2.21.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
 	github.com/phuslu/iploc v1.0.20240930 // indirect
@@ -224,10 +224,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.60.0 // indirect
+	github.com/prometheus/common v0.60.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
-	github.com/quic-go/quic-go v0.47.0 // indirect
+	github.com/quic-go/quic-go v0.48.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/redis/go-redis/v9 v9.6.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -271,7 +271,7 @@ require (
 	go.opentelemetry.io/otel v1.30.0 // indirect
 	go.opentelemetry.io/otel/metric v1.30.0 // indirect
 	go.opentelemetry.io/otel/trace v1.30.0 // indirect
-	go.uber.org/mock v0.4.0 // indirect
+	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
 	golang.org/x/image v0.21.0 // indirect
