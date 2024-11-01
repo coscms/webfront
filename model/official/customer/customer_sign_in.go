@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -179,6 +180,7 @@ func (f *Customer) LinkOAuthUser() error {
 		oAuthM.CopyFrom(oAuthUser)
 		_, err := oAuthM.Add()
 		if err != nil {
+			log.Errorf(`%v: %#v (oAuthUser: %#v)`, err, *oAuthM.OfficialCustomerOauth, *oAuthUser)
 			return err
 		}
 		oAuthM.DelSession()
