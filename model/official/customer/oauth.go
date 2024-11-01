@@ -99,7 +99,9 @@ func (f *OAuth) CopyFrom(user *goth.User) *OAuth {
 	f.Email = user.Email
 	f.AccessToken = user.AccessToken
 	f.RefreshToken = user.RefreshToken
-	f.Expired = uint(user.ExpiresAt.Unix())
+	if !user.ExpiresAt.IsZero() && user.ExpiresAt.Unix() > 0 {
+		f.Expired = uint(user.ExpiresAt.Unix())
+	}
 	return f
 }
 
