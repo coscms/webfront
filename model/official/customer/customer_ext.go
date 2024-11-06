@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"github.com/webx-top/db/factory"
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webfront/dbschema"
@@ -16,6 +17,14 @@ type CustomerBase struct {
 
 func (c *CustomerBase) Short_() string {
 	return "official_customer"
+}
+
+func (c *CustomerBase) Name_() string {
+	b := c
+	if b == nil {
+		b = &CustomerBase{}
+	}
+	return dbschema.WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (c *CustomerBase) SelectColumns() []interface{} {
