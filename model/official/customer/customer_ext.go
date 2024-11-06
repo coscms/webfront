@@ -1,7 +1,7 @@
 package customer
 
 import (
-	"github.com/webx-top/db/factory"
+	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webfront/dbschema"
