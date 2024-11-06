@@ -7,6 +7,17 @@ import (
 	modelLevel "github.com/coscms/webfront/model/official/level"
 )
 
+type CustomerSimple struct {
+	Id     uint64 `db:"id" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Name   string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
+	Gender string `db:"gender" bson:"gender" comment:"性别(male-男;female-女;secret-保密)" json:"gender" xml:"gender"`
+	Avatar string `db:"avatar" bson:"avatar" comment:"头像" json:"avatar" xml:"avatar"`
+}
+
+func (cs *CustomerSimple) Short_() string {
+	return "official_customer"
+}
+
 type CustomerAndGroup struct {
 	*dbschema.OfficialCustomer
 	Group  *dbschema.OfficialCommonGroup    `db:"-,relation=id:group_id|gtZero"`
