@@ -46,7 +46,7 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.11
-	github.com/webx-top/db v1.27.15
+	github.com/webx-top/db v1.27.16
 	github.com/webx-top/echo v1.12.4
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1

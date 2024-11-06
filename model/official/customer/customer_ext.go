@@ -18,6 +18,10 @@ func (c *CustomerBase) Short_() string {
 	return "official_customer"
 }
 
+func (c *CustomerBase) SelectColumns() []interface{} {
+	return []interface{}{`id`, `name`, `gender`, `avatar`}
+}
+
 type CustomerAndGroup struct {
 	*dbschema.OfficialCustomer
 	Group  *dbschema.OfficialCommonGroup    `db:"-,relation=id:group_id|gtZero"`
