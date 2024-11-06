@@ -1229,12 +1229,12 @@ github.com/webx-top/com v0.7.0/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQEG
 github.com/webx-top/com v0.8.2/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQEGsM2Q=
 github.com/webx-top/com v1.2.12/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQEGsM2Q=
 github.com/webx-top/com v1.2.13/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQEGsM2Q=
-github.com/webx-top/com v1.3.11 h1:ICutjtF2g4MntDwDjz0aRrIGQDXc/MKVM9N2KAmzOmQ=
-github.com/webx-top/com v1.3.11/go.mod h1:Pw5Yr5UU0ZtwZU0xVyfyRdqf77wyzh+oRNYnOpX9Oyc=
+github.com/webx-top/com v1.3.13 h1:gdzcAjjv3qaJvo2omjoazj9tdGuFpUaA+eOiyz5frKI=
+github.com/webx-top/com v1.3.13/go.mod h1:Pw5Yr5UU0ZtwZU0xVyfyRdqf77wyzh+oRNYnOpX9Oyc=
 github.com/webx-top/db v1.27.16 h1:OObq6eBIlWzAkgiXsaVs6Qf1c8gpqFE1hP6Kh7sUzBQ=
 github.com/webx-top/db v1.27.16/go.mod h1:XVPAR+eEDVOoI1kbepoz0Hqd+nsJ4b6gTpTmM1Nx9mQ=
-github.com/webx-top/echo v1.12.4 h1:NIha4Ec8k+eraL9p0NlmJ6aY5Un2lQywHT7HVxhvkmU=
-github.com/webx-top/echo v1.12.4/go.mod h1:7gCYWP4Rwd2O45GazqZeJ7ioxbzknVhrsNMyfTPRdC0=
+github.com/webx-top/echo v1.12.7 h1:Rr4F8REQ9YnpD40/1IviYgv+OYHdxcgPg0RLHhZCn8E=
+github.com/webx-top/echo v1.12.7/go.mod h1:qXI3BKphnspAd43wUzYle5kfZCFTT83+aczApkWee8g=
 github.com/webx-top/echo-prometheus v1.1.2 h1:llHHZFWBxb/n0W2Tnn6UjnrOVNi/YQ+v2ETyOZ1248w=
 github.com/webx-top/echo-prometheus v1.1.2/go.mod h1:8QYzHq8JjzNGKpRw4q4vopq/zcA87Flwqc4oNXVu2gk=
 github.com/webx-top/echo-socket.io v1.3.1 h1:KgmLZdZIX7auMYD6ZXGFeXzPROIp4O43rN9T9hC/WdY=
