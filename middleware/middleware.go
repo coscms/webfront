@@ -18,6 +18,7 @@ import (
 	nav "github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
+	uploadClient "github.com/webx-top/client/upload"
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend/usernav"
@@ -236,6 +237,15 @@ func goToSignIn(c echo.Context) error {
 		next := c.Request().URI()
 		if !strings.Contains(next, `/sign_in`) {
 			queryString = `?next=` + url.QueryEscape(next)
+		}
+	}
+	if c.IsPost() && c.Format() == echo.ContentTypeJSON {
+		client := c.Form(`client`)
+		if len(client) > 0 {
+			cli := uploadClient.Get(client)
+			cli.Init(c, &uploadClient.Result{})
+			cli.SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
+			return cli.Response()
 		}
 	}
 	c.Data().SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
