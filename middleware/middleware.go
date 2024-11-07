@@ -238,8 +238,7 @@ func goToSignIn(c echo.Context) error {
 		if !strings.Contains(next, `/sign_in`) {
 			queryString = `?next=` + url.QueryEscape(next)
 		}
-	}
-	if c.IsPost() && c.Format() == echo.ContentTypeJSON {
+	} else if c.IsPost() && c.Format() == echo.ContentTypeJSON {
 		client := c.Form(`client`)
 		if len(client) > 0 {
 			cli := uploadClient.Get(client)
