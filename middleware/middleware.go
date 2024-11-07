@@ -233,19 +233,23 @@ func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
 
 func goToSignIn(c echo.Context) error {
 	var queryString string
+	var next string
 	if c.IsGet() {
-		next := c.Request().URI()
-		if !strings.Contains(next, `/sign_in`) {
-			queryString = `?next=` + url.QueryEscape(next)
+		next = c.Request().URI()
+	} else if c.IsPost() {
+		if c.Format() == echo.ContentTypeJSON {
+			client := c.Form(`client`)
+			if len(client) > 0 {
+				cli := uploadClient.Get(client)
+				cli.Init(c, &uploadClient.Result{})
+				cli.SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
+				return cli.Response()
+			}
 		}
-	} else if c.IsPost() && c.Format() == echo.ContentTypeJSON {
-		client := c.Form(`client`)
-		if len(client) > 0 {
-			cli := uploadClient.Get(client)
-			cli.Init(c, &uploadClient.Result{})
-			cli.SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
-			return cli.Response()
-		}
+		next = c.Referer()
+	}
+	if len(next) > 0 && !strings.Contains(next, `/sign_in`) {
+		queryString = `?next=` + url.QueryEscape(next)
 	}
 	c.Data().SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
 	return c.Redirect(URLFor(`/sign_in`) + queryString)
