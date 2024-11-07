@@ -38,7 +38,7 @@ require (
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/gosimple/slug v1.14.0
-	github.com/hibiken/asynq v0.24.1
+	github.com/hibiken/asynq v0.25.0
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.8.1
@@ -46,7 +46,7 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.13
-	github.com/webx-top/db v1.27.16
+	github.com/webx-top/db v1.27.18
 	github.com/webx-top/echo v1.12.7
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1
@@ -66,7 +66,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.29.0
-	github.com/nging-plugins/dbmanager v1.6.6
+	github.com/nging-plugins/dbmanager v1.6.7
 	github.com/phuslu/lru v1.0.16
 	github.com/silenceper/wechat/v2 v2.1.7
 	github.com/tdewolff/minify/v2 v2.21.1
@@ -76,7 +76,7 @@ require (
 
 require (
 	cloud.google.com/go v0.116.0 // indirect
-	cloud.google.com/go/auth v0.10.0 // indirect
+	cloud.google.com/go/auth v0.10.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/iam v1.2.2 // indirect
@@ -171,10 +171,9 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
-	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
+	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -219,7 +218,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.21.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
-	github.com/phuslu/iploc v1.0.20240930 // indirect
+	github.com/phuslu/iploc v1.0.20241031 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
@@ -282,10 +281,10 @@ require (
 	golang.org/x/time v0.7.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.203.0 // indirect
-	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241021214115-324edc3d5d38 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241021214115-324edc3d5d38 // indirect
+	google.golang.org/api v0.205.0 // indirect
+	google.golang.org/genproto v0.0.0-20241104194629-dd2ea8efbc28 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
