@@ -15,10 +15,34 @@ type CustomerAddedCounter interface {
 	CustomerPendingTodayCount(uid interface{}) (int64, error)
 }
 
+type CustomerAddedMaxGetter interface {
+	GetMaxPerDay() int64
+	GetMaxPending() int64
+	GetMaxPendingPerDay() int64
+}
+
+type CustomChecker interface {
+	CustomCheck(ctx echo.Context, permission *xrole.RolePermission, customerID interface{}, counter CustomerAddedCounter) error
+}
+
+var _ CustomerAddedMaxGetter = (*ConfigCustomerAdd)(nil)
+
 type ConfigCustomerAdd struct {
 	MaxPerDay        int64 `json:"maxPerDay"`
 	MaxPending       int64 `json:"maxPending"`
 	MaxPendingPerDay int64 `json:"maxPendingPerDay"`
+}
+
+func (c *ConfigCustomerAdd) GetMaxPerDay() int64 {
+	return c.MaxPerDay
+}
+
+func (c *ConfigCustomerAdd) GetMaxPending() int64 {
+	return c.MaxPending
+}
+
+func (c *ConfigCustomerAdd) GetMaxPendingPerDay() int64 {
+	return c.MaxPendingPerDay
 }
 
 func (c *ConfigCustomerAdd) Combine(source interface{}) interface{} {
@@ -51,37 +75,45 @@ func CheckRoleCustomerAdd(ctx echo.Context, permission *xrole.RolePermission, be
 	if !ok {
 		return CheckGlobalCustomerAdd(ctx, customerID, behaviorName, counter)
 	}
-	roleCfg, _ := bev.Get(behaviorName).Value.(*ConfigCustomerAdd)
+	roleCfg, ok := bev.Get(behaviorName).Value.(CustomerAddedMaxGetter)
+	if !ok {
+		if chk, ok := bev.Get(behaviorName).Value.(CustomChecker); ok {
+			return chk.CustomCheck(ctx, permission, customerID, counter)
+		}
+	}
 	if roleCfg == nil {
 		return CheckGlobalCustomerAdd(ctx, customerID, behaviorName, counter)
 	}
-	if roleCfg.MaxPerDay <= 0 {
+	if roleCfg.GetMaxPerDay() <= 0 {
 		return ErrCustomerRoleDisabled
 	}
 	todayCount, err := counter.CustomerTodayCount(customerID)
 	if err != nil {
 		return err
 	}
-	if todayCount >= roleCfg.MaxPerDay {
+	if todayCount >= roleCfg.GetMaxPerDay() {
 		return ErrCustomerAddMaxPerDay
 	}
-	if roleCfg.MaxPending > 0 {
+	if roleCfg.GetMaxPending() > 0 {
 		pendingCount, err := counter.CustomerPendingCount(customerID)
 		if err != nil {
 			return err
 		}
-		if pendingCount >= roleCfg.MaxPending {
+		if pendingCount >= roleCfg.GetMaxPending() {
 			return ErrCustomerAddMaxPending
 		}
 	}
-	if roleCfg.MaxPendingPerDay > 0 {
+	if roleCfg.GetMaxPendingPerDay() > 0 {
 		pendingPerDayCount, err := counter.CustomerPendingTodayCount(customerID)
 		if err != nil {
 			return err
 		}
-		if pendingPerDayCount >= roleCfg.MaxPendingPerDay {
+		if pendingPerDayCount >= roleCfg.GetMaxPendingPerDay() {
 			return ErrCustomerAddMaxPendingPerDay
 		}
+	}
+	if chk, ok := roleCfg.(CustomChecker); ok {
+		return chk.CustomCheck(ctx, permission, customerID, counter)
 	}
 	return err
 }
