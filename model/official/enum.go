@@ -8,6 +8,6 @@ var (
 
 func init() {
 	Contype.Add(`text`, `纯文本`)
-	Contype.Add(`html`, `HTML`)
+	Contype.Add(`html`, `富文本`)
 	Contype.Add(`markdown`, `Markdown`)
 }
