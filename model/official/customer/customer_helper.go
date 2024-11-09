@@ -142,3 +142,19 @@ func (f *Customer) LevelUpOnSignIn(set echo.H) error {
 	}
 	return nil
 }
+
+func (f *Customer) GetAdmins(customerIDs ...uint64) (map[uint64]struct{}, error) {
+	r := map[uint64]struct{}{}
+	_, err := f.ListByOffset(nil, func(r db.Result) db.Result {
+		return r.Select(`id`)
+	}, 0, -1, db.And(
+		db.Cond{`id`: db.In(customerIDs)},
+		db.Cond{`uid`: db.Gt(0)},
+	))
+	if err == nil {
+		for _, v := range f.Objects() {
+			r[v.Id] = struct{}{}
+		}
+	}
+	return r, err
+}
