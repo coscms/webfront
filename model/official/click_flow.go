@@ -74,3 +74,37 @@ func (f *ClickFlow) DelByTarget(targetType string, targetID uint64) error {
 		db.Cond{`target_id`: targetID},
 	))
 }
+
+func (f *ClickFlow) ListByCustomerTargets(targetType string, targetIDs []uint64, customerID uint64) (map[uint64]*dbschema.OfficialCommonClickFlow, error) {
+	return f.ListByTargets(targetType, targetIDs, customerID, 0)
+}
+
+func (f *ClickFlow) ListByAdminTargets(targetType string, targetIDs []uint64, adminUID uint) (map[uint64]*dbschema.OfficialCommonClickFlow, error) {
+	return f.ListByTargets(targetType, targetIDs, 0, adminUID)
+}
+
+func (f *ClickFlow) ListByTargets(targetType string, targetIDs []uint64, customerID uint64, adminUID uint) (map[uint64]*dbschema.OfficialCommonClickFlow, error) {
+	conds := []db.Compound{
+		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: db.In(targetIDs)},
+	}
+	if customerID > 0 {
+		conds = append(conds, db.Cond{`owner_id`: customerID})
+		conds = append(conds, db.Cond{`owner_type`: `customer`})
+	} else {
+		if adminUID == 0 {
+			return map[uint64]*dbschema.OfficialCommonClickFlow{}, nil
+		}
+		conds = append(conds, db.Cond{`owner_id`: adminUID})
+		conds = append(conds, db.Cond{`owner_type`: `user`})
+	}
+	_, err := f.ListByOffset(nil, nil, 0, -1, db.And(conds...))
+	if err != nil {
+		return nil, err
+	}
+	result := map[uint64]*dbschema.OfficialCommonClickFlow{}
+	for _, v := range f.Objects() {
+		result[v.TargetId] = v
+	}
+	return result, err
+}

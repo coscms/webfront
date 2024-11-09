@@ -508,24 +508,17 @@ func (f *Comment) WithExtra(list []*CommentAndReplyTarget, customer *dbschema.Of
 		}
 		if customer != nil || user != nil {
 			flowM := official.NewClickFlow(c)
-			conds := []db.Compound{
-				db.Cond{`target_type`: `comment`},
-				db.Cond{`target_id`: db.In(commentIds)},
-			}
+			var clickedFlow map[uint64]*dbschema.OfficialCommonClickFlow
 			if customer != nil {
-				conds = append(conds, db.Cond{`owner_id`: customer.Id})
-				conds = append(conds, db.Cond{`owner_type`: `customer`})
+				clickedFlow, err = flowM.ListByCustomerTargets(`comment`, commentIds, customer.Id)
 			} else {
-				conds = append(conds, db.Cond{`owner_id`: user.Id})
-				conds = append(conds, db.Cond{`owner_type`: `user`})
+				clickedFlow, err = flowM.ListByAdminTargets(`comment`, commentIds, user.Id)
 			}
-			_, err = flowM.ListByOffset(nil, nil, 0, -1, db.And(conds...))
 			if err == nil {
-				for _, v := range flowM.Objects() {
-					for kk, vv := range listx {
-						if vv.Id == v.TargetId {
-							listx[kk].Extra[`clickFlow`] = v
-						}
+				for kk, vv := range listx {
+					cf, ok := clickedFlow[vv.Id]
+					if ok {
+						listx[kk].Extra[`clickFlow`] = cf
 					}
 				}
 			}
