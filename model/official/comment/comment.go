@@ -258,19 +258,8 @@ func (f *Comment) Add() (pk interface{}, err error) {
 	if err != nil {
 		return
 	}
-	if f.RootId > 0 && f.RootId != f.Id { //累计根评论回复数量(包含所有子孙等下级评论)
-		err = cmtM.UpdateField(nil, `replies`, db.Raw(`replies+1`), db.Cond{`id`: f.RootId})
-		if err != nil {
-			return
-		}
-	}
-	if f.RootId != f.ReplyCommentId { //累计上级评论回复数量
-		err = cmtM.UpdateField(nil, `replies`, db.Raw(`replies+1`), db.Cond{`id`: f.ReplyCommentId})
-		if err != nil {
-			return
-		}
-	}
 
+	err = f.IncrRepliesBy(f.OfficialCommonComment)
 	return
 }
 
@@ -284,6 +273,35 @@ func (f *Comment) Edit(mw func(db.Result) db.Result, args ...interface{}) error 
 	}
 	f.Path += fmt.Sprint(f.Id)
 	return f.OfficialCommonComment.Update(mw, args...)
+}
+
+func (f *Comment) IncrRepliesBy(in *dbschema.OfficialCommonComment) error {
+	if in.ReplyCommentId == 0 {
+		return nil
+	}
+	var condVal interface{}
+	if in.RootId > 0 && in.ReplyCommentId != in.RootId && in.RootId != in.Id {
+		condVal = db.In([]uint64{in.RootId, in.ReplyCommentId})
+	} else {
+		condVal = in.ReplyCommentId
+	}
+	return f.UpdateField(nil, `replies`, db.Raw(`replies+1`), `id`, condVal)
+}
+
+func (f *Comment) DecrRepliesBy(in *dbschema.OfficialCommonComment) error {
+	if in.ReplyCommentId == 0 {
+		return nil
+	}
+	var condVal interface{}
+	if in.RootId > 0 && in.ReplyCommentId != in.RootId && in.RootId != in.Id {
+		condVal = db.In([]uint64{in.RootId, in.ReplyCommentId})
+	} else {
+		condVal = in.ReplyCommentId
+	}
+	return f.UpdateField(nil, `replies`, db.Raw(`replies-1`), db.And(
+		db.Cond{`id`: condVal},
+		db.Cond{`replies`: db.Gt(0)},
+	))
 }
 
 func (f *Comment) GetTargetIDs(cond *db.Compounds, limit int, offset int) ([]uint64, error) {
@@ -527,11 +545,11 @@ func (f *Comment) WithExtra(list []*CommentAndReplyTarget, customer *dbschema.Of
 				}
 				for kk, vv := range listx {
 					if vv.OwnerType == `customer` {
-						isBought, _ := boughtCustomerIDs[vv.OwnerId]
+						isBought := boughtCustomerIDs[vv.OwnerId]
 						listx[kk].Extra[`isBought`] = isBought
 					}
 					if vv.ReplyOwnerId > 0 && vv.ReplyOwnerType == `customer` {
-						isBought, _ := boughtCustomerIDs[vv.ReplyOwnerId]
+						isBought := boughtCustomerIDs[vv.ReplyOwnerId]
 						listx[kk].Extra[`repliedCustomerIsBought`] = isBought
 					}
 				}
@@ -541,70 +559,6 @@ func (f *Comment) WithExtra(list []*CommentAndReplyTarget, customer *dbschema.Of
 	return listx, err
 }
 
-// DeleteBy 删除评论，并遍历删除所有对该评论的回复
-func (f *Comment) DeleteBy(row *dbschema.OfficialCommonComment, top bool) error {
-	if row == nil || row.Id < 1 {
-		return nil
-	}
-	ls := common.NewOffsetLister(f.OfficialCommonComment, nil, nil, db.Cond{`reply_comment_id`: row.Id})
-	err := ls.ChunkList(func() error {
-		var err error
-		for _, _row := range f.Objects() {
-			err = f.DeleteBy(_row, false)
-			if err != nil {
-				return err
-			}
-		}
-		return err
-	}, 50, 0)
-	if err != nil {
-		return err
-	}
-	err = f.OfficialCommonComment.Delete(nil, db.Cond{`id`: row.Id})
-	if err != nil {
-		return err
-	}
-	if row.ReplyCommentId == 0 {
-		typeCfg, ok := CommentAllowTypes[row.TargetType]
-		if ok && typeCfg.AfterDelete != nil {
-			if err = typeCfg.AfterDelete(f.Context(), row); err != nil {
-				return err
-			}
-		}
-	} else {
-		if row.RootId > 0 && row.RootId != row.Id { //累计根评论回复数量(包含所有子孙等下级评论)
-			err = row.UpdateField(nil, `replies`, db.Raw(`replies-1`), db.Cond{`id`: row.RootId})
-			if err != nil {
-				return err
-			}
-		}
-		if top && row.RootId != row.ReplyCommentId { //累计上级评论回复数量
-			err = row.UpdateField(nil, `replies`, db.Raw(`replies-1`), db.Cond{`id`: row.ReplyCommentId})
-			if err != nil {
-				return err
-			}
-		}
-	}
-	flowM := official.NewClickFlow(f.Context())
-	err = flowM.DelByTarget(`comment`, row.Id)
-	return err
-}
-
 func (f *Comment) Delete(mw func(db.Result) db.Result, args ...interface{}) error {
-	err := f.Get(nil, args...)
-	if err != nil {
-		if err == db.ErrNoMoreRows {
-			return nil
-		}
-		return err
-	}
-	f.Context().Begin()
-	err = f.DeleteBy(f.OfficialCommonComment, true)
-	if err != nil {
-		f.Context().Rollback()
-		return err
-	}
-
-	f.Context().Commit()
-	return err
+	return f.OfficialCommonComment.Delete(mw, args...)
 }

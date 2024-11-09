@@ -60,6 +60,12 @@ func commentArticleAfterAdd(ctx echo.Context, f *dbschema.OfficialCommonComment)
 }
 
 func commentArticleAfterDelete(ctx echo.Context, f *dbschema.OfficialCommonComment) error {
-	newsM := dbschema.NewOfficialCommonArticle(ctx)
-	return newsM.UpdateField(nil, `comments`, db.Raw(`comments-1`), db.Cond{`id`: f.TargetId})
+	if f.ReplyCommentId == 0 { //不包含对评论的回复统计，只包含根评论
+		newsM := dbschema.NewOfficialCommonArticle(ctx)
+		return newsM.UpdateField(nil, `comments`, db.Raw(`comments-1`), db.And(
+			db.Cond{`id`: f.TargetId},
+			db.Cond{`comments`: db.Gt(0)},
+		))
+	}
+	return nil
 }
