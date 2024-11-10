@@ -2,6 +2,8 @@ package mapping
 
 import (
 	"regexp"
+
+	"github.com/webx-top/com"
 )
 
 type MappingFrom interface {
@@ -13,11 +15,16 @@ type MappingTo interface {
 	Set(key interface{}, value ...interface{})
 }
 
+type M struct {
+	From interface{}
+	To   string
+}
+
 type Layout string
 
-var placeholder = regexp.MustCompile(`(?:%7B|\{)(.+)(?:%7D|\})`)
+var placeholder = regexp.MustCompile(`(?:%7B|\{)([^}%]+)(?:%7D|\})`)
 
-func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string, linkKeyTo string, mapping map[interface{}]string) []T {
+func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string, linkKeyTo string, mapping ...M) []T {
 	kk := map[interface{}]int{}
 	for index, row := range rows {
 		k := row.GetField(linkKeyTo)
@@ -35,15 +42,15 @@ func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string
 		if !ok {
 			continue
 		}
-		for from, to := range mapping {
-			switch v := from.(type) {
+		for _, mp := range mapping {
+			switch v := mp.From.(type) {
 			case string:
 				newVal := srcRow.GetField(v)
 				if newVal == nil {
 					continue
 				}
-				rows[index].Set(to, newVal)
-			case Layout:
+				rows[index].Set(mp.To, newVal)
+			case Layout: // https://aaa/{Id} or https://aaa/?id=%7BId%7D
 				newVal := placeholder.ReplaceAllStringFunc(string(v), func(s string) string {
 					var k string
 					if s[0] == '{' {
@@ -51,10 +58,18 @@ func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string
 					} else {
 						k = s[3 : len(s)-3]
 					}
-					v, _ := srcRow.GetField(k).(string)
-					return v
+					v := srcRow.GetField(k)
+					if v == nil {
+						return ``
+					}
+					return com.String(v)
 				})
-				rows[index].Set(to, newVal)
+				rows[index].Set(mp.To, newVal)
+			case func(V) interface{}:
+				newVal := v(srcRow)
+				if newVal != nil {
+					rows[index].Set(mp.To, newVal)
+				}
 			}
 		}
 	}

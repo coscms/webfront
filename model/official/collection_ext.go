@@ -22,7 +22,7 @@ type CollectionTargetList interface {
 }
 
 type CollectionTargetDo interface {
-	Do(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error)
+	Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error)
 }
 
 type CollectionTarget struct {

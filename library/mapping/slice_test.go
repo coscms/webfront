@@ -1,6 +1,7 @@
 package mapping
 
 import (
+	"fmt"
 	"net/url"
 	"testing"
 
@@ -48,41 +49,59 @@ func (f *to) Set(key interface{}, value ...interface{}) {
 		f.Title = value[0].(string)
 	case `URL`:
 		f.URL = value[0].(string)
+	case `Id`:
+		f.Id = value[0].(int)
 	}
 }
 
 func TestSlice(t *testing.T) {
 	s := []*from{
-		{Id: 100, Title: `1`},
+		{Id: 100, Title: `title`},
 	}
 	d := []*to{
 		{Id: 100, Title: `0`},
 		{Id: 200, Title: ``},
 	}
-	r := Slice(s, d, `Id`, `Id`, map[interface{}]string{
-		`Title`:                       `Title`,
-		Layout(`https://abs/{Title}`): `URL`,
-	})
+	r := Slice(s, d, `Id`, `Id`, M{`Title`, `Title`}, M{Layout(`https://abs/{Id}/{Title}`), `URL`})
 	assert.Equal(t, []*to{
-		{Id: 100, Title: `1`, URL: `https://abs/1`},
+		{Id: 100, Title: `title`, URL: `https://abs/100/title`},
 		{Id: 200, Title: ``},
 	}, r)
 }
 
 func TestSlice2(t *testing.T) {
 	s := []*from{
-		{Id: 100, Title: `1`},
+		{Id: 100, Title: `title`},
 	}
 	d := []*to{
 		{Id: 100, Title: `0`},
 		{Id: 200, Title: ``},
 	}
-	r := Slice(s, d, `Id`, `Id`, map[interface{}]string{
-		`Title`: `Title`,
-		Layout(`https://abs/?id=` + url.QueryEscape(`{Title}`)): `URL`,
-	})
+	c := func(v *from) interface{} {
+		return fmt.Sprintf(`https://abs/?id=%d&title=%s`, v.Id, v.Title)
+	}
+	r := Slice(s, d, `Id`, `Id`, M{`Title`, `Title`},
+		M{c, `URL`},
+	)
 	assert.Equal(t, []*to{
-		{Id: 100, Title: `1`, URL: `https://abs/?id=1`},
+		{Id: 100, Title: `title`, URL: `https://abs/?id=100&title=title`},
+		{Id: 200, Title: ``},
+	}, r)
+}
+
+func TestSlice3(t *testing.T) {
+	s := []*from{
+		{Id: 100, Title: `title`},
+	}
+	d := []*to{
+		{Id: 100, Title: `0`},
+		{Id: 200, Title: ``},
+	}
+	r := Slice(s, d, `Id`, `Id`, M{`Title`, `Title`},
+		M{Layout(`https://abs/?id=` + url.QueryEscape(`{Id}`) + `&title=` + url.QueryEscape(`{Title}`)), `URL`},
+	)
+	assert.Equal(t, []*to{
+		{Id: 100, Title: `title`, URL: `https://abs/?id=100&title=title`},
 		{Id: 200, Title: ``},
 	}, r)
 }

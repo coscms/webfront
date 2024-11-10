@@ -5,6 +5,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
+	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/mapping"
 	"github.com/coscms/webfront/model/official"
 )
@@ -38,16 +39,18 @@ func init() {
 		return func(_ ...bool) error { return nil }, nil, nil
 	}), official.CollectionTargetListFunc(func(c echo.Context, rows []*official.CollectionResponse, targetIDs []uint64) ([]*official.CollectionResponse, error) {
 		articleM := NewArticle(c)
-		err := articleM.ListByOffset(nil, func(r db.Result) db.Result {
+		_, err := articleM.ListByOffset(nil, func(r db.Result) db.Result {
 			return r.Select(`id`, `title`)
-		}, `id`, db.In(targetIDs))
+		}, 0, 1, `id`, db.In(targetIDs))
 		if err != nil {
 			return rows, err
 		}
-		detailURL := c.Echo().URI(`article.detail`, `{Id}`)
-		return mapping.Slice(articleM.Objects(), rows, `Id`, `TargetId`, map[interface{}]string{
-			`Title`:                   `Title`,
-			mapping.Layout(detailURL): `URL`,
-		}), nil
+		urlGenerator := func(v *dbschema.OfficialCommonArticle) interface{} {
+			return c.Echo().URI(`article.detail`, v.Id)
+		}
+		return mapping.Slice(articleM.Objects(), rows, `Id`, `TargetId`,
+			mapping.M{`Title`, `Title`},
+			mapping.M{urlGenerator, `URL`},
+		), nil
 	}))
 }
