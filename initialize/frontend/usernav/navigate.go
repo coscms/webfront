@@ -133,7 +133,7 @@ var LeftNavigate = &navigate.List{
 			},
 			{
 				Display:   false,
-				Name:      `删除收藏`,
+				Name:      `跳转到收藏页`,
 				Action:    `go/:id`,
 				Icon:      ``,
 				Unlimited: true,
