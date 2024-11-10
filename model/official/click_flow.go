@@ -3,6 +3,7 @@ package official
 import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webfront/dbschema"
 )
@@ -40,7 +41,7 @@ func (f *ClickFlow) Add() (pk interface{}, err error) {
 		return
 	}
 	if exists {
-		err = f.Context().E(`您已经表过态了`)
+		err = f.Context().NewError(code.RepeatOperation, `您已经表过态了`)
 		return
 	}
 	return f.OfficialCommonClickFlow.Insert()
@@ -72,6 +73,15 @@ func (f *ClickFlow) DelByTarget(targetType string, targetID uint64) error {
 	return f.OfficialCommonClickFlow.Delete(nil, db.And(
 		db.Cond{`target_type`: targetType},
 		db.Cond{`target_id`: targetID},
+	))
+}
+
+func (f *ClickFlow) DelByTargetOwner(targetType string, targetID uint64, ownerID uint64, ownerType string) error {
+	return f.OfficialCommonClickFlow.Delete(nil, db.And(
+		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
+		db.Cond{`owner_id`: ownerID},
+		db.Cond{`owner_type`: ownerType},
 	))
 }
 
