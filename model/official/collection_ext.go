@@ -26,8 +26,9 @@ type CollectionTargetDo interface {
 }
 
 type CollectionTarget struct {
-	ls CollectionTargetList
-	do CollectionTargetDo
+	ls    CollectionTargetList
+	do    CollectionTargetDo
+	Title string
 }
 
 func (c CollectionTarget) HasList() bool {
@@ -54,10 +55,11 @@ func (c CollectionTarget) Do(ctx echo.Context, id interface{}) (after func(isCan
 
 var CollectionTargets = map[string]CollectionTarget{}
 
-func AddCollectionTarget(name string, targetDo CollectionTargetDo, targetList CollectionTargetList) {
+func AddCollectionTarget(name string, title string, targetDo CollectionTargetDo, targetList CollectionTargetList) {
 	CollectionTargets[name] = CollectionTarget{
-		ls: targetList,
-		do: targetDo,
+		ls:    targetList,
+		do:    targetDo,
+		Title: title,
 	}
 }
 
