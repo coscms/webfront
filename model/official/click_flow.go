@@ -42,13 +42,26 @@ type ClickFlow struct {
 }
 
 func (f *ClickFlow) Add() (pk interface{}, err error) {
-	var exists bool
-	exists, err = f.Exists(f.TargetType, f.TargetId, f.OwnerId, f.OwnerType)
+	old := dbschema.NewOfficialCommonClickFlow(f.Context())
+	err = old.Get(func(r db.Result) db.Result {
+		return r.Select(`type`)
+	}, db.And(
+		db.Cond{`target_type`: f.TargetType},
+		db.Cond{`target_id`: f.TargetId},
+		db.Cond{`owner_id`: f.OwnerId},
+		db.Cond{`owner_type`: f.OwnerType},
+	))
 	if err != nil {
-		return
-	}
-	if exists {
-		err = f.Context().NewError(code.RepeatOperation, `您已经表过态了`)
+		if err != db.ErrNoMoreRows {
+			return
+		}
+		err = nil
+	} else {
+		if old.Type == f.Type {
+			err = f.Context().NewError(code.RepeatOperation, `您已经表过态了`)
+		} else {
+			err = f.Context().NewError(code.DataAlreadyExists, `您已经表过态了`)
+		}
 		return
 	}
 	return f.OfficialCommonClickFlow.Insert()
