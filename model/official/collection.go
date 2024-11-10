@@ -82,3 +82,39 @@ func (f *Collection) ListByTargets(targetType string, targetIDs []uint64, custom
 	}
 	return result, err
 }
+
+func (f *Collection) ListPage(targetType string, targetID uint64, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+	cond := db.NewCompounds()
+	cond.Add(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`target_id`: targetID},
+		db.Cond{`target_type`: targetType},
+	)
+	list := []*CollectionResponse{}
+	err := f.OfficialCommonCollection.ListPageAs(&list, cond, sorts...)
+	if err != nil {
+		return list, err
+	}
+	if ls, ok := CollectionTargets[targetType]; ok && ls.List != nil {
+		list, err = ls.List.List(f.Context(), list)
+	}
+	return list, err
+}
+
+func (f *Collection) ListPageByOffset(targetType string, targetID uint64, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+	cond := db.NewCompounds()
+	cond.Add(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`target_id`: targetID},
+		db.Cond{`target_type`: targetType},
+	)
+	list := []*CollectionResponse{}
+	err := f.OfficialCommonCollection.ListPageByOffsetAs(&list, cond, sorts...)
+	if err != nil {
+		return list, err
+	}
+	if ls, ok := CollectionTargets[targetType]; ok && ls.List != nil {
+		list, err = ls.List.List(f.Context(), list)
+	}
+	return list, err
+}
