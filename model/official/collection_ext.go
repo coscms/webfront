@@ -3,6 +3,7 @@ package official
 import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 )
 
 type CollectionTargetDoFunc func(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error)
@@ -68,4 +69,19 @@ type CollectionResponse struct {
 	Title string `db:"-" json:"title" xml:"title"`
 	URL   string `db:"-" json:"url" xml:"url"`
 	Extra echo.H `db:"-" json:"extra,omitempty" xml:"extra,omitempty"`
+}
+
+func (c *CollectionResponse) Set(key interface{}, value ...interface{}) {
+	switch key.(string) {
+	case `Title`:
+		c.Title = param.AsString(value[0])
+	case `URL`:
+		c.URL = param.AsString(value[0])
+	case `Extra`:
+		c.Extra = param.AsStore(value[0])
+	default:
+		if c.OfficialCommonCollection != nil {
+			c.OfficialCommonCollection.Set(key, value...)
+		}
+	}
 }
