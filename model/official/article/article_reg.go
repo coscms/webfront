@@ -40,7 +40,7 @@ func init() {
 	}), official.CollectionTargetListFunc(func(c echo.Context, rows []*official.CollectionResponse, targetIDs []uint64) ([]*official.CollectionResponse, error) {
 		articleM := NewArticle(c)
 		_, err := articleM.ListByOffset(nil, func(r db.Result) db.Result {
-			return r.Select(`id`, `title`)
+			return r.Select(`id`, `title`, `image`)
 		}, 0, -1, `id`, db.In(targetIDs))
 		if err != nil {
 			return rows, err
@@ -48,9 +48,15 @@ func init() {
 		urlGenerator := func(v *dbschema.OfficialCommonArticle) interface{} {
 			return c.Echo().URI(`article.detail`, v.Id)
 		}
+		extra := func(v *dbschema.OfficialCommonArticle) interface{} {
+			return echo.H{
+				`thumb`: v.Image,
+			}
+		}
 		return mapping.Slice(articleM.Objects(), rows, `Id`, `TargetId`,
 			mapping.M{`Title`, `Title`},
 			mapping.M{urlGenerator, `URL`},
+			mapping.M{extra, `Extra`},
 		), nil
 	}))
 }
