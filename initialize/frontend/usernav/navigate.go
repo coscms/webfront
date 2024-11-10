@@ -111,4 +111,26 @@ var LeftNavigate = &navigate.List{
 			},
 		},
 	},
+	{
+		Display: true,
+		Name:    `我的收藏`,
+		Action:  `favorite`,
+		Icon:    `link`,
+		Children: &navigate.List{
+			{
+				Display:  true,
+				Name:     `我的收藏`,
+				Action:   `index`,
+				Icon:     `star`,
+				Children: &navigate.List{},
+			},
+			{
+				Display:  false,
+				Name:     `删除收藏`,
+				Action:   `delete`,
+				Icon:     `trash`,
+				Children: &navigate.List{},
+			},
+		},
+	},
 }
