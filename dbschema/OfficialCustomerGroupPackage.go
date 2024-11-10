@@ -507,7 +507,7 @@ func (a *OfficialCustomerGroupPackage) UpdateFields(mw func(db.Result) db.Result
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -542,7 +542,7 @@ func (a *OfficialCustomerGroupPackage) UpdatexFields(mw func(db.Result) db.Resul
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -736,6 +736,9 @@ func (a *OfficialCustomerGroupPackage) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerGroupPackage) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -768,6 +771,100 @@ func (a *OfficialCustomerGroupPackage) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerGroupPackage) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Group":
+		return a.Group
+	case "Title":
+		return a.Title
+	case "Description":
+		return a.Description
+	case "Price":
+		return a.Price
+	case "TimeDuration":
+		return a.TimeDuration
+	case "TimeUnit":
+		return a.TimeUnit
+	case "Sort":
+		return a.Sort
+	case "Disabled":
+		return a.Disabled
+	case "Recommend":
+		return a.Recommend
+	case "Sold":
+		return a.Sold
+	case "IconImage":
+		return a.IconImage
+	case "IconClass":
+		return a.IconClass
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerGroupPackage) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Group",
+		"Title",
+		"Description",
+		"Price",
+		"TimeDuration",
+		"TimeUnit",
+		"Sort",
+		"Disabled",
+		"Recommend",
+		"Sold",
+		"IconImage",
+		"IconClass",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCustomerGroupPackage) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Group":
+		return true
+	case "Title":
+		return true
+	case "Description":
+		return true
+	case "Price":
+		return true
+	case "TimeDuration":
+		return true
+	case "TimeUnit":
+		return true
+	case "Sort":
+		return true
+	case "Disabled":
+		return true
+	case "Recommend":
+		return true
+	case "Sold":
+		return true
+	case "IconImage":
+		return true
+	case "IconClass":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -883,17 +980,19 @@ func (a *OfficialCustomerGroupPackage) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerGroupPackage) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerGroupPackage) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerGroupPackage) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerGroupPackage) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerGroupPackage) BatchValidate(kvset map[string]interface{}) error {

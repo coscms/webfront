@@ -449,7 +449,7 @@ func (a *OfficialCommonMessageViewed) UpdateFields(mw func(db.Result) db.Result,
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -474,7 +474,7 @@ func (a *OfficialCommonMessageViewed) UpdatexFields(mw func(db.Result) db.Result
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -604,6 +604,9 @@ func (a *OfficialCommonMessageViewed) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonMessageViewed) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "message_id":
 			a.MessageId = param.AsUint64(value)
@@ -614,6 +617,45 @@ func (a *OfficialCommonMessageViewed) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonMessageViewed) GetField(field string) interface{} {
+	switch field {
+	case "MessageId":
+		return a.MessageId
+	case "ViewerId":
+		return a.ViewerId
+	case "ViewerType":
+		return a.ViewerType
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonMessageViewed) GetAllFieldNames() []string {
+	return []string{
+		"MessageId",
+		"ViewerId",
+		"ViewerType",
+		"Created",
+	}
+}
+
+func (a *OfficialCommonMessageViewed) HasField(field string) bool {
+	switch field {
+	case "MessageId":
+		return true
+	case "ViewerId":
+		return true
+	case "ViewerType":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -674,17 +716,19 @@ func (a *OfficialCommonMessageViewed) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonMessageViewed) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonMessageViewed) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonMessageViewed) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonMessageViewed) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonMessageViewed) BatchValidate(kvset map[string]interface{}) error {

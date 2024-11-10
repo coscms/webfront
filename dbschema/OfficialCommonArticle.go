@@ -582,7 +582,7 @@ func (a *OfficialCommonArticle) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -632,7 +632,7 @@ func (a *OfficialCommonArticle) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -904,6 +904,9 @@ func (a *OfficialCommonArticle) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonArticle) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -966,6 +969,175 @@ func (a *OfficialCommonArticle) FromRow(row map[string]interface{}) {
 		case "slugify":
 			a.Slugify = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCommonArticle) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Category1":
+		return a.Category1
+	case "Category2":
+		return a.Category2
+	case "Category3":
+		return a.Category3
+	case "CategoryId":
+		return a.CategoryId
+	case "SourceId":
+		return a.SourceId
+	case "SourceTable":
+		return a.SourceTable
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Title":
+		return a.Title
+	case "Keywords":
+		return a.Keywords
+	case "Image":
+		return a.Image
+	case "ImageOriginal":
+		return a.ImageOriginal
+	case "Summary":
+		return a.Summary
+	case "Content":
+		return a.Content
+	case "Contype":
+		return a.Contype
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Display":
+		return a.Display
+	case "Template":
+		return a.Template
+	case "Comments":
+		return a.Comments
+	case "CloseComment":
+		return a.CloseComment
+	case "CommentAutoDisplay":
+		return a.CommentAutoDisplay
+	case "CommentAllowUser":
+		return a.CommentAllowUser
+	case "Likes":
+		return a.Likes
+	case "Hates":
+		return a.Hates
+	case "Views":
+		return a.Views
+	case "Tags":
+		return a.Tags
+	case "Price":
+		return a.Price
+	case "Slugify":
+		return a.Slugify
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonArticle) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Category1",
+		"Category2",
+		"Category3",
+		"CategoryId",
+		"SourceId",
+		"SourceTable",
+		"OwnerId",
+		"OwnerType",
+		"Title",
+		"Keywords",
+		"Image",
+		"ImageOriginal",
+		"Summary",
+		"Content",
+		"Contype",
+		"Created",
+		"Updated",
+		"Display",
+		"Template",
+		"Comments",
+		"CloseComment",
+		"CommentAutoDisplay",
+		"CommentAllowUser",
+		"Likes",
+		"Hates",
+		"Views",
+		"Tags",
+		"Price",
+		"Slugify",
+	}
+}
+
+func (a *OfficialCommonArticle) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Category1":
+		return true
+	case "Category2":
+		return true
+	case "Category3":
+		return true
+	case "CategoryId":
+		return true
+	case "SourceId":
+		return true
+	case "SourceTable":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Title":
+		return true
+	case "Keywords":
+		return true
+	case "Image":
+		return true
+	case "ImageOriginal":
+		return true
+	case "Summary":
+		return true
+	case "Content":
+		return true
+	case "Contype":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Display":
+		return true
+	case "Template":
+		return true
+	case "Comments":
+		return true
+	case "CloseComment":
+		return true
+	case "CommentAutoDisplay":
+		return true
+	case "CommentAllowUser":
+		return true
+	case "Likes":
+		return true
+	case "Hates":
+		return true
+	case "Views":
+		return true
+	case "Tags":
+		return true
+	case "Price":
+		return true
+	case "Slugify":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1156,17 +1328,19 @@ func (a *OfficialCommonArticle) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonArticle) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonArticle) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonArticle) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonArticle) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonArticle) BatchValidate(kvset map[string]interface{}) error {

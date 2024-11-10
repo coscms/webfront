@@ -564,7 +564,7 @@ func (a *OfficialCustomer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -609,7 +609,7 @@ func (a *OfficialCustomer) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -883,6 +883,9 @@ func (a *OfficialCustomer) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomer) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -949,6 +952,185 @@ func (a *OfficialCustomer) FromRow(row map[string]interface{}) {
 		case "registered_by":
 			a.RegisteredBy = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCustomer) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "GroupId":
+		return a.GroupId
+	case "Name":
+		return a.Name
+	case "Password":
+		return a.Password
+	case "Salt":
+		return a.Salt
+	case "SafePwd":
+		return a.SafePwd
+	case "SessionId":
+		return a.SessionId
+	case "RealName":
+		return a.RealName
+	case "Mobile":
+		return a.Mobile
+	case "MobileBind":
+		return a.MobileBind
+	case "Email":
+		return a.Email
+	case "EmailBind":
+		return a.EmailBind
+	case "Online":
+		return a.Online
+	case "Disabled":
+		return a.Disabled
+	case "Gender":
+		return a.Gender
+	case "IdCardNo":
+		return a.IdCardNo
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Description":
+		return a.Description
+	case "Avatar":
+		return a.Avatar
+	case "Licenses":
+		return a.Licenses
+	case "LoginFails":
+		return a.LoginFails
+	case "LevelId":
+		return a.LevelId
+	case "AgentLevel":
+		return a.AgentLevel
+	case "InviterId":
+		return a.InviterId
+	case "Following":
+		return a.Following
+	case "Followers":
+		return a.Followers
+	case "RoleIds":
+		return a.RoleIds
+	case "FileSize":
+		return a.FileSize
+	case "FileNum":
+		return a.FileNum
+	case "RegisteredBy":
+		return a.RegisteredBy
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomer) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"GroupId",
+		"Name",
+		"Password",
+		"Salt",
+		"SafePwd",
+		"SessionId",
+		"RealName",
+		"Mobile",
+		"MobileBind",
+		"Email",
+		"EmailBind",
+		"Online",
+		"Disabled",
+		"Gender",
+		"IdCardNo",
+		"Created",
+		"Updated",
+		"Description",
+		"Avatar",
+		"Licenses",
+		"LoginFails",
+		"LevelId",
+		"AgentLevel",
+		"InviterId",
+		"Following",
+		"Followers",
+		"RoleIds",
+		"FileSize",
+		"FileNum",
+		"RegisteredBy",
+	}
+}
+
+func (a *OfficialCustomer) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "GroupId":
+		return true
+	case "Name":
+		return true
+	case "Password":
+		return true
+	case "Salt":
+		return true
+	case "SafePwd":
+		return true
+	case "SessionId":
+		return true
+	case "RealName":
+		return true
+	case "Mobile":
+		return true
+	case "MobileBind":
+		return true
+	case "Email":
+		return true
+	case "EmailBind":
+		return true
+	case "Online":
+		return true
+	case "Disabled":
+		return true
+	case "Gender":
+		return true
+	case "IdCardNo":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Description":
+		return true
+	case "Avatar":
+		return true
+	case "Licenses":
+		return true
+	case "LoginFails":
+		return true
+	case "LevelId":
+		return true
+	case "AgentLevel":
+		return true
+	case "InviterId":
+		return true
+	case "Following":
+		return true
+	case "Followers":
+		return true
+	case "RoleIds":
+		return true
+	case "FileSize":
+		return true
+	case "FileNum":
+		return true
+	case "RegisteredBy":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1149,17 +1331,19 @@ func (a *OfficialCustomer) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomer) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomer) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomer) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomer) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomer) BatchValidate(kvset map[string]interface{}) error {

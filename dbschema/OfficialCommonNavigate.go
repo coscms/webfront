@@ -550,7 +550,7 @@ func (a *OfficialCommonNavigate) UpdateFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -595,7 +595,7 @@ func (a *OfficialCommonNavigate) UpdatexFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -813,6 +813,9 @@ func (a *OfficialCommonNavigate) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonNavigate) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -851,6 +854,115 @@ func (a *OfficialCommonNavigate) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonNavigate) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Type":
+		return a.Type
+	case "LinkType":
+		return a.LinkType
+	case "ParentId":
+		return a.ParentId
+	case "HasChild":
+		return a.HasChild
+	case "Level":
+		return a.Level
+	case "Title":
+		return a.Title
+	case "Cover":
+		return a.Cover
+	case "Url":
+		return a.Url
+	case "Ident":
+		return a.Ident
+	case "Remark":
+		return a.Remark
+	case "Sort":
+		return a.Sort
+	case "Disabled":
+		return a.Disabled
+	case "Target":
+		return a.Target
+	case "Direction":
+		return a.Direction
+	case "Badge":
+		return a.Badge
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonNavigate) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Type",
+		"LinkType",
+		"ParentId",
+		"HasChild",
+		"Level",
+		"Title",
+		"Cover",
+		"Url",
+		"Ident",
+		"Remark",
+		"Sort",
+		"Disabled",
+		"Target",
+		"Direction",
+		"Badge",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCommonNavigate) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Type":
+		return true
+	case "LinkType":
+		return true
+	case "ParentId":
+		return true
+	case "HasChild":
+		return true
+	case "Level":
+		return true
+	case "Title":
+		return true
+	case "Cover":
+		return true
+	case "Url":
+		return true
+	case "Ident":
+		return true
+	case "Remark":
+		return true
+	case "Sort":
+		return true
+	case "Disabled":
+		return true
+	case "Target":
+		return true
+	case "Direction":
+		return true
+	case "Badge":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -981,17 +1093,19 @@ func (a *OfficialCommonNavigate) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonNavigate) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonNavigate) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonNavigate) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonNavigate) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonNavigate) BatchValidate(kvset map[string]interface{}) error {

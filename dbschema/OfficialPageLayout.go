@@ -460,7 +460,7 @@ func (a *OfficialPageLayout) UpdateFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -485,7 +485,7 @@ func (a *OfficialPageLayout) UpdatexFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -639,6 +639,9 @@ func (a *OfficialPageLayout) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialPageLayout) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -657,6 +660,65 @@ func (a *OfficialPageLayout) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialPageLayout) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "BlockId":
+		return a.BlockId
+	case "PageId":
+		return a.PageId
+	case "Configs":
+		return a.Configs
+	case "Sort":
+		return a.Sort
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialPageLayout) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"BlockId",
+		"PageId",
+		"Configs",
+		"Sort",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialPageLayout) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "BlockId":
+		return true
+	case "PageId":
+		return true
+	case "Configs":
+		return true
+	case "Sort":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -737,17 +799,19 @@ func (a *OfficialPageLayout) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialPageLayout) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialPageLayout) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialPageLayout) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialPageLayout) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialPageLayout) BatchValidate(kvset map[string]interface{}) error {

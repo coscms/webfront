@@ -460,7 +460,7 @@ func (a *OfficialCommonRemark) UpdateFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -485,7 +485,7 @@ func (a *OfficialCommonRemark) UpdatexFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -638,6 +638,9 @@ func (a *OfficialCommonRemark) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonRemark) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -656,6 +659,65 @@ func (a *OfficialCommonRemark) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonRemark) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "SourceType":
+		return a.SourceType
+	case "SourceTable":
+		return a.SourceTable
+	case "SourceId":
+		return a.SourceId
+	case "Content":
+		return a.Content
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonRemark) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerId",
+		"OwnerType",
+		"SourceType",
+		"SourceTable",
+		"SourceId",
+		"Content",
+		"Created",
+	}
+}
+
+func (a *OfficialCommonRemark) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "SourceType":
+		return true
+	case "SourceTable":
+		return true
+	case "SourceId":
+		return true
+	case "Content":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -736,17 +798,19 @@ func (a *OfficialCommonRemark) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonRemark) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonRemark) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonRemark) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonRemark) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonRemark) BatchValidate(kvset map[string]interface{}) error {

@@ -490,7 +490,7 @@ func (a *OfficialCommonFriendlink) UpdateFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -520,7 +520,7 @@ func (a *OfficialCommonFriendlink) UpdatexFields(mw func(db.Result) db.Result, k
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -720,6 +720,9 @@ func (a *OfficialCommonFriendlink) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonFriendlink) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -758,6 +761,115 @@ func (a *OfficialCommonFriendlink) FromRow(row map[string]interface{}) {
 		case "return_count":
 			a.ReturnCount = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonFriendlink) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CategoryId":
+		return a.CategoryId
+	case "CustomerId":
+		return a.CustomerId
+	case "Logo":
+		return a.Logo
+	case "LogoOriginal":
+		return a.LogoOriginal
+	case "Name":
+		return a.Name
+	case "Description":
+		return a.Description
+	case "Url":
+		return a.Url
+	case "Host":
+		return a.Host
+	case "VerifyTime":
+		return a.VerifyTime
+	case "VerifyFailCount":
+		return a.VerifyFailCount
+	case "VerifyResult":
+		return a.VerifyResult
+	case "Process":
+		return a.Process
+	case "ProcessRemark":
+		return a.ProcessRemark
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "ReturnTime":
+		return a.ReturnTime
+	case "ReturnCount":
+		return a.ReturnCount
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonFriendlink) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CategoryId",
+		"CustomerId",
+		"Logo",
+		"LogoOriginal",
+		"Name",
+		"Description",
+		"Url",
+		"Host",
+		"VerifyTime",
+		"VerifyFailCount",
+		"VerifyResult",
+		"Process",
+		"ProcessRemark",
+		"Created",
+		"Updated",
+		"ReturnTime",
+		"ReturnCount",
+	}
+}
+
+func (a *OfficialCommonFriendlink) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CategoryId":
+		return true
+	case "CustomerId":
+		return true
+	case "Logo":
+		return true
+	case "LogoOriginal":
+		return true
+	case "Name":
+		return true
+	case "Description":
+		return true
+	case "Url":
+		return true
+	case "Host":
+		return true
+	case "VerifyTime":
+		return true
+	case "VerifyFailCount":
+		return true
+	case "VerifyResult":
+		return true
+	case "Process":
+		return true
+	case "ProcessRemark":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "ReturnTime":
+		return true
+	case "ReturnCount":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -888,17 +1000,19 @@ func (a *OfficialCommonFriendlink) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonFriendlink) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonFriendlink) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonFriendlink) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonFriendlink) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonFriendlink) BatchValidate(kvset map[string]interface{}) error {

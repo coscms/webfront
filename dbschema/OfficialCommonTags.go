@@ -447,7 +447,7 @@ func (a *OfficialCommonTags) UpdateFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -472,7 +472,7 @@ func (a *OfficialCommonTags) UpdatexFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -601,6 +601,9 @@ func (a *OfficialCommonTags) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonTags) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "name":
 			a.Name = param.AsString(value)
@@ -611,6 +614,45 @@ func (a *OfficialCommonTags) FromRow(row map[string]interface{}) {
 		case "display":
 			a.Display = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCommonTags) GetField(field string) interface{} {
+	switch field {
+	case "Name":
+		return a.Name
+	case "Num":
+		return a.Num
+	case "Group":
+		return a.Group
+	case "Display":
+		return a.Display
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonTags) GetAllFieldNames() []string {
+	return []string{
+		"Name",
+		"Num",
+		"Group",
+		"Display",
+	}
+}
+
+func (a *OfficialCommonTags) HasField(field string) bool {
+	switch field {
+	case "Name":
+		return true
+	case "Num":
+		return true
+	case "Group":
+		return true
+	case "Display":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -671,17 +713,19 @@ func (a *OfficialCommonTags) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonTags) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonTags) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonTags) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonTags) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonTags) BatchValidate(kvset map[string]interface{}) error {

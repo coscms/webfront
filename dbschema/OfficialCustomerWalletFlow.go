@@ -487,7 +487,7 @@ func (a *OfficialCustomerWalletFlow) UpdateFields(mw func(db.Result) db.Result, 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -517,7 +517,7 @@ func (a *OfficialCustomerWalletFlow) UpdatexFields(mw func(db.Result) db.Result,
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -704,6 +704,9 @@ func (a *OfficialCustomerWalletFlow) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerWalletFlow) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -736,6 +739,100 @@ func (a *OfficialCustomerWalletFlow) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerWalletFlow) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "AssetType":
+		return a.AssetType
+	case "AmountType":
+		return a.AmountType
+	case "Amount":
+		return a.Amount
+	case "WalletAmount":
+		return a.WalletAmount
+	case "SourceCustomer":
+		return a.SourceCustomer
+	case "SourceType":
+		return a.SourceType
+	case "SourceTable":
+		return a.SourceTable
+	case "SourceId":
+		return a.SourceId
+	case "Number":
+		return a.Number
+	case "TradeNo":
+		return a.TradeNo
+	case "Status":
+		return a.Status
+	case "Description":
+		return a.Description
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerWalletFlow) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"AssetType",
+		"AmountType",
+		"Amount",
+		"WalletAmount",
+		"SourceCustomer",
+		"SourceType",
+		"SourceTable",
+		"SourceId",
+		"Number",
+		"TradeNo",
+		"Status",
+		"Description",
+		"Created",
+	}
+}
+
+func (a *OfficialCustomerWalletFlow) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "AssetType":
+		return true
+	case "AmountType":
+		return true
+	case "Amount":
+		return true
+	case "WalletAmount":
+		return true
+	case "SourceCustomer":
+		return true
+	case "SourceType":
+		return true
+	case "SourceTable":
+		return true
+	case "SourceId":
+		return true
+	case "Number":
+		return true
+	case "TradeNo":
+		return true
+	case "Status":
+		return true
+	case "Description":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -851,17 +948,19 @@ func (a *OfficialCustomerWalletFlow) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerWalletFlow) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerWalletFlow) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerWalletFlow) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerWalletFlow) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerWalletFlow) BatchValidate(kvset map[string]interface{}) error {

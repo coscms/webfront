@@ -441,7 +441,7 @@ func (a *OfficialCustomerDevice) UpdateFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -461,7 +461,7 @@ func (a *OfficialCustomerDevice) UpdatexFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -613,6 +613,9 @@ func (a *OfficialCustomerDevice) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerDevice) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -633,6 +636,70 @@ func (a *OfficialCustomerDevice) FromRow(row map[string]interface{}) {
 		case "expired":
 			a.Expired = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerDevice) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "SessionId":
+		return a.SessionId
+	case "Scense":
+		return a.Scense
+	case "Platform":
+		return a.Platform
+	case "DeviceNo":
+		return a.DeviceNo
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Expired":
+		return a.Expired
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerDevice) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"SessionId",
+		"Scense",
+		"Platform",
+		"DeviceNo",
+		"Created",
+		"Updated",
+		"Expired",
+	}
+}
+
+func (a *OfficialCustomerDevice) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "SessionId":
+		return true
+	case "Scense":
+		return true
+	case "Platform":
+		return true
+	case "DeviceNo":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Expired":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -718,17 +785,19 @@ func (a *OfficialCustomerDevice) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerDevice) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerDevice) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerDevice) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerDevice) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerDevice) BatchValidate(kvset map[string]interface{}) error {

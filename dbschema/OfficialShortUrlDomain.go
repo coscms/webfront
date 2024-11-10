@@ -480,7 +480,7 @@ func (a *OfficialShortUrlDomain) UpdateFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -510,7 +510,7 @@ func (a *OfficialShortUrlDomain) UpdatexFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -670,6 +670,9 @@ func (a *OfficialShortUrlDomain) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialShortUrlDomain) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -688,6 +691,65 @@ func (a *OfficialShortUrlDomain) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialShortUrlDomain) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Domain":
+		return a.Domain
+	case "UrlCount":
+		return a.UrlCount
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialShortUrlDomain) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerId",
+		"OwnerType",
+		"Domain",
+		"UrlCount",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialShortUrlDomain) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Domain":
+		return true
+	case "UrlCount":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -768,17 +830,19 @@ func (a *OfficialShortUrlDomain) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialShortUrlDomain) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialShortUrlDomain) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialShortUrlDomain) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialShortUrlDomain) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialShortUrlDomain) BatchValidate(kvset map[string]interface{}) error {

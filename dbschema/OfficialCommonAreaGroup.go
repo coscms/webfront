@@ -435,7 +435,7 @@ func (a *OfficialCommonAreaGroup) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -455,7 +455,7 @@ func (a *OfficialCommonAreaGroup) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -593,6 +593,9 @@ func (a *OfficialCommonAreaGroup) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonAreaGroup) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -607,6 +610,55 @@ func (a *OfficialCommonAreaGroup) FromRow(row map[string]interface{}) {
 		case "sort":
 			a.Sort = param.AsInt(value)
 		}
+	}
+}
+
+func (a *OfficialCommonAreaGroup) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CountryAbbr":
+		return a.CountryAbbr
+	case "Name":
+		return a.Name
+	case "Abbr":
+		return a.Abbr
+	case "AreaIds":
+		return a.AreaIds
+	case "Sort":
+		return a.Sort
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonAreaGroup) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CountryAbbr",
+		"Name",
+		"Abbr",
+		"AreaIds",
+		"Sort",
+	}
+}
+
+func (a *OfficialCommonAreaGroup) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CountryAbbr":
+		return true
+	case "Name":
+		return true
+	case "Abbr":
+		return true
+	case "AreaIds":
+		return true
+	case "Sort":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -677,17 +729,19 @@ func (a *OfficialCommonAreaGroup) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonAreaGroup) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonAreaGroup) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonAreaGroup) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonAreaGroup) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonAreaGroup) BatchValidate(kvset map[string]interface{}) error {

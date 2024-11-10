@@ -491,7 +491,7 @@ func (a *OfficialCommonMessage) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -521,7 +521,7 @@ func (a *OfficialCommonMessage) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -724,6 +724,9 @@ func (a *OfficialCommonMessage) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonMessage) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -764,6 +767,120 @@ func (a *OfficialCommonMessage) FromRow(row map[string]interface{}) {
 		case "view_progress":
 			a.ViewProgress = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonMessage) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Type":
+		return a.Type
+	case "CustomerA":
+		return a.CustomerA
+	case "CustomerB":
+		return a.CustomerB
+	case "CustomerGroupId":
+		return a.CustomerGroupId
+	case "UserA":
+		return a.UserA
+	case "UserB":
+		return a.UserB
+	case "UserRoleId":
+		return a.UserRoleId
+	case "Title":
+		return a.Title
+	case "Content":
+		return a.Content
+	case "Contype":
+		return a.Contype
+	case "Encrypted":
+		return a.Encrypted
+	case "Password":
+		return a.Password
+	case "Created":
+		return a.Created
+	case "Url":
+		return a.Url
+	case "RootId":
+		return a.RootId
+	case "ReplyId":
+		return a.ReplyId
+	case "HasNewReply":
+		return a.HasNewReply
+	case "ViewProgress":
+		return a.ViewProgress
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonMessage) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Type",
+		"CustomerA",
+		"CustomerB",
+		"CustomerGroupId",
+		"UserA",
+		"UserB",
+		"UserRoleId",
+		"Title",
+		"Content",
+		"Contype",
+		"Encrypted",
+		"Password",
+		"Created",
+		"Url",
+		"RootId",
+		"ReplyId",
+		"HasNewReply",
+		"ViewProgress",
+	}
+}
+
+func (a *OfficialCommonMessage) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Type":
+		return true
+	case "CustomerA":
+		return true
+	case "CustomerB":
+		return true
+	case "CustomerGroupId":
+		return true
+	case "UserA":
+		return true
+	case "UserB":
+		return true
+	case "UserRoleId":
+		return true
+	case "Title":
+		return true
+	case "Content":
+		return true
+	case "Contype":
+		return true
+	case "Encrypted":
+		return true
+	case "Password":
+		return true
+	case "Created":
+		return true
+	case "Url":
+		return true
+	case "RootId":
+		return true
+	case "ReplyId":
+		return true
+	case "HasNewReply":
+		return true
+	case "ViewProgress":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -899,17 +1016,19 @@ func (a *OfficialCommonMessage) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonMessage) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonMessage) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonMessage) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonMessage) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonMessage) BatchValidate(kvset map[string]interface{}) error {

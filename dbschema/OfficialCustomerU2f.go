@@ -461,7 +461,7 @@ func (a *OfficialCustomerU2f) UpdateFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -486,7 +486,7 @@ func (a *OfficialCustomerU2f) UpdatexFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -643,6 +643,9 @@ func (a *OfficialCustomerU2f) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerU2f) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -663,6 +666,70 @@ func (a *OfficialCustomerU2f) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerU2f) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "Name":
+		return a.Name
+	case "Token":
+		return a.Token
+	case "Type":
+		return a.Type
+	case "Extra":
+		return a.Extra
+	case "Step":
+		return a.Step
+	case "Precondition":
+		return a.Precondition
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerU2f) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"Name",
+		"Token",
+		"Type",
+		"Extra",
+		"Step",
+		"Precondition",
+		"Created",
+	}
+}
+
+func (a *OfficialCustomerU2f) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "Name":
+		return true
+	case "Token":
+		return true
+	case "Type":
+		return true
+	case "Extra":
+		return true
+	case "Step":
+		return true
+	case "Precondition":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -748,17 +815,19 @@ func (a *OfficialCustomerU2f) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerU2f) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerU2f) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerU2f) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerU2f) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerU2f) BatchValidate(kvset map[string]interface{}) error {

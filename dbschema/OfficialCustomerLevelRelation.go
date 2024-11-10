@@ -461,7 +461,7 @@ func (a *OfficialCustomerLevelRelation) UpdateFields(mw func(db.Result) db.Resul
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -486,7 +486,7 @@ func (a *OfficialCustomerLevelRelation) UpdatexFields(mw func(db.Result) db.Resu
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -644,6 +644,9 @@ func (a *OfficialCustomerLevelRelation) AsMap(onlyFields ...string) param.Store 
 
 func (a *OfficialCustomerLevelRelation) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -664,6 +667,70 @@ func (a *OfficialCustomerLevelRelation) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerLevelRelation) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "LevelId":
+		return a.LevelId
+	case "Status":
+		return a.Status
+	case "Expired":
+		return a.Expired
+	case "AccumulatedDays":
+		return a.AccumulatedDays
+	case "LastRenewalAt":
+		return a.LastRenewalAt
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerLevelRelation) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"LevelId",
+		"Status",
+		"Expired",
+		"AccumulatedDays",
+		"LastRenewalAt",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCustomerLevelRelation) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "LevelId":
+		return true
+	case "Status":
+		return true
+	case "Expired":
+		return true
+	case "AccumulatedDays":
+		return true
+	case "LastRenewalAt":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -749,17 +816,19 @@ func (a *OfficialCustomerLevelRelation) AsRow(onlyFields ...string) param.Store 
 }
 
 func (a *OfficialCustomerLevelRelation) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerLevelRelation) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerLevelRelation) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerLevelRelation) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerLevelRelation) BatchValidate(kvset map[string]interface{}) error {

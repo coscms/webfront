@@ -465,7 +465,7 @@ func (a *OfficialCustomerPrepaidCard) UpdateFields(mw func(db.Result) db.Result,
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -490,7 +490,7 @@ func (a *OfficialCustomerPrepaidCard) UpdatexFields(mw func(db.Result) db.Result
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -663,6 +663,9 @@ func (a *OfficialCustomerPrepaidCard) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerPrepaidCard) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -691,6 +694,90 @@ func (a *OfficialCustomerPrepaidCard) FromRow(row map[string]interface{}) {
 		case "bg_image":
 			a.BgImage = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerPrepaidCard) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "CustomerId":
+		return a.CustomerId
+	case "Amount":
+		return a.Amount
+	case "SalePrice":
+		return a.SalePrice
+	case "Number":
+		return a.Number
+	case "Password":
+		return a.Password
+	case "Created":
+		return a.Created
+	case "Start":
+		return a.Start
+	case "End":
+		return a.End
+	case "Used":
+		return a.Used
+	case "Disabled":
+		return a.Disabled
+	case "BgImage":
+		return a.BgImage
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerPrepaidCard) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"CustomerId",
+		"Amount",
+		"SalePrice",
+		"Number",
+		"Password",
+		"Created",
+		"Start",
+		"End",
+		"Used",
+		"Disabled",
+		"BgImage",
+	}
+}
+
+func (a *OfficialCustomerPrepaidCard) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "CustomerId":
+		return true
+	case "Amount":
+		return true
+	case "SalePrice":
+		return true
+	case "Number":
+		return true
+	case "Password":
+		return true
+	case "Created":
+		return true
+	case "Start":
+		return true
+	case "End":
+		return true
+	case "Used":
+		return true
+	case "Disabled":
+		return true
+	case "BgImage":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -796,17 +883,19 @@ func (a *OfficialCustomerPrepaidCard) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerPrepaidCard) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerPrepaidCard) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerPrepaidCard) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerPrepaidCard) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerPrepaidCard) BatchValidate(kvset map[string]interface{}) error {

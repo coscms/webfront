@@ -478,7 +478,7 @@ func (a *OfficialAdSettings) UpdateFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -508,7 +508,7 @@ func (a *OfficialAdSettings) UpdatexFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -670,6 +670,9 @@ func (a *OfficialAdSettings) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialAdSettings) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -690,6 +693,70 @@ func (a *OfficialAdSettings) FromRow(row map[string]interface{}) {
 		case "disabled":
 			a.Disabled = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialAdSettings) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "AdvertId":
+		return a.AdvertId
+	case "Type":
+		return a.Type
+	case "Value":
+		return a.Value
+	case "VStart":
+		return a.VStart
+	case "VEnd":
+		return a.VEnd
+	case "TStart":
+		return a.TStart
+	case "TEnd":
+		return a.TEnd
+	case "Disabled":
+		return a.Disabled
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialAdSettings) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"AdvertId",
+		"Type",
+		"Value",
+		"VStart",
+		"VEnd",
+		"TStart",
+		"TEnd",
+		"Disabled",
+	}
+}
+
+func (a *OfficialAdSettings) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "AdvertId":
+		return true
+	case "Type":
+		return true
+	case "Value":
+		return true
+	case "VStart":
+		return true
+	case "VEnd":
+		return true
+	case "TStart":
+		return true
+	case "TEnd":
+		return true
+	case "Disabled":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -775,17 +842,19 @@ func (a *OfficialAdSettings) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialAdSettings) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialAdSettings) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialAdSettings) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialAdSettings) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialAdSettings) BatchValidate(kvset map[string]interface{}) error {

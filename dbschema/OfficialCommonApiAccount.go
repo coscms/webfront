@@ -487,7 +487,7 @@ func (a *OfficialCommonApiAccount) UpdateFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -517,7 +517,7 @@ func (a *OfficialCommonApiAccount) UpdatexFields(mw func(db.Result) db.Result, k
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -705,6 +705,9 @@ func (a *OfficialCommonApiAccount) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonApiAccount) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -737,6 +740,100 @@ func (a *OfficialCommonApiAccount) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonApiAccount) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerType":
+		return a.OwnerType
+	case "OwnerId":
+		return a.OwnerId
+	case "GroupId":
+		return a.GroupId
+	case "Name":
+		return a.Name
+	case "Url":
+		return a.Url
+	case "UrlDev":
+		return a.UrlDev
+	case "AppId":
+		return a.AppId
+	case "AppSecret":
+		return a.AppSecret
+	case "PublicKey":
+		return a.PublicKey
+	case "Encryption":
+		return a.Encryption
+	case "Extra":
+		return a.Extra
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonApiAccount) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerType",
+		"OwnerId",
+		"GroupId",
+		"Name",
+		"Url",
+		"UrlDev",
+		"AppId",
+		"AppSecret",
+		"PublicKey",
+		"Encryption",
+		"Extra",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCommonApiAccount) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerType":
+		return true
+	case "OwnerId":
+		return true
+	case "GroupId":
+		return true
+	case "Name":
+		return true
+	case "Url":
+		return true
+	case "UrlDev":
+		return true
+	case "AppId":
+		return true
+	case "AppSecret":
+		return true
+	case "PublicKey":
+		return true
+	case "Encryption":
+		return true
+	case "Extra":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -852,17 +949,19 @@ func (a *OfficialCommonApiAccount) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonApiAccount) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonApiAccount) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonApiAccount) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonApiAccount) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonApiAccount) BatchValidate(kvset map[string]interface{}) error {

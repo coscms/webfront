@@ -462,7 +462,7 @@ func (a *OfficialCommonArea) UpdateFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -487,7 +487,7 @@ func (a *OfficialCommonArea) UpdatexFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -659,6 +659,9 @@ func (a *OfficialCommonArea) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonArea) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -687,6 +690,90 @@ func (a *OfficialCommonArea) FromRow(row map[string]interface{}) {
 		case "country_abbr":
 			a.CountryAbbr = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCommonArea) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Pid":
+		return a.Pid
+	case "Short":
+		return a.Short
+	case "Name":
+		return a.Name
+	case "Merged":
+		return a.Merged
+	case "Level":
+		return a.Level
+	case "Pinyin":
+		return a.Pinyin
+	case "Code":
+		return a.Code
+	case "Zip":
+		return a.Zip
+	case "First":
+		return a.First
+	case "Lng":
+		return a.Lng
+	case "Lat":
+		return a.Lat
+	case "CountryAbbr":
+		return a.CountryAbbr
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonArea) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Pid",
+		"Short",
+		"Name",
+		"Merged",
+		"Level",
+		"Pinyin",
+		"Code",
+		"Zip",
+		"First",
+		"Lng",
+		"Lat",
+		"CountryAbbr",
+	}
+}
+
+func (a *OfficialCommonArea) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Pid":
+		return true
+	case "Short":
+		return true
+	case "Name":
+		return true
+	case "Merged":
+		return true
+	case "Level":
+		return true
+	case "Pinyin":
+		return true
+	case "Code":
+		return true
+	case "Zip":
+		return true
+	case "First":
+		return true
+	case "Lng":
+		return true
+	case "Lat":
+		return true
+	case "CountryAbbr":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -792,17 +879,19 @@ func (a *OfficialCommonArea) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonArea) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonArea) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonArea) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonArea) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonArea) BatchValidate(kvset map[string]interface{}) error {

@@ -525,7 +525,7 @@ func (a *OfficialCommonRoutePage) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -565,7 +565,7 @@ func (a *OfficialCommonRoutePage) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -757,6 +757,9 @@ func (a *OfficialCommonRoutePage) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonRoutePage) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -785,6 +788,90 @@ func (a *OfficialCommonRoutePage) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonRoutePage) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Route":
+		return a.Route
+	case "Method":
+		return a.Method
+	case "PageContent":
+		return a.PageContent
+	case "PageVars":
+		return a.PageVars
+	case "PageType":
+		return a.PageType
+	case "PageId":
+		return a.PageId
+	case "TemplateEnabled":
+		return a.TemplateEnabled
+	case "TemplateFile":
+		return a.TemplateFile
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonRoutePage) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Route",
+		"Method",
+		"PageContent",
+		"PageVars",
+		"PageType",
+		"PageId",
+		"TemplateEnabled",
+		"TemplateFile",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCommonRoutePage) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Route":
+		return true
+	case "Method":
+		return true
+	case "PageContent":
+		return true
+	case "PageVars":
+		return true
+	case "PageType":
+		return true
+	case "PageId":
+		return true
+	case "TemplateEnabled":
+		return true
+	case "TemplateFile":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -890,17 +977,19 @@ func (a *OfficialCommonRoutePage) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonRoutePage) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonRoutePage) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonRoutePage) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonRoutePage) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonRoutePage) BatchValidate(kvset map[string]interface{}) error {

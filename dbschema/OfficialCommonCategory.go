@@ -528,7 +528,7 @@ func (a *OfficialCommonCategory) UpdateFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -568,7 +568,7 @@ func (a *OfficialCommonCategory) UpdatexFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -772,6 +772,9 @@ func (a *OfficialCommonCategory) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonCategory) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -806,6 +809,105 @@ func (a *OfficialCommonCategory) FromRow(row map[string]interface{}) {
 		case "slugify":
 			a.Slugify = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCommonCategory) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "ParentId":
+		return a.ParentId
+	case "HasChild":
+		return a.HasChild
+	case "Level":
+		return a.Level
+	case "Name":
+		return a.Name
+	case "Keywords":
+		return a.Keywords
+	case "Description":
+		return a.Description
+	case "Cover":
+		return a.Cover
+	case "Type":
+		return a.Type
+	case "Sort":
+		return a.Sort
+	case "Template":
+		return a.Template
+	case "Disabled":
+		return a.Disabled
+	case "ShowOnMenu":
+		return a.ShowOnMenu
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Slugify":
+		return a.Slugify
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonCategory) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"ParentId",
+		"HasChild",
+		"Level",
+		"Name",
+		"Keywords",
+		"Description",
+		"Cover",
+		"Type",
+		"Sort",
+		"Template",
+		"Disabled",
+		"ShowOnMenu",
+		"Created",
+		"Updated",
+		"Slugify",
+	}
+}
+
+func (a *OfficialCommonCategory) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "ParentId":
+		return true
+	case "HasChild":
+		return true
+	case "Level":
+		return true
+	case "Name":
+		return true
+	case "Keywords":
+		return true
+	case "Description":
+		return true
+	case "Cover":
+		return true
+	case "Type":
+		return true
+	case "Sort":
+		return true
+	case "Template":
+		return true
+	case "Disabled":
+		return true
+	case "ShowOnMenu":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Slugify":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -926,17 +1028,19 @@ func (a *OfficialCommonCategory) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonCategory) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonCategory) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonCategory) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonCategory) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonCategory) BatchValidate(kvset map[string]interface{}) error {

@@ -464,7 +464,7 @@ func (a *OfficialCommonComplaint) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -489,7 +489,7 @@ func (a *OfficialCommonComplaint) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -659,6 +659,9 @@ func (a *OfficialCommonComplaint) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonComplaint) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -685,6 +688,85 @@ func (a *OfficialCommonComplaint) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonComplaint) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "TargetName":
+		return a.TargetName
+	case "TargetId":
+		return a.TargetId
+	case "TargetType":
+		return a.TargetType
+	case "TargetIdent":
+		return a.TargetIdent
+	case "Type":
+		return a.Type
+	case "Content":
+		return a.Content
+	case "Process":
+		return a.Process
+	case "Result":
+		return a.Result
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonComplaint) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"TargetName",
+		"TargetId",
+		"TargetType",
+		"TargetIdent",
+		"Type",
+		"Content",
+		"Process",
+		"Result",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCommonComplaint) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "TargetName":
+		return true
+	case "TargetId":
+		return true
+	case "TargetType":
+		return true
+	case "TargetIdent":
+		return true
+	case "Type":
+		return true
+	case "Content":
+		return true
+	case "Process":
+		return true
+	case "Result":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -785,17 +867,19 @@ func (a *OfficialCommonComplaint) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonComplaint) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonComplaint) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonComplaint) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonComplaint) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonComplaint) BatchValidate(kvset map[string]interface{}) error {

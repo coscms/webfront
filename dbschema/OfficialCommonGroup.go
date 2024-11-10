@@ -459,7 +459,7 @@ func (a *OfficialCommonGroup) UpdateFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -484,7 +484,7 @@ func (a *OfficialCommonGroup) UpdatexFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -633,6 +633,9 @@ func (a *OfficialCommonGroup) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonGroup) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -649,6 +652,60 @@ func (a *OfficialCommonGroup) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonGroup) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "ParentId":
+		return a.ParentId
+	case "Uid":
+		return a.Uid
+	case "Name":
+		return a.Name
+	case "Type":
+		return a.Type
+	case "Description":
+		return a.Description
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonGroup) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"ParentId",
+		"Uid",
+		"Name",
+		"Type",
+		"Description",
+		"Created",
+	}
+}
+
+func (a *OfficialCommonGroup) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "ParentId":
+		return true
+	case "Uid":
+		return true
+	case "Name":
+		return true
+	case "Type":
+		return true
+	case "Description":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -724,17 +781,19 @@ func (a *OfficialCommonGroup) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonGroup) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonGroup) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonGroup) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonGroup) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonGroup) BatchValidate(kvset map[string]interface{}) error {

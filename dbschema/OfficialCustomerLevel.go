@@ -511,7 +511,7 @@ func (a *OfficialCustomerLevel) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -546,7 +546,7 @@ func (a *OfficialCustomerLevel) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -756,6 +756,9 @@ func (a *OfficialCustomerLevel) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerLevel) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -796,6 +799,120 @@ func (a *OfficialCustomerLevel) FromRow(row map[string]interface{}) {
 		case "role_ids":
 			a.RoleIds = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerLevel) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Short":
+		return a.Short
+	case "Description":
+		return a.Description
+	case "IconImage":
+		return a.IconImage
+	case "IconClass":
+		return a.IconClass
+	case "Color":
+		return a.Color
+	case "Bgcolor":
+		return a.Bgcolor
+	case "Price":
+		return a.Price
+	case "IntegralAsset":
+		return a.IntegralAsset
+	case "IntegralMin":
+		return a.IntegralMin
+	case "IntegralMax":
+		return a.IntegralMax
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Score":
+		return a.Score
+	case "Disabled":
+		return a.Disabled
+	case "Extra":
+		return a.Extra
+	case "Group":
+		return a.Group
+	case "RoleIds":
+		return a.RoleIds
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerLevel) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Short",
+		"Description",
+		"IconImage",
+		"IconClass",
+		"Color",
+		"Bgcolor",
+		"Price",
+		"IntegralAsset",
+		"IntegralMin",
+		"IntegralMax",
+		"Created",
+		"Updated",
+		"Score",
+		"Disabled",
+		"Extra",
+		"Group",
+		"RoleIds",
+	}
+}
+
+func (a *OfficialCustomerLevel) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Short":
+		return true
+	case "Description":
+		return true
+	case "IconImage":
+		return true
+	case "IconClass":
+		return true
+	case "Color":
+		return true
+	case "Bgcolor":
+		return true
+	case "Price":
+		return true
+	case "IntegralAsset":
+		return true
+	case "IntegralMin":
+		return true
+	case "IntegralMax":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Score":
+		return true
+	case "Disabled":
+		return true
+	case "Extra":
+		return true
+	case "Group":
+		return true
+	case "RoleIds":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -931,17 +1048,19 @@ func (a *OfficialCustomerLevel) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerLevel) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerLevel) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerLevel) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerLevel) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerLevel) BatchValidate(kvset map[string]interface{}) error {

@@ -467,7 +467,7 @@ func (a *OfficialCustomerOauth) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -492,7 +492,7 @@ func (a *OfficialCustomerOauth) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -674,6 +674,9 @@ func (a *OfficialCustomerOauth) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerOauth) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -706,6 +709,100 @@ func (a *OfficialCustomerOauth) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerOauth) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "CustomerId":
+		return a.CustomerId
+	case "Name":
+		return a.Name
+	case "NickName":
+		return a.NickName
+	case "UnionId":
+		return a.UnionId
+	case "OpenId":
+		return a.OpenId
+	case "Type":
+		return a.Type
+	case "Avatar":
+		return a.Avatar
+	case "Email":
+		return a.Email
+	case "Mobile":
+		return a.Mobile
+	case "AccessToken":
+		return a.AccessToken
+	case "RefreshToken":
+		return a.RefreshToken
+	case "Expired":
+		return a.Expired
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerOauth) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"CustomerId",
+		"Name",
+		"NickName",
+		"UnionId",
+		"OpenId",
+		"Type",
+		"Avatar",
+		"Email",
+		"Mobile",
+		"AccessToken",
+		"RefreshToken",
+		"Expired",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCustomerOauth) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "CustomerId":
+		return true
+	case "Name":
+		return true
+	case "NickName":
+		return true
+	case "UnionId":
+		return true
+	case "OpenId":
+		return true
+	case "Type":
+		return true
+	case "Avatar":
+		return true
+	case "Email":
+		return true
+	case "Mobile":
+		return true
+	case "AccessToken":
+		return true
+	case "RefreshToken":
+		return true
+	case "Expired":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -821,17 +918,19 @@ func (a *OfficialCustomerOauth) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerOauth) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerOauth) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerOauth) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerOauth) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerOauth) BatchValidate(kvset map[string]interface{}) error {

@@ -485,7 +485,7 @@ func (a *OfficialCustomerInvitation) UpdateFields(mw func(db.Result) db.Result, 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -515,7 +515,7 @@ func (a *OfficialCustomerInvitation) UpdatexFields(mw func(db.Result) db.Result,
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -694,6 +694,9 @@ func (a *OfficialCustomerInvitation) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerInvitation) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -722,6 +725,90 @@ func (a *OfficialCustomerInvitation) FromRow(row map[string]interface{}) {
 		case "allow_num":
 			a.AllowNum = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerInvitation) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Code":
+		return a.Code
+	case "Created":
+		return a.Created
+	case "Start":
+		return a.Start
+	case "End":
+		return a.End
+	case "Disabled":
+		return a.Disabled
+	case "LevelId":
+		return a.LevelId
+	case "AgentLevelId":
+		return a.AgentLevelId
+	case "RoleIds":
+		return a.RoleIds
+	case "UsedNum":
+		return a.UsedNum
+	case "AllowNum":
+		return a.AllowNum
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerInvitation) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerId",
+		"OwnerType",
+		"Code",
+		"Created",
+		"Start",
+		"End",
+		"Disabled",
+		"LevelId",
+		"AgentLevelId",
+		"RoleIds",
+		"UsedNum",
+		"AllowNum",
+	}
+}
+
+func (a *OfficialCustomerInvitation) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Code":
+		return true
+	case "Created":
+		return true
+	case "Start":
+		return true
+	case "End":
+		return true
+	case "Disabled":
+		return true
+	case "LevelId":
+		return true
+	case "AgentLevelId":
+		return true
+	case "RoleIds":
+		return true
+	case "UsedNum":
+		return true
+	case "AllowNum":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -827,17 +914,19 @@ func (a *OfficialCustomerInvitation) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerInvitation) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerInvitation) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerInvitation) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerInvitation) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerInvitation) BatchValidate(kvset map[string]interface{}) error {

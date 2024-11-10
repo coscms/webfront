@@ -574,7 +574,7 @@ func (a *OfficialCommonComment) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -624,7 +624,7 @@ func (a *OfficialCommonComment) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -864,6 +864,9 @@ func (a *OfficialCommonComment) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonComment) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -910,6 +913,135 @@ func (a *OfficialCommonComment) FromRow(row map[string]interface{}) {
 		case "hates":
 			a.Hates = param.AsUint64(value)
 		}
+	}
+}
+
+func (a *OfficialCommonComment) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "ReplyCommentId":
+		return a.ReplyCommentId
+	case "ReplyOwnerId":
+		return a.ReplyOwnerId
+	case "ReplyOwnerType":
+		return a.ReplyOwnerType
+	case "RootId":
+		return a.RootId
+	case "TargetType":
+		return a.TargetType
+	case "TargetSubtype":
+		return a.TargetSubtype
+	case "TargetId":
+		return a.TargetId
+	case "TargetOwnerId":
+		return a.TargetOwnerId
+	case "TargetOwnerType":
+		return a.TargetOwnerType
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Content":
+		return a.Content
+	case "Contype":
+		return a.Contype
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Display":
+		return a.Display
+	case "Level":
+		return a.Level
+	case "Path":
+		return a.Path
+	case "Replies":
+		return a.Replies
+	case "Likes":
+		return a.Likes
+	case "Hates":
+		return a.Hates
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonComment) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"ReplyCommentId",
+		"ReplyOwnerId",
+		"ReplyOwnerType",
+		"RootId",
+		"TargetType",
+		"TargetSubtype",
+		"TargetId",
+		"TargetOwnerId",
+		"TargetOwnerType",
+		"OwnerId",
+		"OwnerType",
+		"Content",
+		"Contype",
+		"Created",
+		"Updated",
+		"Display",
+		"Level",
+		"Path",
+		"Replies",
+		"Likes",
+		"Hates",
+	}
+}
+
+func (a *OfficialCommonComment) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "ReplyCommentId":
+		return true
+	case "ReplyOwnerId":
+		return true
+	case "ReplyOwnerType":
+		return true
+	case "RootId":
+		return true
+	case "TargetType":
+		return true
+	case "TargetSubtype":
+		return true
+	case "TargetId":
+		return true
+	case "TargetOwnerId":
+		return true
+	case "TargetOwnerType":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Content":
+		return true
+	case "Contype":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Display":
+		return true
+	case "Level":
+		return true
+	case "Path":
+		return true
+	case "Replies":
+		return true
+	case "Likes":
+		return true
+	case "Hates":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1060,17 +1192,19 @@ func (a *OfficialCommonComment) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonComment) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonComment) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonComment) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonComment) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonComment) BatchValidate(kvset map[string]interface{}) error {

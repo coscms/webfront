@@ -452,7 +452,7 @@ func (a *OfficialCustomerWallet) UpdateFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -477,7 +477,7 @@ func (a *OfficialCustomerWallet) UpdatexFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -620,6 +620,9 @@ func (a *OfficialCustomerWallet) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerWallet) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "customer_id":
 			a.CustomerId = param.AsUint64(value)
@@ -636,6 +639,60 @@ func (a *OfficialCustomerWallet) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerWallet) GetField(field string) interface{} {
+	switch field {
+	case "CustomerId":
+		return a.CustomerId
+	case "AssetType":
+		return a.AssetType
+	case "Balance":
+		return a.Balance
+	case "Freeze":
+		return a.Freeze
+	case "Accumulated":
+		return a.Accumulated
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerWallet) GetAllFieldNames() []string {
+	return []string{
+		"CustomerId",
+		"AssetType",
+		"Balance",
+		"Freeze",
+		"Accumulated",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialCustomerWallet) HasField(field string) bool {
+	switch field {
+	case "CustomerId":
+		return true
+	case "AssetType":
+		return true
+	case "Balance":
+		return true
+	case "Freeze":
+		return true
+	case "Accumulated":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -711,17 +768,19 @@ func (a *OfficialCustomerWallet) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerWallet) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerWallet) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerWallet) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerWallet) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerWallet) BatchValidate(kvset map[string]interface{}) error {

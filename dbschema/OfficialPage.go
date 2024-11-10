@@ -459,7 +459,7 @@ func (a *OfficialPage) UpdateFields(mw func(db.Result) db.Result, kvset map[stri
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -484,7 +484,7 @@ func (a *OfficialPage) UpdatexFields(mw func(db.Result) db.Result, kvset map[str
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -634,6 +634,9 @@ func (a *OfficialPage) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialPage) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -650,6 +653,60 @@ func (a *OfficialPage) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialPage) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Ident":
+		return a.Ident
+	case "Template":
+		return a.Template
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialPage) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Ident",
+		"Template",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialPage) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Ident":
+		return true
+	case "Template":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -725,17 +782,19 @@ func (a *OfficialPage) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialPage) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialPage) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialPage) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialPage) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialPage) BatchValidate(kvset map[string]interface{}) error {

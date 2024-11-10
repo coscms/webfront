@@ -506,7 +506,7 @@ func (a *OfficialAdItem) UpdateFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -541,7 +541,7 @@ func (a *OfficialAdItem) UpdatexFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -731,6 +731,9 @@ func (a *OfficialAdItem) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialAdItem) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -761,6 +764,95 @@ func (a *OfficialAdItem) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialAdItem) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "PublisherId":
+		return a.PublisherId
+	case "PositionId":
+		return a.PositionId
+	case "Content":
+		return a.Content
+	case "Contype":
+		return a.Contype
+	case "Mode":
+		return a.Mode
+	case "Url":
+		return a.Url
+	case "Disabled":
+		return a.Disabled
+	case "Start":
+		return a.Start
+	case "End":
+		return a.End
+	case "Sort":
+		return a.Sort
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialAdItem) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"PublisherId",
+		"PositionId",
+		"Content",
+		"Contype",
+		"Mode",
+		"Url",
+		"Disabled",
+		"Start",
+		"End",
+		"Sort",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *OfficialAdItem) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "PublisherId":
+		return true
+	case "PositionId":
+		return true
+	case "Content":
+		return true
+	case "Contype":
+		return true
+	case "Mode":
+		return true
+	case "Url":
+		return true
+	case "Disabled":
+		return true
+	case "Start":
+		return true
+	case "End":
+		return true
+	case "Sort":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -871,17 +963,19 @@ func (a *OfficialAdItem) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialAdItem) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialAdItem) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialAdItem) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialAdItem) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialAdItem) BatchValidate(kvset map[string]interface{}) error {

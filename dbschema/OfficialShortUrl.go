@@ -486,7 +486,7 @@ func (a *OfficialShortUrl) UpdateFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -516,7 +516,7 @@ func (a *OfficialShortUrl) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -700,6 +700,9 @@ func (a *OfficialShortUrl) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialShortUrl) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -730,6 +733,95 @@ func (a *OfficialShortUrl) FromRow(row map[string]interface{}) {
 		case "password":
 			a.Password = param.AsString(value)
 		}
+	}
+}
+
+func (a *OfficialShortUrl) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "LongUrl":
+		return a.LongUrl
+	case "LongHash":
+		return a.LongHash
+	case "ShortUrl":
+		return a.ShortUrl
+	case "DomainId":
+		return a.DomainId
+	case "Visited":
+		return a.Visited
+	case "Visits":
+		return a.Visits
+	case "Available":
+		return a.Available
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Expired":
+		return a.Expired
+	case "Password":
+		return a.Password
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialShortUrl) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerId",
+		"OwnerType",
+		"LongUrl",
+		"LongHash",
+		"ShortUrl",
+		"DomainId",
+		"Visited",
+		"Visits",
+		"Available",
+		"Created",
+		"Updated",
+		"Expired",
+		"Password",
+	}
+}
+
+func (a *OfficialShortUrl) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "LongUrl":
+		return true
+	case "LongHash":
+		return true
+	case "ShortUrl":
+		return true
+	case "DomainId":
+		return true
+	case "Visited":
+		return true
+	case "Visits":
+		return true
+	case "Available":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Expired":
+		return true
+	case "Password":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -840,17 +932,19 @@ func (a *OfficialShortUrl) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialShortUrl) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialShortUrl) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialShortUrl) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialShortUrl) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialShortUrl) BatchValidate(kvset map[string]interface{}) error {

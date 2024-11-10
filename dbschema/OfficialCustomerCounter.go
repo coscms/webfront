@@ -426,7 +426,7 @@ func (a *OfficialCustomerCounter) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -446,7 +446,7 @@ func (a *OfficialCustomerCounter) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -565,6 +565,9 @@ func (a *OfficialCustomerCounter) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCustomerCounter) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "customer_id":
 			a.CustomerId = param.AsUint64(value)
@@ -573,6 +576,40 @@ func (a *OfficialCustomerCounter) FromRow(row map[string]interface{}) {
 		case "total":
 			a.Total = param.AsUint64(value)
 		}
+	}
+}
+
+func (a *OfficialCustomerCounter) GetField(field string) interface{} {
+	switch field {
+	case "CustomerId":
+		return a.CustomerId
+	case "Target":
+		return a.Target
+	case "Total":
+		return a.Total
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCustomerCounter) GetAllFieldNames() []string {
+	return []string{
+		"CustomerId",
+		"Target",
+		"Total",
+	}
+}
+
+func (a *OfficialCustomerCounter) HasField(field string) bool {
+	switch field {
+	case "CustomerId":
+		return true
+	case "Target":
+		return true
+	case "Total":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -628,17 +665,19 @@ func (a *OfficialCustomerCounter) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerCounter) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCustomerCounter) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCustomerCounter) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCustomerCounter) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCustomerCounter) BatchValidate(kvset map[string]interface{}) error {

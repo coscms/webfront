@@ -479,7 +479,7 @@ func (a *OfficialCommonClickFlow) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -509,7 +509,7 @@ func (a *OfficialCommonClickFlow) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -664,6 +664,9 @@ func (a *OfficialCommonClickFlow) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialCommonClickFlow) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -680,6 +683,60 @@ func (a *OfficialCommonClickFlow) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *OfficialCommonClickFlow) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "TargetType":
+		return a.TargetType
+	case "TargetId":
+		return a.TargetId
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Type":
+		return a.Type
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialCommonClickFlow) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"TargetType",
+		"TargetId",
+		"OwnerId",
+		"OwnerType",
+		"Type",
+		"Created",
+	}
+}
+
+func (a *OfficialCommonClickFlow) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "TargetType":
+		return true
+	case "TargetId":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Type":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -755,17 +812,19 @@ func (a *OfficialCommonClickFlow) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonClickFlow) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialCommonClickFlow) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialCommonClickFlow) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialCommonClickFlow) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialCommonClickFlow) BatchValidate(kvset map[string]interface{}) error {

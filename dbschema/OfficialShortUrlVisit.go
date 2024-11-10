@@ -466,7 +466,7 @@ func (a *OfficialShortUrlVisit) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -491,7 +491,7 @@ func (a *OfficialShortUrlVisit) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -689,6 +689,9 @@ func (a *OfficialShortUrlVisit) AsMap(onlyFields ...string) param.Store {
 
 func (a *OfficialShortUrlVisit) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "owner_id":
 			a.OwnerId = param.AsUint64(value)
@@ -733,6 +736,130 @@ func (a *OfficialShortUrlVisit) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsInt(value)
 		}
+	}
+}
+
+func (a *OfficialShortUrlVisit) GetField(field string) interface{} {
+	switch field {
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "UrlId":
+		return a.UrlId
+	case "DomainId":
+		return a.DomainId
+	case "Year":
+		return a.Year
+	case "Month":
+		return a.Month
+	case "Day":
+		return a.Day
+	case "Hour":
+		return a.Hour
+	case "Ip":
+		return a.Ip
+	case "Referer":
+		return a.Referer
+	case "Language":
+		return a.Language
+	case "Country":
+		return a.Country
+	case "Region":
+		return a.Region
+	case "Province":
+		return a.Province
+	case "City":
+		return a.City
+	case "Isp":
+		return a.Isp
+	case "Os":
+		return a.Os
+	case "OsVersion":
+		return a.OsVersion
+	case "Browser":
+		return a.Browser
+	case "BrowserVersion":
+		return a.BrowserVersion
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *OfficialShortUrlVisit) GetAllFieldNames() []string {
+	return []string{
+		"OwnerId",
+		"OwnerType",
+		"UrlId",
+		"DomainId",
+		"Year",
+		"Month",
+		"Day",
+		"Hour",
+		"Ip",
+		"Referer",
+		"Language",
+		"Country",
+		"Region",
+		"Province",
+		"City",
+		"Isp",
+		"Os",
+		"OsVersion",
+		"Browser",
+		"BrowserVersion",
+		"Created",
+	}
+}
+
+func (a *OfficialShortUrlVisit) HasField(field string) bool {
+	switch field {
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "UrlId":
+		return true
+	case "DomainId":
+		return true
+	case "Year":
+		return true
+	case "Month":
+		return true
+	case "Day":
+		return true
+	case "Hour":
+		return true
+	case "Ip":
+		return true
+	case "Referer":
+		return true
+	case "Language":
+		return true
+	case "Country":
+		return true
+	case "Region":
+		return true
+	case "Province":
+		return true
+	case "City":
+		return true
+	case "Isp":
+		return true
+	case "Os":
+		return true
+	case "OsVersion":
+		return true
+	case "Browser":
+		return true
+	case "BrowserVersion":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -878,17 +1005,19 @@ func (a *OfficialShortUrlVisit) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialShortUrlVisit) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *OfficialShortUrlVisit) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *OfficialShortUrlVisit) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *OfficialShortUrlVisit) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *OfficialShortUrlVisit) BatchValidate(kvset map[string]interface{}) error {
