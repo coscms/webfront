@@ -41,7 +41,7 @@ func init() {
 		articleM := NewArticle(c)
 		_, err := articleM.ListByOffset(nil, func(r db.Result) db.Result {
 			return r.Select(`id`, `title`)
-		}, 0, 1, `id`, db.In(targetIDs))
+		}, 0, -1, `id`, db.In(targetIDs))
 		if err != nil {
 			return rows, err
 		}
