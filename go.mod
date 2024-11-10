@@ -66,7 +66,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.29.0
-	github.com/nging-plugins/dbmanager v1.6.7
+	github.com/nging-plugins/dbmanager v1.7.0
 	github.com/phuslu/lru v1.0.16
 	github.com/silenceper/wechat/v2 v2.1.7
 	github.com/tdewolff/minify/v2 v2.21.1
