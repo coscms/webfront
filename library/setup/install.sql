@@ -309,7 +309,7 @@ CREATE TABLE `official_common_collection` (
   `visited` int unsigned NOT NULL DEFAULT '0' COMMENT '最近访问时间',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `common_collection_uniqid` (`customer_id`,`target_id`,`target_type`),
+  UNIQUE KEY `common_collection_uniqid` (`customer_id`,`target_type`,`target_id`),
   KEY `common_collection_visited` (`visited` DESC),
   KEY `common_collection_views` (`views` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='收藏夹';
@@ -1166,4 +1166,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-10 15:30:36
+-- Dump completed on 2024-11-10 19:35:31

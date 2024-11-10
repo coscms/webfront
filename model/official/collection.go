@@ -34,16 +34,16 @@ func (f *Collection) Add() (pk interface{}, err error) {
 func (f *Collection) Exists(targetType string, targetID uint64, customerID uint64) (bool, error) {
 	return f.OfficialCommonCollection.Exists(nil, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: targetID},
 		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
 	))
 }
 
 func (f *Collection) Find(targetType string, targetID uint64, customerID uint64) error {
 	return f.Get(nil, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: targetID},
 		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
 	))
 }
 
@@ -61,16 +61,16 @@ func (f *Collection) DelByTarget(targetType string, targetID uint64) error {
 func (f *Collection) DelByTargetOwner(targetType string, targetID uint64, customerID uint64) error {
 	return f.OfficialCommonCollection.Delete(nil, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: targetID},
 		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
 	))
 }
 
 func (f *Collection) ListByTargets(targetType string, targetIDs []uint64, customerID uint64) (map[uint64]*dbschema.OfficialCommonCollection, error) {
 	conds := []db.Compound{
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: db.In(targetIDs)},
 		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: db.In(targetIDs)},
 	}
 	_, err := f.ListByOffset(nil, nil, 0, -1, db.And(conds...))
 	if err != nil {
@@ -83,11 +83,10 @@ func (f *Collection) ListByTargets(targetType string, targetIDs []uint64, custom
 	return result, err
 }
 
-func (f *Collection) ListPage(targetType string, targetID uint64, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+func (f *Collection) ListPage(targetType string, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
 	cond := db.NewCompounds()
 	cond.Add(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: targetID},
 		db.Cond{`target_type`: targetType},
 	)
 	list := []*CollectionResponse{}
@@ -105,11 +104,10 @@ func (f *Collection) ListPage(targetType string, targetID uint64, customerID uin
 	return list, err
 }
 
-func (f *Collection) ListPageByOffset(targetType string, targetID uint64, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+func (f *Collection) ListPageByOffset(targetType string, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
 	cond := db.NewCompounds()
 	cond.Add(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`target_id`: targetID},
 		db.Cond{`target_type`: targetType},
 	)
 	list := []*CollectionResponse{}
