@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	official.AddClickFlowTarget(`comment`, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string) error, func() uint64, error) {
+	official.AddClickFlowTarget(`comment`, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string, isCancel ...bool) error, func() uint64, error) {
 		m := NewComment(c)
 		err := m.Get(nil, `id`, id)
 		if err != nil {
@@ -18,9 +18,9 @@ func init() {
 			}
 			return nil, nil, err
 		}
-		return func(typ string) error {
+		return func(typ string, isCancel ...bool) error {
 			field := typ + `s`
-			return m.UpdateField(nil, field, db.Raw(field+`+1`), db.Cond{`id`: id})
+			return m.UpdateField(nil, field, db.Raw(field+official.MakeOperator(isCancel...)+`1`), db.Cond{`id`: id})
 		}, nil, nil
 	}))
 	modelArticle.ContentHideDetectorRegister(`comment`, `评论后才能查看`, func(params *modelArticle.ContentHideParams) bool {
