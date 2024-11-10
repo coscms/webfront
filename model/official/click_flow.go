@@ -60,7 +60,7 @@ func (f *ClickFlow) Add() (pk interface{}, err error) {
 		if old.Type == f.Type {
 			err = f.Context().NewError(code.RepeatOperation, `您已经表过态了`)
 		} else {
-			err = f.Context().NewError(code.DataAlreadyExists, `您已经表过态了`)
+			err = f.Context().NewError(code.DataAlreadyExists, `您已经表态过其它观点`)
 		}
 		return
 	}
