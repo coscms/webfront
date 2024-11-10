@@ -131,6 +131,14 @@ var LeftNavigate = &navigate.List{
 				Icon:     `trash`,
 				Children: &navigate.List{},
 			},
+			{
+				Display:   false,
+				Name:      `删除收藏`,
+				Action:    `go/:id`,
+				Icon:      ``,
+				Unlimited: true,
+				Children:  &navigate.List{},
+			},
 		},
 	},
 }
