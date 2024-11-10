@@ -96,7 +96,11 @@ func (f *Collection) ListPage(targetType string, targetID uint64, customerID uin
 		return list, err
 	}
 	if ls, ok := CollectionTargets[targetType]; ok && ls.List != nil {
-		list, err = ls.List.List(f.Context(), list)
+		targetIDs := make([]uint64, len(list))
+		for index, row := range list {
+			targetIDs[index] = row.TargetId
+		}
+		list, err = ls.List.List(f.Context(), list, targetIDs)
 	}
 	return list, err
 }
@@ -114,7 +118,11 @@ func (f *Collection) ListPageByOffset(targetType string, targetID uint64, custom
 		return list, err
 	}
 	if ls, ok := CollectionTargets[targetType]; ok && ls.List != nil {
-		list, err = ls.List.List(f.Context(), list)
+		targetIDs := make([]uint64, len(list))
+		for index, row := range list {
+			targetIDs[index] = row.TargetId
+		}
+		list, err = ls.List.List(f.Context(), list, targetIDs)
 	}
 	return list, err
 }

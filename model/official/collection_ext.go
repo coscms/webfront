@@ -5,20 +5,20 @@ import (
 	"github.com/webx-top/echo"
 )
 
-type CollectionTargetDoFunc func(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error)
+type CollectionTargetDoFunc func(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error)
 
-func (c CollectionTargetDoFunc) Do(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error) {
+func (c CollectionTargetDoFunc) Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error) {
 	return c(ctx, id)
 }
 
-type CollectionTargetListFunc func(ctx echo.Context, rows []*CollectionResponse) ([]*CollectionResponse, error)
+type CollectionTargetListFunc func(ctx echo.Context, rows []*CollectionResponse, targetIDs []uint64) ([]*CollectionResponse, error)
 
-func (c CollectionTargetListFunc) List(ctx echo.Context, rows []*CollectionResponse) ([]*CollectionResponse, error) {
-	return c(ctx, rows)
+func (c CollectionTargetListFunc) List(ctx echo.Context, rows []*CollectionResponse, targetIDs []uint64) ([]*CollectionResponse, error) {
+	return c(ctx, rows, targetIDs)
 }
 
 type CollectionTargetList interface {
-	List(ctx echo.Context, rows []*CollectionResponse) ([]*CollectionResponse, error)
+	List(ctx echo.Context, rows []*CollectionResponse, targetIDs []uint64) ([]*CollectionResponse, error)
 }
 
 type CollectionTargetDo interface {
