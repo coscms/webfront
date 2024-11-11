@@ -15,16 +15,41 @@ type MappingTo interface {
 	Set(key interface{}, value ...interface{})
 }
 
+type MappingCfgGetter interface {
+	GetFrom() interface{}
+	GetTo() string
+}
+
+func From(from interface{}, to ...string) M {
+	if len(to) > 0 {
+		return M{KFrom: from, KTo: to[0]}
+	}
+	return M{KFrom: from}
+}
+
 type M struct {
-	From interface{}
-	To   string
+	KFrom interface{}
+	KTo   string
+}
+
+func (a M) To(to string) M {
+	a.KTo = to
+	return a
+}
+
+func (a M) GetFrom() interface{} {
+	return a.KFrom
+}
+
+func (a M) GetTo() string {
+	return a.KTo
 }
 
 type Layout string
 
 var placeholder = regexp.MustCompile(`(?:%7B|\{)([^}%]+)(?:%7D|\})`)
 
-func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string, linkKeyTo string, mapping ...M) []T {
+func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string, linkKeyTo string, mapping ...MappingCfgGetter) []T {
 	kk := map[interface{}]int{}
 	for index, row := range rows {
 		k := row.GetField(linkKeyTo)
@@ -43,13 +68,13 @@ func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string
 			continue
 		}
 		for _, mp := range mapping {
-			switch v := mp.From.(type) {
+			switch v := mp.GetFrom().(type) {
 			case string:
 				newVal := srcRow.GetField(v)
 				if newVal == nil {
 					continue
 				}
-				rows[index].Set(mp.To, newVal)
+				rows[index].Set(mp.GetTo(), newVal)
 			case Layout: // https://aaa/{Id} or https://aaa/?id=%7BId%7D
 				newVal := placeholder.ReplaceAllStringFunc(string(v), func(s string) string {
 					var k string
@@ -64,11 +89,11 @@ func Slice[V MappingFrom, T MappingTo](queried []V, rows []T, linkKeyFrom string
 					}
 					return com.String(v)
 				})
-				rows[index].Set(mp.To, newVal)
+				rows[index].Set(mp.GetTo(), newVal)
 			case func(V) interface{}:
 				newVal := v(srcRow)
 				if newVal != nil {
-					rows[index].Set(mp.To, newVal)
+					rows[index].Set(mp.GetTo(), newVal)
 				}
 			}
 		}

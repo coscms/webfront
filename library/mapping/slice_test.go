@@ -80,7 +80,7 @@ func TestSlice2(t *testing.T) {
 	c := func(v *from) interface{} {
 		return fmt.Sprintf(`https://abs/?id=%d&title=%s`, v.Id, v.Title)
 	}
-	r := Slice(s, d, `Id`, `Id`, M{`Title`, `Title`},
+	r := Slice(s, d, `Id`, `Id`, From(`Title`).To(`Title`),
 		M{c, `URL`},
 	)
 	assert.Equal(t, []*to{
