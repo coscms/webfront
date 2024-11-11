@@ -105,6 +105,7 @@ type OfficialCommonCollection struct {
 	Id         uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	TargetType string `db:"target_type" bson:"target_type" comment:"目标类型" json:"target_type" xml:"target_type"`
 	TargetId   uint64 `db:"target_id" bson:"target_id" comment:"目标ID" json:"target_id" xml:"target_id"`
+	Title      string `db:"title" bson:"title" comment:"标题" json:"title" xml:"title"`
 	CustomerId uint64 `db:"customer_id" bson:"customer_id" comment:"用户ID" json:"customer_id" xml:"customer_id"`
 	Views      uint   `db:"views" bson:"views" comment:"浏览次数" json:"views" xml:"views"`
 	Visited    uint   `db:"visited" bson:"visited" comment:"最近访问时间" json:"visited" xml:"visited"`
@@ -591,6 +592,7 @@ func (a *OfficialCommonCollection) Reset() *OfficialCommonCollection {
 	a.Id = 0
 	a.TargetType = ``
 	a.TargetId = 0
+	a.Title = ``
 	a.CustomerId = 0
 	a.Views = 0
 	a.Visited = 0
@@ -604,6 +606,7 @@ func (a *OfficialCommonCollection) AsMap(onlyFields ...string) param.Store {
 		r["Id"] = a.Id
 		r["TargetType"] = a.TargetType
 		r["TargetId"] = a.TargetId
+		r["Title"] = a.Title
 		r["CustomerId"] = a.CustomerId
 		r["Views"] = a.Views
 		r["Visited"] = a.Visited
@@ -618,6 +621,8 @@ func (a *OfficialCommonCollection) AsMap(onlyFields ...string) param.Store {
 			r["TargetType"] = a.TargetType
 		case "TargetId":
 			r["TargetId"] = a.TargetId
+		case "Title":
+			r["Title"] = a.Title
 		case "CustomerId":
 			r["CustomerId"] = a.CustomerId
 		case "Views":
@@ -643,6 +648,8 @@ func (a *OfficialCommonCollection) FromRow(row map[string]interface{}) {
 			a.TargetType = param.AsString(value)
 		case "target_id":
 			a.TargetId = param.AsUint64(value)
+		case "title":
+			a.Title = param.AsString(value)
 		case "customer_id":
 			a.CustomerId = param.AsUint64(value)
 		case "views":
@@ -663,6 +670,8 @@ func (a *OfficialCommonCollection) GetField(field string) interface{} {
 		return a.TargetType
 	case "TargetId":
 		return a.TargetId
+	case "Title":
+		return a.Title
 	case "CustomerId":
 		return a.CustomerId
 	case "Views":
@@ -681,6 +690,7 @@ func (a *OfficialCommonCollection) GetAllFieldNames() []string {
 		"Id",
 		"TargetType",
 		"TargetId",
+		"Title",
 		"CustomerId",
 		"Views",
 		"Visited",
@@ -695,6 +705,8 @@ func (a *OfficialCommonCollection) HasField(field string) bool {
 	case "TargetType":
 		return true
 	case "TargetId":
+		return true
+	case "Title":
 		return true
 	case "CustomerId":
 		return true
@@ -735,6 +747,8 @@ func (a *OfficialCommonCollection) Set(key interface{}, value ...interface{}) {
 			a.TargetType = param.AsString(vv)
 		case "TargetId":
 			a.TargetId = param.AsUint64(vv)
+		case "Title":
+			a.Title = param.AsString(vv)
 		case "CustomerId":
 			a.CustomerId = param.AsUint64(vv)
 		case "Views":
@@ -753,6 +767,7 @@ func (a *OfficialCommonCollection) AsRow(onlyFields ...string) param.Store {
 		r["id"] = a.Id
 		r["target_type"] = a.TargetType
 		r["target_id"] = a.TargetId
+		r["title"] = a.Title
 		r["customer_id"] = a.CustomerId
 		r["views"] = a.Views
 		r["visited"] = a.Visited
@@ -767,6 +782,8 @@ func (a *OfficialCommonCollection) AsRow(onlyFields ...string) param.Store {
 			r["target_type"] = a.TargetType
 		case "target_id":
 			r["target_id"] = a.TargetId
+		case "title":
+			r["title"] = a.Title
 		case "customer_id":
 			r["customer_id"] = a.CustomerId
 		case "views":

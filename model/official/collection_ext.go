@@ -6,9 +6,9 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type CollectionTargetDoFunc func(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error)
+type CollectionTargetDoFunc func(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idAndTitleGetter func() (uint64, string), err error)
 
-func (c CollectionTargetDoFunc) Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error) {
+func (c CollectionTargetDoFunc) Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idAndTitleGetter func() (uint64, string), err error) {
 	return c(ctx, id)
 }
 
@@ -23,7 +23,7 @@ type CollectionTargetList interface {
 }
 
 type CollectionTargetDo interface {
-	Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error)
+	Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idAndTitleGetter func() (uint64, string), err error)
 }
 
 type CollectionTarget struct {
@@ -47,7 +47,7 @@ func (c CollectionTarget) List(ctx echo.Context, rows []*CollectionResponse, tar
 	return c.ls.List(ctx, rows, targetIDs)
 }
 
-func (c CollectionTarget) Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idGetter func() uint64, err error) {
+func (c CollectionTarget) Do(ctx echo.Context, id interface{}) (after func(isCancel ...bool) error, idAndTitleGetter func() (uint64, string), err error) {
 	if c.do == nil {
 		return nil, nil, nil
 	}

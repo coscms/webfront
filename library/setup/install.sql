@@ -304,6 +304,7 @@ CREATE TABLE `official_common_collection` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `target_type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'article' COMMENT '目标类型',
   `target_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '目标ID',
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标题',
   `customer_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
   `views` int unsigned NOT NULL DEFAULT '0' COMMENT '浏览次数',
   `visited` int unsigned NOT NULL DEFAULT '0' COMMENT '最近访问时间',
@@ -311,7 +312,8 @@ CREATE TABLE `official_common_collection` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `common_collection_uniqid` (`customer_id`,`target_type`,`target_id`),
   KEY `common_collection_visited` (`visited` DESC),
-  KEY `common_collection_views` (`views` DESC)
+  KEY `common_collection_views` (`views` DESC),
+  FULLTEXT KEY `common_collection_title` (`title`) /*!50100 WITH PARSER `ngram` */ 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='收藏夹';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1166,4 +1168,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-10 19:35:31
+-- Dump completed on 2024-11-11 13:22:14
