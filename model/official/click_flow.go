@@ -105,6 +105,22 @@ func (f *ClickFlow) DelByTargetOwner(targetType string, targetID uint64, ownerID
 	))
 }
 
+func (f *ClickFlow) NewestTimeByCustomerID(targetType string, targetID uint64, ownerID uint64, ownerType string) (uint, error) {
+	m := dbschema.NewOfficialCommonClickFlow(f.Context())
+	err := m.Get(func(r db.Result) db.Result {
+		return r.Select(`created`).OrderBy(`-id`)
+	}, db.And(
+		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
+		db.Cond{`owner_id`: ownerID},
+		db.Cond{`owner_type`: ownerType},
+	))
+	if err != nil && err == db.ErrNoMoreRows {
+		return 0, nil
+	}
+	return m.Created, err
+}
+
 func (f *ClickFlow) ListByCustomerTargets(targetType string, targetIDs []uint64, customerID uint64) (map[uint64]*dbschema.OfficialCommonClickFlow, error) {
 	return f.ListByTargets(targetType, targetIDs, customerID, 0)
 }

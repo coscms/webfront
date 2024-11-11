@@ -67,6 +67,21 @@ func (f *Collection) DelByTargetOwner(targetType string, targetID uint64, custom
 	))
 }
 
+func (f *Collection) NewestTimeByCustomerID(targetType string, targetID uint64, customerID uint64) (uint, error) {
+	m := dbschema.NewOfficialCommonCollection(f.Context())
+	err := m.Get(func(r db.Result) db.Result {
+		return r.Select(`created`).OrderBy(`-id`)
+	}, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`target_type`: targetType},
+		db.Cond{`target_id`: targetID},
+	))
+	if err != nil && err == db.ErrNoMoreRows {
+		return 0, nil
+	}
+	return m.Created, err
+}
+
 func (f *Collection) ListByTargets(targetType string, targetIDs []uint64, customerID uint64) (map[uint64]*dbschema.OfficialCommonCollection, error) {
 	conds := []db.Compound{
 		db.Cond{`customer_id`: customerID},
