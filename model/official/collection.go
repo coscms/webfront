@@ -2,6 +2,7 @@ package official
 
 import (
 	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory/mysql"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
@@ -83,12 +84,15 @@ func (f *Collection) ListByTargets(targetType string, targetIDs []uint64, custom
 	return result, err
 }
 
-func (f *Collection) ListPage(targetType string, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+func (f *Collection) ListPage(targetType string, customerID uint64, title string, sorts ...interface{}) ([]*CollectionResponse, error) {
 	cond := db.NewCompounds()
 	cond.Add(
 		db.Cond{`customer_id`: customerID},
 		db.Cond{`target_type`: targetType},
 	)
+	if len(title) > 0 {
+		cond.Add(mysql.SearchField(`~title`, title))
+	}
 	list := []*CollectionResponse{}
 	err := f.OfficialCommonCollection.ListPageAs(&list, cond, sorts...)
 	if err != nil {
@@ -104,12 +108,15 @@ func (f *Collection) ListPage(targetType string, customerID uint64, sorts ...int
 	return list, err
 }
 
-func (f *Collection) ListPageByOffset(targetType string, customerID uint64, sorts ...interface{}) ([]*CollectionResponse, error) {
+func (f *Collection) ListPageByOffset(targetType string, customerID uint64, title string, sorts ...interface{}) ([]*CollectionResponse, error) {
 	cond := db.NewCompounds()
 	cond.Add(
 		db.Cond{`customer_id`: customerID},
 		db.Cond{`target_type`: targetType},
 	)
+	if len(title) > 0 {
+		cond.Add(mysql.SearchField(`~title`, title))
+	}
 	list := []*CollectionResponse{}
 	err := f.OfficialCommonCollection.ListPageByOffsetAs(&list, cond, sorts...)
 	if err != nil {

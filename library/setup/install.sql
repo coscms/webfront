@@ -235,7 +235,8 @@ CREATE TABLE `official_common_article` (
   KEY `common_article_owner` (`owner_id`,`owner_type`,`created`),
   KEY `common_article_likes` (`likes` DESC),
   KEY `common_article_comments` (`comments` DESC),
-  KEY `common_article_updated` (`updated` DESC)
+  KEY `common_article_updated` (`updated` DESC),
+  FULLTEXT KEY `common_article_title` (`title`) /*!50100 WITH PARSER `ngram` */ 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='官方新闻';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -463,7 +464,7 @@ CREATE TABLE `official_common_message` (
   KEY `common_message_encrypted` (`encrypted`),
   KEY `common_message_view_progress` (`view_progress`),
   KEY `common_message_has_new_reply` (`has_new_reply` DESC),
-  FULLTEXT KEY `common_message_title_content` (`title`,`content`)
+  FULLTEXT KEY `common_message_title_content` (`title`,`content`) /*!50100 WITH PARSER `ngram` */ 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='站内信';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1168,4 +1169,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-11 13:22:14
+-- Dump completed on 2024-11-11 13:38:47
