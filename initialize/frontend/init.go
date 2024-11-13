@@ -14,6 +14,10 @@ import (
 	"github.com/webx-top/echo/middleware/render"
 	"github.com/webx-top/echo/subdomains"
 
+	captchaLib "github.com/coscms/webcore/library/captcha"
+	"github.com/coscms/webcore/library/captcha/captchabiz"
+	"github.com/coscms/webcore/library/captcha/driver/captcha_go"
+
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
 	backendLib "github.com/coscms/webcore/library/backend"
@@ -205,6 +209,9 @@ func addMiddleware(e *echo.Echo) {
 	e.Use(xMW.Middlewares...)
 
 	captcha.New(``).Wrapper(e)
+	captchaGoG := e.Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo))
+	captcha_go.RegisterRoute(captchaGoG)
+
 	e.Route("GET", `/qrcode`, backendLib.QrCode)
 
 	httpserver.Frontend.I18n().Handler(e, `App.i18n`)
