@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.4.2
+require github.com/coscms/webcore v0.4.5
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,14 +47,14 @@ require (
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.17
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.7
+	github.com/webx-top/echo v1.12.9
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.1
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/pagination v0.3.1
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yanyiwu/gojieba v1.4.4
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.24.0
 	golang.org/x/sync v0.9.0
 	gopkg.in/redis.v5 v5.2.9
 )
@@ -139,7 +139,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/coscms/captcha v0.0.0-20241113151227-32493bf463a1 // indirect
+	github.com/coscms/captcha v0.0.1 // indirect
 	github.com/coscms/go-imgparse v0.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -281,7 +281,7 @@ require (
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
-	golang.org/x/time v0.7.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/api v0.205.0 // indirect
