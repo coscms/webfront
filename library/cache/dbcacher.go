@@ -4,13 +4,15 @@ import (
 	"context"
 
 	"github.com/admpub/cache/x"
+	"github.com/coscms/captcha"
 	"github.com/webx-top/db/lib/factory"
 )
 
 var DBCacher = NewDBCacher()
-var _ factory.Cacher = DBCacher
+var _ factory.Cacher = (*dbCacher)(nil)
+var _ captcha.Storer = (*dbCacher)(nil)
 
-func NewDBCacher() factory.Cacher {
+func NewDBCacher() *dbCacher {
 	return &dbCacher{}
 }
 
@@ -22,6 +24,10 @@ func (d *dbCacher) Put(ctx context.Context, key string, value interface{}, ttlSe
 
 func (d *dbCacher) Del(ctx context.Context, key string) error {
 	return Cache(cacheRootContext).Delete(ctx, key)
+}
+
+func (d *dbCacher) Delete(ctx context.Context, key string) error {
+	return d.Del(ctx, key)
 }
 
 func (d *dbCacher) Get(ctx context.Context, key string, value interface{}) error {

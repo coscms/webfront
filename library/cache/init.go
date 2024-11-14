@@ -6,6 +6,7 @@ import (
 	"github.com/admpub/cache"
 	"github.com/admpub/color"
 	"github.com/admpub/log"
+	"github.com/coscms/webcore/library/captcha/driver/captcha_go"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/extend"
@@ -62,4 +63,5 @@ func init() {
 	config.OnGroupSetSettings(`cache`, connection)
 	factory.SetCacher(DBCacher)
 	extend.Register(`locker`, func() interface{} { return NewReloadableOptions() })
+	captcha_go.DefaultStore = DBCacher
 }
