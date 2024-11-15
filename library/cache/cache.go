@@ -40,23 +40,25 @@ func Cache(ctx context.Context, args ...string) cache.Cache {
 			fallbackConnectionName = args[2]
 		}
 	}
-	key := instanceCachePrefix + defaultConnectionName
-	c, ok := echo.Get(key).(cache.Cache)
+	defaultKey := instanceCachePrefix + defaultConnectionName
+	c, ok := echo.Get(defaultKey).(cache.Cache)
 	if ok {
 		return c
 	}
 	logPrefix := color.GreenString(`[cache]`)
-	log.Debug(logPrefix, `[`+defaultConnectionName+`] 未找到已连接的实例`)
+	log.Warn(logPrefix, `[`+defaultConnectionName+`] 未找到已连接的实例`)
 	if defaultConnectionName != fallbackConnectionName {
-		key = instanceCachePrefix + fallbackConnectionName
-		c, ok = echo.Get(key).(cache.Cache)
+		fallbackKey := instanceCachePrefix + fallbackConnectionName
+		c, ok = echo.Get(fallbackKey).(cache.Cache)
 		if ok {
+			log.Warn(logPrefix, `[`+c.Name()+`] 使用备用实例`)
+			echo.Set(defaultKey, c)
 			return c
 		}
-		log.Debug(logPrefix, `[`+fallbackConnectionName+`] 未找到已连接的实例`)
+		log.Warn(logPrefix, `[`+fallbackConnectionName+`] 未找到已连接的实例`)
 	}
 	if c == nil {
-		log.Debug(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例`)
+		log.Warn(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例`)
 		c, ok = defaultCacheInstance.Load().(cache.Cache)
 		if !ok {
 			if ctx == nil {
@@ -68,6 +70,7 @@ func Cache(ctx context.Context, args ...string) cache.Cache {
 				log.Errorf(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例错误: %v`, err)
 			} else {
 				defaultCacheInstance.Store(c)
+				echo.Set(defaultKey, c)
 			}
 		}
 	}
@@ -86,7 +89,7 @@ func CacheNew(ctx context.Context, opts cache.Options, keys ...string) error {
 	logPrefix := color.GreenString(`[cache]`) + `[` + connectionName + `][` + opts.Adapter + `]`
 	c, ok := echo.Get(key).(cache.Cache)
 	if ok {
-		log.Info(logPrefix, `断开连接`)
+		log.Okay(logPrefix, `断开连接`)
 		echo.Delete(key)
 		c.Close()
 	}

@@ -35,6 +35,7 @@ func connection(diffs config.Diffs) error {
 			log.Error(logPrefix, err)
 		} else {
 			adapters = append(adapters, defaultCfg.Adapter)
+			log.Okayf(`cache system uses default storage engine: %s`, defaultCfg.Adapter)
 		}
 	}
 	fallbackCfg, ok := cfg.Get(`fallback`).(*cache.Options)
@@ -45,6 +46,7 @@ func connection(diffs config.Diffs) error {
 			log.Error(logPrefix, err)
 		} else {
 			adapters = append(adapters, fallbackCfg.Adapter)
+			log.Okayf(`cache system uses fallback storage engine: %s`, defaultCfg.Adapter)
 		}
 	}
 	lockerCfg, ok := config.FromFile().Extend.Get(`locker`).(*ReloadableOptions)
@@ -52,8 +54,10 @@ func connection(diffs config.Diffs) error {
 		if com.InSlice(`redis`, adapters) {
 			resetRedsync()
 			SetDefaultLockType(LockTypeRedis)
+			log.Okayf(`locker system uses storage engine: %s`, defaultCfg.Adapter)
 		} else {
 			SetDefaultLockType(LockTypeMemory)
+			log.Okay(`locker system uses storage engine: memory`)
 		}
 	}
 	return nil
