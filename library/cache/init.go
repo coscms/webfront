@@ -63,5 +63,5 @@ func init() {
 	config.OnGroupSetSettings(`cache`, connection)
 	factory.SetCacher(DBCacher)
 	extend.Register(`locker`, func() interface{} { return NewReloadableOptions() })
-	captcha_go.DefaultStore = DBCacher
+	captcha_go.DefaultStorer = DBCacher
 }

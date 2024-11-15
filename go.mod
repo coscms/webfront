@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.5.5
+require github.com/coscms/webcore v0.5.6
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -63,7 +63,7 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
-	github.com/coscms/captcha v0.0.1
+	github.com/coscms/captcha v0.1.0
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.29.0
