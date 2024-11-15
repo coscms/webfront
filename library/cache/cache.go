@@ -58,7 +58,7 @@ func Cache(ctx context.Context, args ...string) cache.Cache {
 			if ok {
 				log.Warn(logPrefix, `[`+c.Name()+`] 使用备用实例`)
 				echo.Set(defaultKey, c)
-				return c
+				return c, nil
 			}
 			log.Warn(logPrefix, `[`+fallbackConnectionName+`] 未找到已连接的实例`)
 		}
