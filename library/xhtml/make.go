@@ -52,9 +52,9 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
 		nocache := ctx.Formx(`nocache`).Int()
 		switch nocache {
-		case 1: // 禁用缓存
+		case 1: // 禁用HTML缓存和数据缓存
 			return false, nil
-		case 2: // 强制缓存新数据
+		case 2: // 强制缓存新HTML
 			fallthrough
 		case 3:
 			reqURL := ctx.Request().URL().Path()
@@ -66,6 +66,15 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 			if err := Make(http.MethodGet, reqURL, cacheKey); err != nil {
 				return true, err
 			}
+
+		case 12: // 禁用HTML缓存和强制刷新数据缓存
+			ctx.Request().URL().Query().Set(`nocache`, `2`)
+			ctx.Request().Form().Set(`nocache`, `2`)
+			return false, nil
+		case 13: // 禁用HTML缓存和强制刷新数据缓存
+			ctx.Request().URL().Query().Set(`nocache`, `3`)
+			ctx.Request().Form().Set(`nocache`, `3`)
+			return false, nil
 		}
 	}
 	var cachedETag sql.NullString
