@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"path/filepath"
+	"sync/atomic"
 
 	"github.com/admpub/cache"
 	_ "github.com/admpub/cache/memcache" // memcache
@@ -21,7 +22,7 @@ var (
 		Adapter:  `memory`,
 		Interval: 300,
 	}
-	defaultCacheInstance   cache.Cache
+	defaultCacheInstance   atomic.Value // cache.Cache
 	cacheConfigParsers     = map[string]func(cache.Options) (cache.Options, error){}
 	instanceCachePrefix    = `Cache:`
 	defaultConnectionName  = `default`
@@ -56,17 +57,19 @@ func Cache(ctx context.Context, args ...string) cache.Cache {
 	}
 	if c == nil {
 		log.Debug(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例`)
-		if defaultCacheInstance == nil {
+		c, ok = defaultCacheInstance.Load().(cache.Cache)
+		if !ok {
 			if ctx == nil {
 				ctx = context.Background()
 			}
 			var err error
-			defaultCacheInstance, err = cache.Cacher(ctx, *defaultCacheOptions)
+			c, err = cache.Cacher(ctx, *defaultCacheOptions)
 			if err != nil {
 				log.Errorf(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例错误: %v`, err)
+			} else {
+				defaultCacheInstance.Store(c)
 			}
 		}
-		c = defaultCacheInstance
 	}
 	return c
 }
