@@ -11,6 +11,7 @@ import (
 	"github.com/admpub/color"
 	"github.com/admpub/log"
 	"github.com/webx-top/echo"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/coscms/webcore/library/common"
 
@@ -22,6 +23,7 @@ var (
 		Adapter:  `memory`,
 		Interval: 300,
 	}
+	sg                     singleflight.Group
 	defaultCacheInstance   atomic.Value // cache.Cache
 	cacheConfigParsers     = map[string]func(cache.Options) (cache.Options, error){}
 	instanceCachePrefix    = `Cache:`
@@ -45,35 +47,45 @@ func Cache(ctx context.Context, args ...string) cache.Cache {
 	if ok {
 		return c
 	}
-	logPrefix := color.GreenString(`[cache]`)
-	log.Warn(logPrefix, `[`+defaultConnectionName+`] 未找到已连接的实例`)
-	if defaultConnectionName != fallbackConnectionName {
-		fallbackKey := instanceCachePrefix + fallbackConnectionName
-		c, ok = echo.Get(fallbackKey).(cache.Cache)
-		if ok {
-			log.Warn(logPrefix, `[`+c.Name()+`] 使用备用实例`)
-			echo.Set(defaultKey, c)
-			return c
-		}
-		log.Warn(logPrefix, `[`+fallbackConnectionName+`] 未找到已连接的实例`)
-	}
-	if c == nil {
-		log.Warn(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例`)
-		c, ok = defaultCacheInstance.Load().(cache.Cache)
-		if !ok {
-			if ctx == nil {
-				ctx = context.Background()
-			}
-			var err error
-			c, err = cache.Cacher(ctx, *defaultCacheOptions)
-			if err != nil {
-				log.Errorf(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例错误: %v`, err)
-			} else {
-				defaultCacheInstance.Store(c)
+	val, err, _ := sg.Do(`getCache`, func() (interface{}, error) {
+		logPrefix := color.GreenString(`[cache]`)
+		log.Warn(logPrefix, `[`+defaultConnectionName+`] 未找到已连接的实例`)
+		var c cache.Cache
+		var ok bool
+		if defaultConnectionName != fallbackConnectionName {
+			fallbackKey := instanceCachePrefix + fallbackConnectionName
+			c, ok = echo.Get(fallbackKey).(cache.Cache)
+			if ok {
+				log.Warn(logPrefix, `[`+c.Name()+`] 使用备用实例`)
 				echo.Set(defaultKey, c)
+				return c
+			}
+			log.Warn(logPrefix, `[`+fallbackConnectionName+`] 未找到已连接的实例`)
+		}
+		if c == nil {
+			log.Warn(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例`)
+			c, ok = defaultCacheInstance.Load().(cache.Cache)
+			if !ok {
+				if ctx == nil {
+					ctx = context.Background()
+				}
+				var err error
+				c, err = cache.Cacher(ctx, *defaultCacheOptions)
+				if err != nil {
+					log.Errorf(logPrefix, `[`+defaultCacheOptions.Adapter+`] 使用默认实例错误: %v`, err)
+				} else {
+					defaultCacheInstance.Store(c)
+					echo.Set(defaultKey, c)
+				}
 			}
 		}
+		return c, nil
+	})
+	if err != nil {
+		log.Error(err)
+		return c
 	}
+	c = val.(cache.Cache)
 	return c
 }
 
