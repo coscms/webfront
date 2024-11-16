@@ -13,28 +13,25 @@ var (
 
 // 资产类型
 const (
-	AssetTypeMoney      = `money`
-	AssetTypeIntegral   = `integral`
-	AssetTypeCredit     = `credit`
-	AssetTypePoint      = `point`
-	AssetTypeGold       = `gold`
-	AssetTypeSilver     = `silver`
-	AssetTypeCopper     = `copper`
-	AssetTypeExperience = `experience`
+	AssetTypeMoney      = `money`      // 人民币
+	AssetTypeIntegral   = `integral`   // 积分
+	AssetTypeCredit     = `credit`     // 信用分
+	AssetTypePoint      = `point`      // 点数
+	AssetTypeExperience = `experience` // 经验
 )
 
 // 金额类型
 const (
-	AmountTypeBalance = `balance`
-	AmountTypeFreeze  = `freeze`
+	AmountTypeBalance = `balance` // 余额
+	AmountTypeFreeze  = `freeze`  // 冻结金额
 )
 
 // 资金流水记录状态
 const (
 	//状态(pending-待确认;confirmed-已确认;canceled-已取消)
-	FlowStatusPending   = `pending`
-	FlowStatusConfirmed = `confirmed`
-	FlowStatusCanceled  = `canceled`
+	FlowStatusPending   = `pending`   // 待确认
+	FlowStatusConfirmed = `confirmed` // 已确认
+	FlowStatusCanceled  = `canceled`  // 已取消
 )
 
 func init() {
@@ -72,30 +69,6 @@ func init() {
 		H: echo.H{
 			`icon`: `iconfont icon-dengji-11`,
 			`bg`:   `gray`,
-		},
-	})
-	AssetTypes.AddItem(&echo.KV{
-		K: AssetTypeGold,
-		V: `金币`,
-		H: echo.H{
-			`icon`: `iconfont icon-jinbi2 tx-gold`,
-			`bg`:   `superlight`,
-		},
-	})
-	AssetTypes.AddItem(&echo.KV{
-		K: AssetTypeSilver,
-		V: `银币`,
-		H: echo.H{
-			`icon`: `iconfont icon-tongbi tx-silver`,
-			`bg`:   `gray`,
-		},
-	})
-	AssetTypes.AddItem(&echo.KV{
-		K: AssetTypeCopper,
-		V: `铜钱`,
-		H: echo.H{
-			`icon`: `iconfont icon-tongbi tx-copper`,
-			`bg`:   `superlight`,
 		},
 	})
 	AssetTypes.AddItem(&echo.KV{
