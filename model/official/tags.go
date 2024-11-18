@@ -108,7 +108,7 @@ func (f *Tags) DecrNum(group string, name []string, n ...int) error {
 func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postTags []string, disallowCreateTags ...bool) ([]string, error) {
 	var (
 		delTags        []string
-		tags           []string
+		tags           = make([]string, 0, len(postTags))
 		err            error
 		disallowCreate bool
 	)
@@ -139,14 +139,16 @@ func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postT
 			if err != db.ErrNoMoreRows {
 				return nil, err
 			}
-		}
-		// 找出新增tags
-		for _, tagRow := range f.Objects() {
-			delete(uniqueTags, tagRow.Name) //从提交的tags中清除掉已经存在的tags
-			if createMode {                 //新增模式时，增加标签使用次数
-				err = f.IncrNum(group, tagRow.Name)
-				if err != nil {
-					return nil, err
+			err = nil
+		} else {
+			// 找出新增tags
+			for _, tagRow := range f.Objects() {
+				delete(uniqueTags, tagRow.Name) //从提交的tags中清除掉已经存在的tags
+				if createMode {                 //新增模式时，增加标签使用次数
+					err = f.IncrNum(group, tagRow.Name)
+					if err != nil {
+						return nil, err
+					}
 				}
 			}
 		}
