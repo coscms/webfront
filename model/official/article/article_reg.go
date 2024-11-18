@@ -13,6 +13,7 @@ import (
 const GroupName = `article`
 
 func init() {
+	official.AddTagGroup(GroupName, `文章`)
 	official.AddClickFlowTarget(GroupName, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string, isCancel ...bool) error, func() uint64, error) {
 		articleM := NewArticle(c)
 		err := articleM.Get(nil, `id`, id)
