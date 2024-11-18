@@ -6,6 +6,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webfront/dbschema"
@@ -27,7 +28,19 @@ func (f *Tags) ListByGroup(group string, limit int) []*dbschema.OfficialCommonTa
 	return f.Objects()
 }
 
+func (f *Tags) check() error {
+	f.Name = strings.TrimSpace(f.Name)
+	if len(f.Name) == 0 {
+		return f.Context().NewError(code.InvalidParameter, `标签名无效`).SetZone(`name`)
+	}
+	f.Group = strings.TrimSpace(f.Group)
+	return nil
+}
+
 func (f *Tags) Add() (pk interface{}, err error) {
+	if err = f.check(); err != nil {
+		return nil, err
+	}
 	cond := db.NewCompounds()
 	cond.AddKV(`name`, f.Name)
 	cond.AddKV(`group`, f.Group)
@@ -47,6 +60,9 @@ func (f *Tags) Add() (pk interface{}, err error) {
 }
 
 func (f *Tags) Edit(mw func(db.Result) db.Result, args ...interface{}) error {
+	if err := f.check(); err != nil {
+		return err
+	}
 	return f.OfficialCommonTags.Update(mw, args...)
 }
 
