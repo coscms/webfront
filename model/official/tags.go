@@ -105,7 +105,7 @@ func (f *Tags) DecrNum(group string, name []string, n ...int) error {
 	return err
 }
 
-func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postTags []string, disallowCreateTags ...bool) ([]string, error) {
+func (f *Tags) UpdateTags(group string, oldTags []string, postTags []string, disallowCreateTags ...bool) ([]string, error) {
 	var (
 		delTags        []string
 		tags           = make([]string, 0, len(postTags))
@@ -114,6 +114,9 @@ func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postT
 	)
 	if len(disallowCreateTags) > 0 {
 		disallowCreate = disallowCreateTags[0]
+	}
+	if oldTags == nil {
+		oldTags = []string{}
 	}
 	uniqueTags := map[string]int{}
 	if len(postTags) > 0 && len(group) > 0 {
@@ -136,19 +139,15 @@ func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postT
 			db.Cond{`name`: db.In(tags)},
 		))
 		if err != nil {
-			if err != db.ErrNoMoreRows {
-				return nil, err
-			}
-			err = nil
-		} else {
-			// 找出新增tags
-			for _, tagRow := range f.Objects() {
-				delete(uniqueTags, tagRow.Name) //从提交的tags中清除掉已经存在的tags
-				if createMode {                 //新增模式时，增加标签使用次数
-					err = f.IncrNum(group, tagRow.Name)
-					if err != nil {
-						return nil, err
-					}
+			return nil, err
+		}
+		// 找出新增tags
+		for _, tagRow := range f.Objects() {
+			delete(uniqueTags, tagRow.Name)         //从提交的tags中清除掉已经存在的tags
+			if !com.InSlice(tagRow.Name, oldTags) { //旧数据tags中没有时，代表本次新增了此标签
+				err = f.IncrNum(group, tagRow.Name)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
@@ -174,10 +173,10 @@ func (f *Tags) UpdateTags(createMode bool, group string, oldTags []string, postT
 				}
 			}
 		}
-	} else if !createMode { //如果没有提交tags，则删除旧tags
+	} else { //如果没有提交tags，则删除旧tags
 		delTags = oldTags
 	}
-	if !createMode && len(delTags) > 0 { // 在非新增模式删除标签时才减去使用次数
+	if len(delTags) > 0 { // 删除标签时才减去使用次数
 		err = f.DecrNum(group, delTags)
 	}
 	return tags, err
