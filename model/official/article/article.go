@@ -84,7 +84,7 @@ func (f *Article) check(old *dbschema.OfficialCommonArticle) error {
 		oldTags = strings.Split(old.Tags, `,`)
 	}
 	tagsM := official.NewTags(f.Context())
-	tags, err := tagsM.UpdateTags(f.Id == 0, GroupName, oldTags, strings.Split(f.Tags, `,`), f.DisallowCreateTags)
+	tags, err := tagsM.UpdateTags(old == nil, GroupName, oldTags, strings.Split(f.Tags, `,`), f.DisallowCreateTags)
 	if err != nil {
 		return err
 	}
