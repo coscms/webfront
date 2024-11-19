@@ -8,29 +8,6 @@ import (
 	"github.com/coscms/webfront/dbschema"
 )
 
-type ClickFlowTargetFunc func(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error)
-
-func (c ClickFlowTargetFunc) Do(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error) {
-	return c(ctx, id)
-}
-
-func MakeOperator(isCancel ...bool) string {
-	if len(isCancel) > 0 && isCancel[0] {
-		return `-`
-	}
-	return `+`
-}
-
-type ClickFlowTarget interface {
-	Do(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, idGetter func() uint64, err error)
-}
-
-var ClickFlowTargets = map[string]ClickFlowTarget{}
-
-func AddClickFlowTarget(name string, target ClickFlowTarget) {
-	ClickFlowTargets[name] = target
-}
-
 func NewClickFlow(ctx echo.Context) *ClickFlow {
 	return &ClickFlow{
 		OfficialCommonClickFlow: dbschema.NewOfficialCommonClickFlow(ctx),

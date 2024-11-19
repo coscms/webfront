@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	official.AddClickFlowTarget(`comment`, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string, isCancel ...bool) error, func() uint64, error) {
+	official.AddClickFlowTarget(`comment`, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string, isCancel ...bool) error, func() official.ClickFlowTargetInfo, error) {
 		m := NewComment(c)
 		err := m.Get(nil, `id`, id)
 		if err != nil {
