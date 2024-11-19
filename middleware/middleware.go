@@ -165,22 +165,7 @@ func permCheck(c echo.Context, customer *dbschema.OfficialCustomer) error {
 }
 
 func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *xrole.RolePermission, route string) error {
-	var (
-		err error
-		ret bool
-	)
-	err, route, ret = xrole.SpecialAuths.Check(ctx, route, customer, permission)
-	if ret || err != nil {
-		return err
-	}
-	if route == `/user/index` {
-		return nil
-	}
-	route = strings.TrimPrefix(route, `/user/`)
-	if !permission.Check(ctx, route) {
-		return nerrors.ErrUserNoPerm
-	}
-	return nil
+	return xrole.CheckPermissionByRoutePath(ctx, customer, permission, route)
 }
 
 func SkipCurrentURLPermCheck(h echo.Handler) echo.HandlerFunc {

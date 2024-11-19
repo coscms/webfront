@@ -1,6 +1,9 @@
 package xrole
 
 import (
+	"strings"
+
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
 )
@@ -48,4 +51,28 @@ func AuthUnregister(ppath string) {
 	if _, ok := SpecialAuths[ppath]; ok {
 		delete(SpecialAuths, ppath)
 	}
+}
+
+func CheckPermissionByRoutePath(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, routePath string) error {
+	err, route, ret := SpecialAuths.Check(ctx, routePath, customer, permission)
+	if ret || err != nil {
+		return err
+	}
+	if route == `/user/index` {
+		return nil
+	}
+	route = strings.TrimPrefix(route, `/user/`)
+	if !permission.Check(ctx, route) {
+		return nerrors.ErrUserNoPerm
+	}
+	return nil
+}
+
+func CheckPermissionByName(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, name string) bool {
+	route := ctx.Echo().GetRoutePathByName(name)
+	if len(route) == 0 {
+		log.Warnf(`the route named %s could not be found`, name)
+		return false
+	}
+	return CheckPermissionByRoutePath(ctx, customer, permission) == nil
 }
