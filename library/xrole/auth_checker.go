@@ -3,6 +3,7 @@ package xrole
 import (
 	"strings"
 
+	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
@@ -74,5 +75,5 @@ func CheckPermissionByName(ctx echo.Context, customer *dbschema.OfficialCustomer
 		log.Warnf(`the route named %s could not be found`, name)
 		return false
 	}
-	return CheckPermissionByRoutePath(ctx, customer, permission) == nil
+	return CheckPermissionByRoutePath(ctx, customer, permission, route) == nil
 }
