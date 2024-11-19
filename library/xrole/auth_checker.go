@@ -69,7 +69,7 @@ func CheckPermissionByRoutePath(ctx echo.Context, customer *dbschema.OfficialCus
 	return nil
 }
 
-func CheckPermissionByName(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, name string) bool {
+func CheckPermissionByRouteName(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, name string) bool {
 	route := ctx.Echo().GetRoutePathByName(name)
 	if len(route) == 0 {
 		log.Warnf(`the route named %s could not be found`, name)
