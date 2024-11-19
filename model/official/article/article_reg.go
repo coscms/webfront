@@ -28,7 +28,7 @@ func init() {
 			return articleM.UpdateField(nil, field, db.Raw(field+official.MakeOperator(isCancel...)+`1`), db.Cond{`id`: id})
 		}, nil, nil
 	}))
-	official.AddCollectionTarget(GroupName, `文章`, official.CollectionTargetDoFunc(func(c echo.Context, id interface{}) (func(isCancel ...bool) error, func() (uint64, string), error) {
+	official.AddCollectionTarget(GroupName, `文章`, official.CollectionTargetDoFunc(func(c echo.Context, id interface{}) (func(isCancel ...bool) error, func() official.CollectionTargetInfo, error) {
 		articleM := NewArticle(c)
 		err := articleM.Get(nil, `id`, id)
 		if err != nil {
@@ -37,8 +37,8 @@ func init() {
 			}
 			return nil, nil, err
 		}
-		return func(_ ...bool) error { return nil }, func() (uint64, string) {
-			return articleM.Id, articleM.Title
+		return func(_ ...bool) error { return nil }, func() official.CollectionTargetInfo {
+			return official.CollectionTargetInfo{ID: articleM.Id, Title: articleM.Title}
 		}, nil
 	}), official.CollectionTargetListFunc(func(c echo.Context, rows []*official.CollectionResponse, targetIDs []uint64) ([]*official.CollectionResponse, error) {
 		articleM := NewArticle(c)
