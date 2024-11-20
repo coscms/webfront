@@ -90,7 +90,7 @@ func CheckPermissionByRouteName(ctx echo.Context, customer *dbschema.OfficialCus
 	}
 	handlerPermission := routed.String(`permission`)
 	if handlerPermission == route.PermissionPublic {
-		return false
+		return true
 	}
 	return CheckPermissionByRoutePath(ctx, customer, permission, routed.Path) == nil
 }
