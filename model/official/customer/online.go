@@ -45,7 +45,7 @@ func (u *Online) Add() (interface{}, error) {
 	return u.OfficialCustomerOnline.Insert()
 }
 
-func (u *Online) Incr(target string, n uint) error {
+func (u *Online) Incr(n uint) error {
 	exists, err := u.Exists()
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (u *Online) Incr(target string, n uint) error {
 	))
 }
 
-func (u *Online) Decr(target string, n uint64) error {
+func (u *Online) Decr(n uint64) error {
 	exists, err := u.Exists()
 	if err != nil || !exists {
 		return err
