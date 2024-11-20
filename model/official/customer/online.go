@@ -3,6 +3,7 @@ package customer
 import (
 	"time"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -56,21 +57,45 @@ func (u *Online) Incr(n uint) error {
 		u.ClientCount = n
 		u.Updated = uint(time.Now().Unix())
 		_, err = u.OfficialCustomerOnline.Insert()
+	} else {
+		err = u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
+			`client_count`: db.Raw("client_count+" + param.AsString(n)),
+			`updated`:      time.Now().Unix(),
+		}, db.And(
+			db.Cond{`session_id`: u.SessionId},
+			db.Cond{`customer_id`: u.CustomerId},
+		))
+	}
+	if err != nil {
 		return err
 	}
-	return u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
-		`client_count`: db.Raw("client_count+" + param.AsString(n)),
-		`updated`:      time.Now().Unix(),
+	customerM := dbschema.NewOfficialCustomer(u.Context())
+	err = customerM.UpdateField(nil, `online`, `Y`, db.And(
+		db.Cond{`id`: u.CustomerId},
+		db.Cond{`online`: `N`},
+	))
+	return err
+}
+
+func (u *Online) Decr(n uint64) error {
+	err := u.OfficialCustomerOnline.Get(func(r db.Result) db.Result {
+		return r.Select(`id`, `client_count`)
 	}, db.And(
 		db.Cond{`session_id`: u.SessionId},
 		db.Cond{`customer_id`: u.CustomerId},
 	))
-}
-
-func (u *Online) Decr(n uint64) error {
-	exists, err := u.Exists()
-	if err != nil || !exists {
+	if err != nil {
+		if err == db.ErrNoMoreRows {
+			return nil
+		}
 		return err
+	}
+	if u.ClientCount <= 1 {
+		customerM := dbschema.NewOfficialCustomer(u.Context())
+		customerM.UpdateField(nil, `online`, `N`, db.And(
+			db.Cond{`id`: u.CustomerId},
+			db.Cond{`online`: `Y`},
+		))
 	}
 	return u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
 		`client_count`: db.Raw("client_count-" + param.AsString(n)),
@@ -108,4 +133,17 @@ func (u *Online) IsOnlineCustomerID(customerID uint64) bool {
 		db.Cond{`client_count`: db.Gt(0)},
 	))
 	return exists
+}
+
+func (u *Online) ResetClientCount() error {
+	err := u.OfficialCustomerOnline.UpdateField(nil, `client_count`, 0, db.And(
+		db.Cond{`client_count`: db.NotEq(0)},
+		db.Cond{`updated`: db.Lt(com.StartTime.Unix())},
+	))
+	if err != nil {
+		return err
+	}
+	customerM := dbschema.NewOfficialCustomer(u.Context())
+	err = customerM.UpdateField(nil, `online`, `N`, db.Cond{`online`: `Y`})
+	return err
 }

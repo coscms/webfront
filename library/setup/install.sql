@@ -658,7 +658,8 @@ CREATE TABLE `official_customer` (
   KEY `customer_mobile` (`mobile`,`mobile_bind`),
   KEY `customer_email` (`email`,`email_bind`),
   KEY `customer_disabled` (`disabled`),
-  KEY `customer_updated` (`updated` DESC)
+  KEY `customer_updated` (`updated` DESC),
+  KEY `customer_online` (`online`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='客户资料';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1187,4 +1188,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-20 18:25:10
+-- Dump completed on 2024-11-20 21:19:11
