@@ -58,7 +58,7 @@ func (u *Online) Add() (interface{}, error) {
 func (u *Online) Incr(n uint) error {
 	old := dbschema.NewOfficialCustomerOnline(u.Context())
 	err := old.Get(func(r db.Result) db.Result {
-		return r.Select(`session_id`, `customer_id`)
+		return r.Select(`session_id`, `customer_id`, `updated`)
 	}, u.MakeCond(u.SessionId, u.CustomerId))
 	if err != nil {
 		if err != db.ErrNoMoreRows {
@@ -69,14 +69,18 @@ func (u *Online) Incr(n uint) error {
 		_, err = u.OfficialCustomerOnline.Insert()
 	} else {
 		kvset := echo.H{
-			`client_count`: db.Raw("client_count+" + param.AsString(n)),
-			`updated`:      time.Now().Unix(),
+			`updated`: time.Now().Unix(),
 		}
 		if old.SessionId != u.SessionId {
 			kvset[`session_id`] = u.SessionId
 		}
-		if old.CustomerId == 0 {
+		if old.CustomerId != u.CustomerId {
 			kvset[`customer_id`] = u.CustomerId
+		}
+		if int64(old.Updated) < com.StartTime.Unix() { // 程序启动之前的状态需要重新设置为1
+			kvset[`client_count`] = 1
+		} else {
+			kvset[`client_count`] = db.Raw("client_count+" + param.AsString(n))
 		}
 		err = u.OfficialCustomerOnline.UpdateFields(nil, kvset, u.MakeCond(u.SessionId, u.CustomerId))
 	}
@@ -136,6 +140,7 @@ func (u *Online) IsOnlineCustomerIDs(customerIDs []uint64) map[uint64]bool {
 	}, 0, -1, db.And(
 		db.Cond{`customer_id`: db.In(customerIDs)},
 		db.Cond{`client_count`: db.Gt(0)},
+		db.Cond{`updated`: db.Gte(com.StartTime.Unix())},
 	))
 	exists := map[uint64]bool{}
 	for _, row := range u.Objects() {
@@ -148,6 +153,7 @@ func (u *Online) IsOnlineCustomerID(customerID uint64) bool {
 	exists, _ := u.OfficialCustomerOnline.Exists(nil, db.And(
 		db.Cond{`customer_id`: customerID},
 		db.Cond{`client_count`: db.Gt(0)},
+		db.Cond{`updated`: db.Gte(com.StartTime.Unix())},
 	))
 	return exists
 }
