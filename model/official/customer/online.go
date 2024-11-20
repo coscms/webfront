@@ -158,11 +158,16 @@ func (u *Online) IsOnlineCustomerID(customerID uint64) bool {
 	return exists
 }
 
-func (u *Online) ResetClientCount() error {
-	err := u.OfficialCustomerOnline.UpdateField(nil, `client_count`, 0, db.And(
-		db.Cond{`client_count`: db.NotEq(0)},
-		db.Cond{`updated`: db.Lt(com.StartTime.Unix())},
-	))
+func (u *Online) ResetClientCount(isDelete ...bool) error {
+	var err error
+	if len(isDelete) > 0 && isDelete[0] {
+		err = u.OfficialCustomerOnline.Delete(nil, db.Cond{`updated`: db.Lt(com.StartTime.Unix())})
+	} else {
+		err = u.OfficialCustomerOnline.UpdateField(nil, `client_count`, 0, db.And(
+			db.Cond{`client_count`: db.NotEq(0)},
+			db.Cond{`updated`: db.Lt(com.StartTime.Unix())},
+		))
+	}
 	if err != nil {
 		return err
 	}
