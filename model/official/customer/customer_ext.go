@@ -26,12 +26,18 @@ func (c *CustomerBase) SelectColumns() []interface{} {
 	return []interface{}{`id`, `name`, `gender`, `avatar`}
 }
 
+type CustomerBaseWithOnline struct {
+	*CustomerBase
+	Online bool `db:"-"`
+}
+
 type CustomerAndGroup struct {
 	*dbschema.OfficialCustomer
 	Group  *dbschema.OfficialCommonGroup    `db:"-,relation=id:group_id|gtZero"`
 	Levels []*modelLevel.RelationExt        `db:"-,relation=customer_id:id|gtZero" json:",omitempty"`
 	Agent  map[string]interface{}           `db:"-" json:",omitempty" xml:",omitempty"`
 	Roles  []*dbschema.OfficialCustomerRole `db:"-,relation=id:role_ids|notEmpty|split"`
+	Online bool                             `db:"-"`
 }
 
 func (d *CustomerAndGroup) AsMap() param.Store {
