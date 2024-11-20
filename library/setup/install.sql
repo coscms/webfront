@@ -890,7 +890,8 @@ CREATE TABLE `official_customer_online` (
   `client_count` int unsigned NOT NULL DEFAULT '0' COMMENT '客户端计数',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '活跃时间',
   UNIQUE KEY `customer_online_uniq` (`session_id`,`customer_id`),
-  KEY `customer_online_updated` (`updated` DESC)
+  KEY `customer_online_updated` (`updated` DESC),
+  KEY `customer_online_clients` (`client_count`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='客户在线状态';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1186,4 +1187,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-20 18:06:58
+-- Dump completed on 2024-11-20 18:25:10
