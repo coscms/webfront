@@ -28,7 +28,7 @@ func (c *CustomerBase) SelectColumns() []interface{} {
 
 type CustomerBaseWithOnline struct {
 	*CustomerBase
-	Online bool `db:"-"`
+	Online bool `db:"-" json:"online" xml:"online"`
 }
 
 type CustomerAndGroup struct {
@@ -37,7 +37,7 @@ type CustomerAndGroup struct {
 	Levels []*modelLevel.RelationExt        `db:"-,relation=customer_id:id|gtZero" json:",omitempty"`
 	Agent  map[string]interface{}           `db:"-" json:",omitempty" xml:",omitempty"`
 	Roles  []*dbschema.OfficialCustomerRole `db:"-,relation=id:role_ids|notEmpty|split"`
-	Online bool                             `db:"-"`
+	Online bool                             `db:"-" json:"online" xml:"online"`
 }
 
 func (d *CustomerAndGroup) AsMap() param.Store {
