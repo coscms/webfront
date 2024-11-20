@@ -23,11 +23,18 @@ type Online struct {
 	*dbschema.OfficialCustomerOnline
 }
 
+func (u *Online) MakeCond(sessionID string, customerID uint64) db.Compound {
+	if customerID == 0 {
+		return db.Cond{`session_id`: sessionID}
+	}
+	return db.Or(
+		db.Cond{`session_id`: sessionID},
+		db.Cond{`customer_id`: customerID},
+	)
+}
+
 func (u *Online) Exists() (bool, error) {
-	return u.OfficialCustomerOnline.Exists(nil, db.And(
-		db.Cond{`session_id`: u.SessionId},
-		db.Cond{`customer_id`: u.CustomerId},
-	))
+	return u.OfficialCustomerOnline.Exists(nil, u.MakeCond(u.SessionId, u.CustomerId))
 }
 
 func (u *Online) check() error {
@@ -49,22 +56,29 @@ func (u *Online) Add() (interface{}, error) {
 }
 
 func (u *Online) Incr(n uint) error {
-	exists, err := u.Exists()
+	old := dbschema.NewOfficialCustomerOnline(u.Context())
+	err := old.Get(func(r db.Result) db.Result {
+		return r.Select(`session_id`, `customer_id`)
+	}, u.MakeCond(u.SessionId, u.CustomerId))
 	if err != nil {
-		return err
-	}
-	if !exists {
+		if err != db.ErrNoMoreRows {
+			return err
+		}
 		u.ClientCount = n
 		u.Updated = uint(time.Now().Unix())
 		_, err = u.OfficialCustomerOnline.Insert()
 	} else {
-		err = u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
+		kvset := echo.H{
 			`client_count`: db.Raw("client_count+" + param.AsString(n)),
 			`updated`:      time.Now().Unix(),
-		}, db.And(
-			db.Cond{`session_id`: u.SessionId},
-			db.Cond{`customer_id`: u.CustomerId},
-		))
+		}
+		if old.SessionId != u.SessionId {
+			kvset[`session_id`] = u.SessionId
+		}
+		if old.CustomerId == 0 {
+			kvset[`customer_id`] = u.CustomerId
+		}
+		err = u.OfficialCustomerOnline.UpdateFields(nil, kvset, u.MakeCond(u.SessionId, u.CustomerId))
 	}
 	if err != nil {
 		return err
@@ -78,31 +92,36 @@ func (u *Online) Incr(n uint) error {
 }
 
 func (u *Online) Decr(n uint64) error {
-	err := u.OfficialCustomerOnline.Get(func(r db.Result) db.Result {
-		return r.Select(`id`, `client_count`)
-	}, db.And(
-		db.Cond{`session_id`: u.SessionId},
-		db.Cond{`customer_id`: u.CustomerId},
-	))
+	old := dbschema.NewOfficialCustomerOnline(u.Context())
+	err := old.Get(func(r db.Result) db.Result {
+		return r.Select(`client_count`, `session_id`, `customer_id`)
+	}, u.MakeCond(u.SessionId, u.CustomerId))
 	if err != nil {
 		if err == db.ErrNoMoreRows {
 			return nil
 		}
 		return err
 	}
-	if u.ClientCount <= 1 {
+	if old.ClientCount <= 1 {
 		customerM := dbschema.NewOfficialCustomer(u.Context())
 		customerM.UpdateField(nil, `online`, `N`, db.And(
 			db.Cond{`id`: u.CustomerId},
 			db.Cond{`online`: `Y`},
 		))
 	}
-	return u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
+	kvset := echo.H{
 		`client_count`: db.Raw("client_count-" + param.AsString(n)),
 		`updated`:      time.Now().Unix(),
-	}, db.And(
-		db.Cond{`session_id`: u.SessionId},
-		db.Cond{`customer_id`: u.CustomerId},
+	}
+	if old.SessionId != u.SessionId {
+		kvset[`session_id`] = u.SessionId
+	}
+	if old.CustomerId != u.CustomerId {
+		kvset[`customer_id`] = u.CustomerId
+	}
+	return u.OfficialCustomerOnline.UpdateFields(nil, kvset, db.And(
+		db.Cond{`session_id`: old.SessionId},
+		db.Cond{`customer_id`: old.CustomerId},
 		db.Cond{`client_count`: db.Gt(0)},
 	))
 }
