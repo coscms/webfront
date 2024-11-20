@@ -1,6 +1,8 @@
 package customer
 
 import (
+	"time"
+
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -55,7 +57,10 @@ func (u *Online) Incr(n uint) error {
 		_, err = u.OfficialCustomerOnline.Insert()
 		return err
 	}
-	return u.OfficialCustomerOnline.UpdateField(nil, `client_count`, db.Raw("client_count+"+param.AsString(n)), db.And(
+	return u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
+		`client_count`: db.Raw("client_count+" + param.AsString(n)),
+		`updated`:      time.Now().Unix(),
+	}, db.And(
 		db.Cond{`session_id`: u.SessionId},
 		db.Cond{`customer_id`: u.CustomerId},
 	))
@@ -66,7 +71,9 @@ func (u *Online) Decr(n uint64) error {
 	if err != nil || !exists {
 		return err
 	}
-	return u.OfficialCustomerOnline.UpdateField(nil, `client_count`, db.Raw("client_count-"+param.AsString(n)), db.And(
+	return u.OfficialCustomerOnline.UpdateFields(nil, echo.H{
+		`client_count`: db.Raw("client_count-" + param.AsString(n)),
+	}, db.And(
 		db.Cond{`session_id`: u.SessionId},
 		db.Cond{`customer_id`: u.CustomerId},
 	))
