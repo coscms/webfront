@@ -54,6 +54,7 @@ func (u *Online) Incr(n uint) error {
 	}
 	if !exists {
 		u.ClientCount = n
+		u.Updated = uint(time.Now().Unix())
 		_, err = u.OfficialCustomerOnline.Insert()
 		return err
 	}
