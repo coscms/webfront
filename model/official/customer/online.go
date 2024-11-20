@@ -113,7 +113,7 @@ func (u *Online) Cleanup() error {
 
 func (u *Online) IsOnlineCustomerIDs(customerIDs []uint64) map[uint64]bool {
 	u.OfficialCustomerOnline.ListByOffset(nil, func(r db.Result) db.Result {
-		return r.Select(`id`)
+		return r.Select(`customer_id`)
 	}, 0, -1, db.And(
 		db.Cond{`customer_id`: db.In(customerIDs)},
 		db.Cond{`client_count`: db.Gt(0)},
@@ -126,9 +126,7 @@ func (u *Online) IsOnlineCustomerIDs(customerIDs []uint64) map[uint64]bool {
 }
 
 func (u *Online) IsOnlineCustomerID(customerID uint64) bool {
-	exists, _ := u.OfficialCustomerOnline.Exists(nil, func(r db.Result) db.Result {
-		return r.Select(`id`)
-	}, 0, -1, db.And(
+	exists, _ := u.OfficialCustomerOnline.Exists(nil, db.And(
 		db.Cond{`customer_id`: customerID},
 		db.Cond{`client_count`: db.Gt(0)},
 	))
