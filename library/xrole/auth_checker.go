@@ -50,9 +50,20 @@ func AuthRegister(ppath string, checker AuthChecker) {
 }
 
 func AuthUnregister(ppath string) {
-	if _, ok := SpecialAuths[ppath]; ok {
-		delete(SpecialAuths, ppath)
-	}
+	delete(SpecialAuths, ppath)
+}
+
+var publicRoutePaths = map[string]struct{}{
+	`/user/index`:  {},
+	`/user/notice`: {},
+}
+
+func RegisterPublic(ppath string) {
+	publicRoutePaths[ppath] = struct{}{}
+}
+
+func UnregisterPublic(ppath string) {
+	delete(publicRoutePaths, ppath)
 }
 
 func CheckPermissionByRoutePath(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, routePath string) error {
@@ -60,7 +71,8 @@ func CheckPermissionByRoutePath(ctx echo.Context, customer *dbschema.OfficialCus
 	if ret || err != nil {
 		return err
 	}
-	if route == `/user/index` {
+	_, isPublic := publicRoutePaths[route]
+	if isPublic {
 		return nil
 	}
 	route = strings.TrimPrefix(route, `/user/`)
