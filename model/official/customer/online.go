@@ -78,9 +78,34 @@ func (u *Online) Decr(n uint64) error {
 	}, db.And(
 		db.Cond{`session_id`: u.SessionId},
 		db.Cond{`customer_id`: u.CustomerId},
+		db.Cond{`client_count`: db.Gt(0)},
 	))
 }
 
 func (u *Online) Cleanup() error {
 	return u.OfficialCustomerOnline.Delete(nil, db.Cond{`client_count`: 0})
+}
+
+func (u *Online) IsOnlineCustomerIDs(customerIDs []uint64) map[uint64]bool {
+	u.OfficialCustomerOnline.ListByOffset(nil, func(r db.Result) db.Result {
+		return r.Select(`id`)
+	}, 0, -1, db.And(
+		db.Cond{`customer_id`: db.In(customerIDs)},
+		db.Cond{`client_count`: db.Gt(0)},
+	))
+	exists := map[uint64]bool{}
+	for _, row := range u.Objects() {
+		exists[row.CustomerId] = true
+	}
+	return exists
+}
+
+func (u *Online) IsOnlineCustomerID(customerID uint64) bool {
+	exists, _ := u.OfficialCustomerOnline.Exists(nil, func(r db.Result) db.Result {
+		return r.Select(`id`)
+	}, 0, -1, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`client_count`: db.Gt(0)},
+	))
+	return exists
 }
