@@ -878,6 +878,23 @@ CREATE TABLE `official_customer_oauth` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `official_customer_online`
+--
+
+DROP TABLE IF EXISTS `official_customer_online`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `official_customer_online` (
+  `customer_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '客户ID',
+  `session_id` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'session id',
+  `client_count` int unsigned NOT NULL DEFAULT '0' COMMENT '客户端计数',
+  `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '活跃时间',
+  UNIQUE KEY `customer_online_uniq` (`session_id`,`customer_id`),
+  KEY `customer_online_updated` (`updated` DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='客户在线状态';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `official_customer_prepaid_card`
 --
 
@@ -1169,4 +1186,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-11 13:38:47
+-- Dump completed on 2024-11-20 18:06:58

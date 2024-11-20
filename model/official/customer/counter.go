@@ -45,7 +45,7 @@ func (u *Counter) Add() (interface{}, error) {
 	return u.OfficialCustomerCounter.Insert()
 }
 
-func (u *Counter) Incr(target string, n uint64) error {
+func (u *Counter) Incr(n uint64) error {
 	exists, err := u.Exists()
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (u *Counter) Incr(target string, n uint64) error {
 	))
 }
 
-func (u *Counter) Decr(target string, n uint64) error {
+func (u *Counter) Decr(n uint64) error {
 	exists, err := u.Exists()
 	if err != nil || !exists {
 		return err
@@ -72,7 +72,7 @@ func (u *Counter) Decr(target string, n uint64) error {
 	))
 }
 
-func (u *Counter) GetTotal(target string) (uint64, error) {
+func (u *Counter) GetTotal() (uint64, error) {
 	err := u.OfficialCustomerCounter.Get(nil, db.And(
 		db.Cond{`customer_id`: u.CustomerId},
 		db.Cond{`target`: u.Target},
