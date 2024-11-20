@@ -5,6 +5,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/nerrors"
+	"github.com/coscms/webcore/registry/route"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
 )
@@ -70,10 +71,14 @@ func CheckPermissionByRoutePath(ctx echo.Context, customer *dbschema.OfficialCus
 }
 
 func CheckPermissionByRouteName(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *RolePermission, name string) bool {
-	route := ctx.Echo().GetRoutePathByName(name)
-	if len(route) == 0 {
+	routed := ctx.Echo().GetRouteByName(name)
+	if routed == nil {
 		log.Warnf(`the route named %s could not be found`, name)
 		return false
 	}
-	return CheckPermissionByRoutePath(ctx, customer, permission, route) == nil
+	handlerPermission := routed.String(`permission`)
+	if handlerPermission == route.PermissionPublic {
+		return false
+	}
+	return CheckPermissionByRoutePath(ctx, customer, permission, routed.Path) == nil
 }

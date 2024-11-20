@@ -18,6 +18,7 @@ import (
 	nav "github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
+	"github.com/coscms/webcore/registry/route"
 	uploadClient "github.com/webx-top/client/upload"
 
 	"github.com/coscms/webfront/dbschema"
@@ -158,14 +159,18 @@ func permCheck(c echo.Context, customer *dbschema.OfficialCustomer) error {
 			return err
 		}
 	}
-	c.SetFunc(`CheckPerm`, func(route string) error {
-		return checkPermission(c, customer, permission, route)
+	c.SetFunc(`CheckPerm`, func(routePath string) error {
+		return checkPermission(c, customer, permission, routePath)
 	})
 	return nil
 }
 
-func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *xrole.RolePermission, route string) error {
-	return xrole.CheckPermissionByRoutePath(ctx, customer, permission, route)
+func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *xrole.RolePermission, routePath string) error {
+	handlerPermission := ctx.Route().String(`permission`)
+	if handlerPermission == route.PermissionPublic {
+		return nil
+	}
+	return xrole.CheckPermissionByRoutePath(ctx, customer, permission, routePath)
 }
 
 func SkipCurrentURLPermCheck(h echo.Handler) echo.HandlerFunc {
