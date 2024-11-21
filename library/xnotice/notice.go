@@ -107,20 +107,6 @@ func ResetClientCount() {
 }
 
 func MemoryNoticeSender(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
-	c := ctx.(echo.Context)
-	sessionID := c.Session().ID()
-	if len(sessionID) > 0 || customer != nil {
-		onlineM := modelCustomer.NewOnline(c)
-		onlineM.SessionId = sessionID
-		if customer != nil {
-			onlineM.CustomerId = customer.Id
-		}
-		err := onlineM.Incr(1)
-		if err != nil {
-			return nil, nil, err
-		}
-		defer onlineM.Decr(1)
-	}
 	return frontend.Notify.MakeMessageGetter(customer.Name)
 }
 
