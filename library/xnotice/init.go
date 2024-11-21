@@ -7,6 +7,7 @@ import (
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
+	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
 func init() {
@@ -32,4 +33,10 @@ func init() {
 			log.Errorf(`failed to custM.UpdateField(online=N,name=%q): %v`, user, err)
 		}
 	})
+	modelCustomer.OnSignOut(onLogout)
+}
+
+func onLogout(customer *dbschema.OfficialCustomer) error {
+	frontend.Notify.CloseMessage(customer.Name)
+	return nil
 }
