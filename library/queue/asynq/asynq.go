@@ -23,10 +23,6 @@ type Asynq struct {
 	serverConfig   *asynq.Config
 }
 
-func ParseRedisURI(connURI string) (asynq.RedisConnOpt, error) {
-	return asynq.ParseRedisURI(connURI)
-}
-
 func (a *Asynq) SetRedisOptions(redisOptions asynq.RedisConnOpt) error {
 	if redisOptions == nil {
 		redisOptions = &asynq.RedisClientOpt{

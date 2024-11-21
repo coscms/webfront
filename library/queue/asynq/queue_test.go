@@ -23,7 +23,7 @@ func TestQueue(t *testing.T) {
 			return err
 		}
 		id := data["user_id"]
-		fmt.Printf("[a] Send Welcome Email to User %d\n", id)
+		fmt.Printf("[a] Send Welcome Email to User %v\n", id)
 		return nil
 	})
 	defer a.Close()
@@ -40,7 +40,7 @@ func TestQueue(t *testing.T) {
 			return err
 		}
 		id := data["user_id"]
-		fmt.Printf("[a1] Send Welcome Email to User %d\n", id)
+		fmt.Printf("[a1] Send Welcome Email to User %v\n", id)
 		return nil
 	})
 	defer a1.Close()
@@ -57,7 +57,7 @@ func TestQueue(t *testing.T) {
 			return err
 		}
 		id := data["user_id"]
-		fmt.Printf("[a2] Send Welcome Email to User %d\n", id)
+		fmt.Printf("[a2] Send Welcome Email to User %v\n", id)
 		return nil
 	})
 	defer a2.Close()
