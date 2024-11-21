@@ -49,7 +49,7 @@ require (
 	github.com/webx-top/db v1.28.0
 	github.com/webx-top/echo v1.12.12
 	github.com/webx-top/echo-prometheus v1.1.2
-	github.com/webx-top/echo-socket.io v1.3.1
+	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/pagination v0.3.1
 	github.com/webx-top/validation v0.0.3 // indirect

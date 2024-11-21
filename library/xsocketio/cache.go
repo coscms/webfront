@@ -3,6 +3,9 @@ package xsocketio
 import (
 	"sync"
 
+	"github.com/admpub/log"
+	"github.com/coscms/webfront/library/cache"
+	socketio "github.com/googollee/go-socket.io"
 	esi "github.com/webx-top/echo-socket.io"
 )
 
@@ -11,7 +14,7 @@ var (
 	mu        = &sync.RWMutex{}
 )
 
-func SocketIO(namespace string) *esi.Wrapper {
+func SocketIO(namespace string, cfg *Config) *esi.Wrapper {
 	mu.RLock()
 	v, y := instances[namespace]
 	mu.RUnlock()
@@ -20,6 +23,19 @@ func SocketIO(namespace string) *esi.Wrapper {
 	}
 
 	v = socketIOWrapper(namespace)
+	if cfg.EnableRedis {
+		redisCfg := cache.RedisOptions()
+		if redisCfg != nil {
+			v.Server.Adapter(&socketio.RedisAdapterOptions{
+				Addr:     redisCfg.Addr,
+				Prefix:   `SOCKETIO`,
+				Network:  redisCfg.Network,
+				Password: redisCfg.Password,
+				DB:       redisCfg.DB,
+			})
+			log.Okayf(`socket.io enable redis adapter`)
+		}
+	}
 	v.Serve()
 	mu.Lock()
 	instances[namespace] = v

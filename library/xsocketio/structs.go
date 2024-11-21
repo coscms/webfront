@@ -7,6 +7,7 @@ func NewConfig() *Config {
 }
 
 type Config struct {
+	EnableRedis bool
 }
 
 func (c *Config) FromStore(v echo.H) *Config {

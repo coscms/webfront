@@ -1241,8 +1241,8 @@ github.com/webx-top/echo v1.12.12 h1:VNmj0qaviGgwi7aPC4wf+gWUdAC8WLZBx/nXg2VJrAo
 github.com/webx-top/echo v1.12.12/go.mod h1:ceprNzPoCPBTJOIU1sDRGMHe5ugyIyfC7BC4HtzI5l8=
 github.com/webx-top/echo-prometheus v1.1.2 h1:llHHZFWBxb/n0W2Tnn6UjnrOVNi/YQ+v2ETyOZ1248w=
 github.com/webx-top/echo-prometheus v1.1.2/go.mod h1:8QYzHq8JjzNGKpRw4q4vopq/zcA87Flwqc4oNXVu2gk=
-github.com/webx-top/echo-socket.io v1.3.1 h1:KgmLZdZIX7auMYD6ZXGFeXzPROIp4O43rN9T9hC/WdY=
-github.com/webx-top/echo-socket.io v1.3.1/go.mod h1:D3VFxDTRUgJrnPnzmYc5yIi4CgaNuTbF/S7E9XrvdEc=
+github.com/webx-top/echo-socket.io v1.3.2 h1:woCM5LSVq/9Po77Y6PlRB+tRjuK8q1Tp9K5jcngAxhw=
+github.com/webx-top/echo-socket.io v1.3.2/go.mod h1:eJxSST2qr21eqIwDHZiNYlTs5UKc0j544xAHiX873y4=
 github.com/webx-top/image v0.1.1 h1:g8DMDi5cvmoQW3ZlA73t2cF/ywIp1AAEiy1HeIUTXv0=
 github.com/webx-top/image v0.1.1/go.mod h1:+h1W1x6ci+EqAlbnKSEdpflMWrCGNlLqB0OcmfglzMg=
 github.com/webx-top/pagination v0.3.1 h1:0jX1hCG6DmAXQW06Ns9hySjxsvcsM1JVAvXOeFv+bfA=
