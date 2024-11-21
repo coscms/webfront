@@ -24,6 +24,9 @@ func RegisterRoute(e echo.RouteRegister, cfg *Config, s ...func(*middleware.CORS
 	prefix := e.Prefix()
 	nsp := strings.Trim(prefix, `/`)
 	nsp = strings.ReplaceAll(nsp, `/`, `_`)
+	if cfg == nil {
+		cfg = GetConfig()
+	}
 	socket := SocketIO(nsp, cfg)
 	e.Any(`/socket.io/`, func(ctx echo.Context) error {
 		if common.Setting(`socketio`).String(`enabled`) != `1` {
