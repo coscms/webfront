@@ -14,7 +14,7 @@ func ParseRedisURI(connURI string) (asynq.RedisConnOpt, error) {
 func RedisOptFromCache() (asynq.RedisConnOpt, error) {
 	cfg := cache.RedisOptions()
 	if cfg == nil {
-		return nil, errors.New(`supported`)
+		return nil, errors.New(`[asynq]failed to obtain redis configuration: cache.RedisOptions is nil`)
 	}
 	return asynq.RedisClientOpt{
 		Network: cfg.Network,

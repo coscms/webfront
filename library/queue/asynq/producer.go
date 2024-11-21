@@ -1,6 +1,8 @@
 package asynq
 
 import (
+	"encoding/json"
+
 	"github.com/hibiken/asynq"
 )
 
@@ -20,4 +22,12 @@ func (a *Asynq) Send(task *asynq.Task, options ...asynq.Option) (*asynq.TaskInfo
 
 func (a *Asynq) SendBy(typeName string, payload []byte, options ...asynq.Option) (*asynq.TaskInfo, error) {
 	return a.Send(NewTask(typeName, payload), options...)
+}
+
+func (a *Asynq) SendJSON(typeName string, payload interface{}, options ...asynq.Option) (*asynq.TaskInfo, error) {
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	return a.Send(NewTask(typeName, b), options...)
 }
