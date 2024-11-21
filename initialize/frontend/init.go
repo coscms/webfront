@@ -23,6 +23,7 @@ import (
 	backendLib "github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webcore/library/notice"
 	ngingMW "github.com/coscms/webcore/middleware"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/frontend"
@@ -44,6 +45,7 @@ const (
 )
 
 var TmplCustomParser func(tmpl string, content []byte) []byte
+var Notify = notice.NewUserNotices(false, nil)
 
 func init() {
 	config.AddConfigInitor(func(c *config.Config) {
