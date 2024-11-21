@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 
 	"github.com/admpub/once"
+	"github.com/webx-top/echo/defaults"
+
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/cmder"
 	"github.com/coscms/webfront/library/queue/asynq"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
-	"github.com/webx-top/echo/defaults"
 )
 
 type CustomerOnline struct {

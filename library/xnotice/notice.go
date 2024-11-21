@@ -6,15 +6,16 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/websocket"
+	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
+	ws "github.com/webx-top/echo/handler/websocket"
+
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/coscms/webfront/middleware/sessdata"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
-	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/defaults"
-	ws "github.com/webx-top/echo/handler/websocket"
 )
 
 type NSender func(context.Context, *dbschema.OfficialCustomer) (close func(), msg <-chan *notice.Message, err error)
