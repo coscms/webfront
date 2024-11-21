@@ -21,12 +21,20 @@ func NewConfig() *Config {
 }
 
 type Config struct {
-	EnableRedis bool `json:"enableRedis"`
-	RedisDB     int  `json:"redisDB"`
+	EnableRedis   bool   `json:"enableRedis"`
+	RedisDB       int    `json:"redisDB"`
+	RedisAddr     string `json:"redisAddr"`
+	RedisPrefix   string `json:"redisPrefix"`
+	RedisNetwork  string `json:"redisNetwork"`
+	RedisPassword string `json:"redisPassword"`
 }
 
 func (c *Config) FromStore(v echo.H) *Config {
 	c.EnableRedis = v.Bool(`enableRedis`)
 	c.RedisDB = v.Int(`redisDB`)
+	c.RedisAddr = v.String(`redisAddr`)
+	c.RedisPrefix = v.String(`redisPrefix`)
+	c.RedisNetwork = v.String(`redisNetwork`)
+	c.RedisPassword = v.String(`redisPassword`)
 	return c
 }
