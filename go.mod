@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.2
+require github.com/coscms/webcore v0.6.4
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.19
 	github.com/webx-top/db v1.28.1
-	github.com/webx-top/echo v1.13.0
+	github.com/webx-top/echo v1.13.1
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.1
@@ -146,7 +146,7 @@ require (
 	github.com/coscms/session-boltstore v0.0.0-20241122060137-861b57ff0116 // indirect
 	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f // indirect
 	github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac // indirect
-	github.com/coscms/session-sqlitestore v0.0.2 // indirect
+	github.com/coscms/session-sqlitestore v0.0.3 // indirect
 	github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
