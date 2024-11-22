@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 
 	"github.com/admpub/cache"
-	_ "github.com/admpub/cache/memcache" // memcache
-	_ "github.com/admpub/cache/redis5"   // redis
+	_ "github.com/admpub/cache/redis5" // redis
+	_ "github.com/admpub/cache/sqlite" // sqlite
 	"github.com/admpub/color"
 	"github.com/admpub/log"
 	"github.com/webx-top/echo"
