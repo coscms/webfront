@@ -3,15 +3,18 @@ package cache
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 
 	"github.com/admpub/cache"
-	_ "github.com/admpub/cache/redis5" // redis
-	_ "github.com/admpub/cache/sqlite" // sqlite
 	"github.com/admpub/color"
 	"github.com/admpub/log"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"golang.org/x/sync/singleflight"
+
+	_ "github.com/admpub/cache/redis5" // redis
+	_ "github.com/admpub/cache/sqlite" // sqlite
 
 	"github.com/coscms/webcore/library/common"
 
@@ -99,14 +102,15 @@ func CacheNew(ctx context.Context, opts cache.Options, keys ...string) error {
 	}
 	key := instanceCachePrefix + connectionName
 	logPrefix := color.GreenString(`[cache]`) + `[` + connectionName + `][` + opts.Adapter + `]`
+	if len(opts.AdapterConfig) == 0 {
+		log.Okay(logPrefix, `缺少必要的配置参数，跳过`)
+		return nil
+	}
 	c, ok := echo.Get(key).(cache.Cache)
 	if ok {
 		log.Okay(logPrefix, `断开连接`)
 		echo.Delete(key)
 		c.Close()
-	}
-	if len(opts.AdapterConfig) == 0 {
-		return nil
 	}
 	echo.FireByNameWithMap(`webx.cache.connected.`+opts.Adapter+`.before`, echo.H{`cache`: nil, `options`: opts})
 	log.Info(logPrefix, `开始连接`)
@@ -114,6 +118,16 @@ func CacheNew(ctx context.Context, opts cache.Options, keys ...string) error {
 	case `file`:
 		if !filepath.IsAbs(opts.AdapterConfig) {
 			opts.AdapterConfig = filepath.Join(echo.Wd(), opts.AdapterConfig)
+		}
+	case `sqlite`:
+		if strings.HasSuffix(opts.AdapterConfig, echo.FilePathSeparator) {
+			opts.AdapterConfig += `cache.sqlite`
+		}
+		if !filepath.IsAbs(opts.AdapterConfig) {
+			opts.AdapterConfig = filepath.Join(echo.Wd(), opts.AdapterConfig)
+		}
+		if com.IsDir(opts.AdapterConfig) {
+			opts.AdapterConfig = filepath.Join(opts.AdapterConfig, `cache.sqlite`)
 		}
 	case `redis`:
 		if IsDbAccount(opts.AdapterConfig) {
