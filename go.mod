@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.4
+require github.com/coscms/webcore v0.6.5
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.19
 	github.com/webx-top/db v1.28.1
-	github.com/webx-top/echo v1.13.1
+	github.com/webx-top/echo v1.13.2
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.1
@@ -88,7 +88,7 @@ require (
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
 	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 // indirect
-	github.com/admpub/boltstore v1.1.2 // indirect
+	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.7 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
@@ -125,11 +125,11 @@ require (
 	github.com/admpub/qrcode v0.0.3 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
 	github.com/admpub/realip v0.2.7 // indirect
-	github.com/admpub/redistore v1.2.1 // indirect
+	github.com/admpub/redistore v1.2.2 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/securecookie v1.3.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
-	github.com/admpub/sessions v0.2.1 // indirect
+	github.com/admpub/sessions v0.2.3 // indirect
 	github.com/admpub/sonyflake v0.0.1 // indirect
 	github.com/admpub/tail v1.1.1 // indirect
 	github.com/admpub/timeago v1.2.2 // indirect
@@ -143,11 +143,11 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coscms/go-imgparse v0.0.1 // indirect
-	github.com/coscms/session-boltstore v0.0.0-20241122060137-861b57ff0116 // indirect
+	github.com/coscms/session-boltstore v0.0.0-20241123103427-f7a05e3c6d60 // indirect
 	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f // indirect
-	github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac // indirect
+	github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511 // indirect
 	github.com/coscms/session-sqlitestore v0.0.3 // indirect
-	github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2 // indirect
+	github.com/coscms/session-sqlstore v0.0.0-20241123103622-54cef6a2850b // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
@@ -160,7 +160,6 @@ require (
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fynelabs/selfupdate v0.2.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
-	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.20.2 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -227,7 +226,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
-	github.com/phuslu/iploc v1.0.20241031 // indirect
+	github.com/phuslu/iploc v1.0.20241122 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
