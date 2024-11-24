@@ -44,37 +44,47 @@ func Make(method string, path string, saveAs string, reqRewrite ...func(*http.Re
 	return err
 }
 
+func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bool, error) {
+	nocacheStr := ctx.Form(`nocache`)
+	if len(nocacheStr) == 0 {
+		return true, nil
+	}
+	switch nocacheStr {
+	case `1`: // 禁用HTML缓存和数据缓存
+		return false, nil
+	case `2`, `make`: // 强制缓存新HTML
+		fallthrough
+	case `3`, `mkall`:
+		isMakeAll := nocacheStr == `mkall`
+		reqURL := ctx.Request().URL().Path()
+		if len(urlWithQueryString) > 0 && urlWithQueryString[0] {
+			if isMakeAll {
+				query := ctx.Request().URL().Query()
+				query.Set(`nocache`, `2`)
+				reqURL += `?` + query.Encode()
+			} else {
+				if query := ctx.Request().URL().RawQuery(); len(query) > 0 {
+					reqURL += `?` + query
+				}
+			}
+		} else if isMakeAll {
+			reqURL += `?nocache=2`
+		}
+		err := Make(http.MethodGet, reqURL, cacheKey)
+		return true, err
+	}
+	return true, nil
+}
+
 func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bool, error) {
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
 
 	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
-		nocache := ctx.Formx(`nocache`).Int()
-		switch nocache {
-		case 1: // 禁用HTML缓存和数据缓存
-			return false, nil
-		case 2: // 强制缓存新HTML
-			fallthrough
-		case 3:
-			reqURL := ctx.Request().URL().Path()
-			if len(urlWithQueryString) > 0 && urlWithQueryString[0] {
-				if query := ctx.Request().URL().RawQuery(); len(query) > 0 {
-					reqURL += `?` + query
-				}
-			}
-			if err := Make(http.MethodGet, reqURL, cacheKey); err != nil {
-				return true, err
-			}
-
-		case 12: // 禁用HTML缓存和强制刷新数据缓存
-			ctx.Request().URL().Query().Set(`nocache`, `2`)
-			ctx.Request().Form().Set(`nocache`, `2`)
-			return false, nil
-		case 13: // 禁用HTML缓存和强制刷新数据缓存
-			ctx.Request().URL().Query().Set(`nocache`, `3`)
-			ctx.Request().Form().Set(`nocache`, `3`)
-			return false, nil
+		cached, err := controlCache(ctx, cacheKey, urlWithQueryString...)
+		if err != nil || !cached {
+			return cached, err
 		}
 	}
 	var cachedETag sql.NullString

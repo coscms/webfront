@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.6
+require github.com/coscms/webcore v0.6.8
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -33,7 +33,7 @@ require (
 	github.com/admpub/sensitive v0.0.0-20230925121413-6c7ffc3addbb
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
-	github.com/coscms/forms v1.12.2
+	github.com/coscms/forms v1.13.2
 	github.com/coscms/oauth2s v0.4.1
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
@@ -120,7 +120,7 @@ require (
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
-	github.com/admpub/map2struct v0.1.2 // indirect
+	github.com/admpub/map2struct v0.1.3 // indirect
 	github.com/admpub/mysql-schema-sync v0.2.6 // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/qrcode v0.0.3 // indirect
