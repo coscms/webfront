@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.11
+require github.com/coscms/webcore v0.6.12
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -33,7 +33,7 @@ require (
 	github.com/admpub/sensitive v0.0.0-20230925121413-6c7ffc3addbb
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
-	github.com/coscms/forms v1.13.6
+	github.com/coscms/forms v1.13.7
 	github.com/coscms/oauth2s v0.4.1
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
