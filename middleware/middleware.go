@@ -14,11 +14,11 @@ import (
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/license"
 	nav "github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
-	"github.com/coscms/webcore/registry/route"
 	uploadClient "github.com/webx-top/client/upload"
 
 	"github.com/coscms/webfront/dbschema"
@@ -167,7 +167,7 @@ func permCheck(c echo.Context, customer *dbschema.OfficialCustomer) error {
 
 func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *xrole.RolePermission, routePath string) error {
 	handlerPermission := ctx.Route().String(`permission`)
-	if handlerPermission == route.PermissionPublic {
+	if handlerPermission == httpserver.PermissionPublic {
 		return nil
 	}
 	return xrole.CheckPermissionByRoutePath(ctx, customer, permission, routePath)

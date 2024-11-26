@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/admpub/log"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
-	"github.com/coscms/webcore/registry/route"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
 )
@@ -89,7 +89,7 @@ func CheckPermissionByRouteName(ctx echo.Context, customer *dbschema.OfficialCus
 		return false
 	}
 	handlerPermission := routed.String(`permission`)
-	if handlerPermission == route.PermissionPublic {
+	if handlerPermission == httpserver.PermissionPublic {
 		return true
 	}
 	return CheckPermissionByRoutePath(ctx, customer, permission, routed.Path) == nil
