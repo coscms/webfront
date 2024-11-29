@@ -1,6 +1,11 @@
 package customer
 
-import "github.com/webx-top/echo"
+import (
+	"html/template"
+
+	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
+)
 
 var (
 	// AssetTypes 资产类型
@@ -108,4 +113,58 @@ func AssetTypeIsIgnoreAccumulated(assetType string) bool {
 		return false
 	}
 	return item.H.Bool(`ignoreAccumulated`)
+}
+
+func assetSymbol(item *echo.KV) string {
+	var symbol string
+	if item.H != nil && item.H.Has(`symbol`) {
+		symbol = item.H.String(`symbol`)
+	}
+	return symbol
+}
+
+// MakeAssetAmountFormatter 构造指定类型资产的金额格式化函数
+func MakeAssetAmountFormatter(ctx echo.Context, assetType string) func(amount float64) template.HTML {
+	item := AssetTypes.GetItem(assetType)
+	if item == nil {
+		return func(amount float64) template.HTML {
+			return template.HTML(com.String(amount))
+		}
+	}
+	if item.X == nil {
+		symbol := assetSymbol(item)
+		return func(amount float64) template.HTML {
+			return template.HTML(symbol + com.String(amount))
+		}
+	}
+	rd, ok := item.X.(echo.RenderContextWithData)
+	if !ok {
+		symbol := assetSymbol(item)
+		return func(amount float64) template.HTML {
+			return template.HTML(symbol + com.String(amount))
+		}
+	}
+	return func(amount float64) template.HTML {
+		return rd.RenderWithData(ctx, amount)
+	}
+}
+
+// MakeAnyAssetAmountFormatter 构造任意类型资产的金额格式化函数
+func MakeAnyAssetAmountFormatter(ctx echo.Context) func(assetType string, amount float64) template.HTML {
+	return func(assetType string, amount float64) template.HTML {
+		item := AssetTypes.GetItem(assetType)
+		if item == nil {
+			return template.HTML(com.String(amount))
+		}
+		if item.X == nil {
+			symbol := assetSymbol(item)
+			return template.HTML(symbol + com.String(amount))
+		}
+		rd, ok := item.X.(echo.RenderContextWithData)
+		if !ok {
+			symbol := assetSymbol(item)
+			return template.HTML(symbol + com.String(amount))
+		}
+		return rd.RenderWithData(ctx, amount)
+	}
 }
