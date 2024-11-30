@@ -24,7 +24,7 @@ func mobileSend(c echo.Context, m *modelCustomer.Customer, account string) error
 		return c.E(`您输入的手机号与账号设置的不匹配，请输入账号中设置的手机号码`)
 	}
 	c.Request().Form().Set(`mobile`, account)
-	message := `亲爱的客户: {name}，您正在找回密码，点击链接开始重置密码：` + GenResetPasswordURL(m.Name, `mobile`, account) + ` 或者 手动输入验证码为：{code} ({lifeTime}分钟内有效) [{siteName}]`
+	message := `亲爱的客户: {name}，您正在找回密码，点击链接开始重置密码：` + GenResetPasswordURL(m.Name, `mobile`, account) + ` 或者 手动输入验证码：{code} ({lifeTime}分钟内有效) [{siteName}]`
 	return sendmsg.MobileSend(c, m, `forgot`, message)
 }
 
