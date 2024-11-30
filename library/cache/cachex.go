@@ -6,6 +6,7 @@ import (
 	"github.com/admpub/cache/x"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 )
 
 type QueryFunc = x.QueryFunc
@@ -26,12 +27,15 @@ var (
 )
 
 func AdminRefreshable(ctx echo.Context, customer *dbschema.OfficialCustomer, ttl x.GetOption) x.GetOption {
-	if customer == nil {
-		return ttl
+	if !defaults.IsMockContext(ctx) {
+		if customer == nil {
+			return ttl
+		}
+		if customer.Uid <= 0 {
+			return ttl
+		}
 	}
-	if customer.Uid <= 0 {
-		return ttl
-	}
+
 	nocache := ctx.Formx(`nocache`).Bool()
 	return TTLIf(nocache, Fresh, ttl)
 }
