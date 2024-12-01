@@ -205,16 +205,16 @@ func (f *Message) AddData(customer *dbschema.OfficialCustomer, user *dbschemaNgi
 			return
 		}
 		if customer != nil {
-			if ((msgM.CustomerB > 0 && customer.Id == msgM.CustomerB) ||
+			if !((msgM.CustomerB > 0 && customer.Id == msgM.CustomerB) ||
 				(msgM.CustomerA > 0 && customer.Id == msgM.CustomerA) ||
-				(msgM.CustomerGroupId > 0 && customer.GroupId == msgM.CustomerGroupId)) == false {
+				(msgM.CustomerGroupId > 0 && customer.GroupId == msgM.CustomerGroupId)) {
 				f.Context().Rollback()
 				return nil, f.Context().E(`您无权回复此消息`)
 			}
 		} else if user != nil {
-			if ((msgM.UserB > 0 && user.Id == msgM.UserB) ||
+			if !((msgM.UserB > 0 && user.Id == msgM.UserB) ||
 				(msgM.UserA > 0 && user.Id == msgM.UserA) ||
-				(msgM.UserRoleId > 0 && com.InSlice(param.AsString(msgM.UserRoleId), strings.Split(user.RoleIds, `,`)))) == false {
+				(msgM.UserRoleId > 0 && com.InSlice(param.AsString(msgM.UserRoleId), strings.Split(user.RoleIds, `,`)))) {
 				f.Context().Rollback()
 				return nil, f.Context().E(`您无权回复此消息`)
 			}
@@ -227,7 +227,7 @@ func (f *Message) AddData(customer *dbschema.OfficialCustomer, user *dbschemaNgi
 		} else {
 			f.RootId = msgM.Id
 		}
-		if (f.CustomerA == f.CustomerB || f.UserA == f.UserB) == false {
+		if !(f.CustomerA == f.CustomerB || f.UserA == f.UserB) {
 			err = msgM.UpdateField(nil, `has_new_reply`, 1, db.Cond{`id`: f.RootId})
 			if err != nil {
 				f.Context().Rollback()
