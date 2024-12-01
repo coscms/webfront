@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/sqlbuilder"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/middleware/tplfunc"
 	"github.com/webx-top/echo/param"
 
@@ -99,12 +100,12 @@ func (f *Message) check() error {
 		return f.Context().E(`内容不能为空`)
 	}
 	if len(f.Encrypted) == 0 {
-		f.Encrypted = `N`
+		f.Encrypted = common.BoolN
 	}
 	if f.HasNewReply > 1 {
 		f.HasNewReply = 1
 	}
-	if f.Encrypted == `Y` {
+	if f.Encrypted == common.BoolY {
 		f.Content = config.FromFile().Encode(f.Content, f.Password)
 	} else {
 		if len(f.Title) == 0 {
@@ -112,7 +113,7 @@ func (f *Message) check() error {
 		}
 	}
 	if len(f.Contype) == 0 {
-		f.Contype = `text`
+		f.Contype = common.ContentTypeText
 	}
 	if f.CustomerA > 0 {
 		f.UserA = 0
@@ -184,6 +185,20 @@ func (f *Message) LastSend(customerID uint64) (*dbschema.OfficialCommonMessage, 
 		//db.Cond{`reply_id`: 0},
 	))
 	return m, err
+}
+
+func (f *Message) SendSystemMessage(customerID uint64, title string, contype string, content string) error {
+	m := f.OfficialCommonMessage
+	m.Title = title
+	m.Content = content
+	m.Contype = common.GetContype(contype, common.ContentTypeText)
+	m.Encrypted = common.BoolN
+	m.CustomerB = customerID
+	if m.CustomerB < 1 {
+		return f.Context().NewError(code.InvalidParameter, `请选择收信人`).SetZone(`customerId`)
+	}
+	_, err := f.AddData(nil, nil)
+	return err
 }
 
 // AddData 添加消息
