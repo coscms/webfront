@@ -253,36 +253,12 @@ func (f *Message) CountUnread(viewerID uint64, groupIDs []uint, isSystemMessage 
 	if len(viewerTypes) > 0 {
 		viewerType = viewerTypes[0]
 	}
-	var cond db.Compound
-	if len(groupIDs) > 0 {
-		if viewerType == `customer` {
-			cond = db.Or(
-				db.Cond{viewerType + `_b`: viewerID},
-				db.Cond{`customer_group_id`: db.In(groupIDs)},
-			)
-		} else {
-			cond = db.Or(
-				db.Cond{viewerType + `_b`: viewerID},
-				db.Cond{`user_role_id`: db.In(groupIDs)},
-			)
-		}
-	} else {
-		cond = db.Cond{viewerType + `_b`: viewerID}
-	}
-	var srcCond db.Compound
-	if isSystemMessage {
-		srcCond = db.Cond{viewerType + `_a`: 0}
-	} else {
-		srcCond = db.Cond{viewerType + `_a`: db.NotEq(0)}
-	}
-	n, _ := f.Count(nil, db.And(
-		srcCond,
-		cond,
-		db.Or(
-			db.Cond{`has_new_reply`: 1},
-			db.Raw(`NOT EXISTS (SELECT 1 FROM `+f.ToTable(f.Viewed)+` b WHERE b.message_id=`+f.ToTable(f)+`.id AND b.viewer_id=? AND b.viewer_type=?)`, viewerID, viewerType),
-		),
+	cond := f.makeCond(viewerType, viewerID, groupIDs, isSystemMessage)
+	cond = append(cond, db.Or(
+		db.Cond{`has_new_reply`: 1},
+		db.Raw(`NOT EXISTS (SELECT 1 FROM `+f.ToTable(f.Viewed)+` b WHERE b.message_id=`+f.ToTable(f)+`.id AND b.viewer_id=? AND b.viewer_type=?)`, viewerID, viewerType),
 	))
+	n, _ := f.Count(nil, db.And(cond...))
 	return n
 }
 
@@ -294,12 +270,7 @@ func (f *Message) IsSystemMessage() bool {
 	return f.UserA == 0 && f.CustomerA == 0
 }
 
-// ListWithViewedByRecipient 收件箱列表
-func (f *Message) ListWithViewedByRecipient(viewerID uint64, groupIDs []uint, isSystemMessage bool, onlyUnread bool, otherCond db.Compound, viewerTypes ...string) ([]*MessageWithViewed, error) {
-	viewerType := `customer`
-	if len(viewerTypes) > 0 {
-		viewerType = viewerTypes[0]
-	}
+func (f *Message) makeCond(viewerType string, viewerID uint64, groupIDs []uint, isSystemMessage bool) []db.Compound {
 	cond := []db.Compound{
 		//db.Cond{`reply_id`: 0},
 	}
@@ -327,6 +298,16 @@ func (f *Message) ListWithViewedByRecipient(viewerID uint64, groupIDs []uint, is
 			db.Cond{`user_a`: db.NotEq(0)},
 		))
 	}
+	return cond
+}
+
+// ListWithViewedByRecipient 收件箱列表
+func (f *Message) ListWithViewedByRecipient(viewerID uint64, groupIDs []uint, isSystemMessage bool, onlyUnread bool, otherCond db.Compound, viewerTypes ...string) ([]*MessageWithViewed, error) {
+	viewerType := `customer`
+	if len(viewerTypes) > 0 {
+		viewerType = viewerTypes[0]
+	}
+	cond := f.makeCond(viewerType, viewerID, groupIDs, isSystemMessage)
 	if onlyUnread {
 		cond = append(cond,
 			db.Or(
