@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
+	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/top"
 )
@@ -54,7 +55,7 @@ func (f *Category) Delete(mw func(db.Result) db.Result, args ...interface{}) err
 	if err != nil {
 		return err
 	}
-	if f.HasChild == `Y` {
+	if f.HasChild == common.BoolY {
 		return f.Context().NewError(code.Failure, `删除失败：请先删除子分类`)
 	}
 	if err = f.Context().Begin(); err != nil {
@@ -85,7 +86,7 @@ func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, ex
 	}
 	cond := db.NewCompounds()
 	cond.AddKV(`type`, typ)
-	cond.AddKV(`disabled`, `N`)
+	cond.AddKV(`disabled`, common.BoolN)
 	cond.AddKV(`level`, db.Lte(maxLevel))
 	if excludeId > 0 {
 		cond.AddKV(`id`, db.NotEq(excludeId))
@@ -178,11 +179,25 @@ func (f *Category) PositionIds(id uint) ([]uint, error) {
 	return result, nil
 }
 
+func (f *Category) setDefaults() {
+	f.Name = strings.TrimSpace(f.Name)
+	f.Keywords = strings.TrimSpace(f.Keywords)
+	f.Description = strings.TrimSpace(f.Description)
+	f.Template = strings.TrimSpace(f.Template)
+	f.Disabled = common.GetBoolFlag(f.Disabled)
+	f.ShowOnMenu = common.GetBoolFlag(f.ShowOnMenu, common.BoolY)
+	f.Slugify = strings.TrimSpace(f.Slugify)
+	if len(f.Slugify) == 0 {
+		f.Slugify = top.Slugify(f.Name)
+	}
+}
+
 func (f *Category) Add() (pk interface{}, err error) {
 	f.Context().Begin()
 	defer func() {
 		f.Context().End(err == nil)
 	}()
+	f.setDefaults()
 	err = f.Exists(f.Name)
 	if err != nil {
 		return
@@ -199,8 +214,8 @@ func (f *Category) Add() (pk interface{}, err error) {
 		}
 		f.Level = parent.Level + 1
 		f.Type = parent.Type
-		if parent.HasChild == `N` {
-			err = parent.UpdateField(nil, `has_child`, `Y`, `id`, f.ParentId)
+		if parent.HasChild == common.BoolN {
+			err = parent.UpdateField(nil, `has_child`, common.BoolY, `id`, f.ParentId)
 			if err != nil {
 				return
 			}
@@ -212,7 +227,6 @@ func (f *Category) Add() (pk interface{}, err error) {
 		err = f.Context().NewError(code.Failure, `操作失败！分类超过最大层数: %d`, f.MaxLevel())
 		return
 	}
-	f.Slugify = top.Slugify(f.Name)
 	return f.OfficialCommonCategory.Insert()
 }
 
@@ -221,6 +235,7 @@ func (f *Category) Edit(mw func(db.Result) db.Result, args ...interface{}) (err 
 	defer func() {
 		f.Context().End(err == nil)
 	}()
+	f.setDefaults()
 	if err = f.ExistsOther(f.Name, f.Id); err != nil {
 		return err
 	}
@@ -247,8 +262,8 @@ func (f *Category) Edit(mw func(db.Result) db.Result, args ...interface{}) (err 
 			}
 			f.Level = parent.Level + 1
 			f.Type = parent.Type
-			if parent.HasChild == `N` {
-				err = parent.UpdateField(nil, `has_child`, `Y`, `id`, f.ParentId)
+			if parent.HasChild == common.BoolN {
+				err = parent.UpdateField(nil, `has_child`, common.BoolY, `id`, f.ParentId)
 				if err != nil {
 					return
 				}
@@ -268,7 +283,6 @@ func (f *Category) Edit(mw func(db.Result) db.Result, args ...interface{}) (err 
 			return err
 		}
 	}
-	f.Slugify = top.Slugify(f.Name)
 	return f.OfficialCommonCategory.Update(mw, args...)
 }
 
@@ -289,10 +303,10 @@ func (f *Category) UpdateAllParents(oldData *dbschema.OfficialCommonCategory) (e
 		if err != nil {
 			return
 		}
-		if n == 0 && oldParent.HasChild != `N` {
-			err = oldData.UpdateField(nil, `has_child`, `N`, `id`, oldData.ParentId)
-		} else if n > 0 && oldParent.HasChild == `N` {
-			err = oldData.UpdateField(nil, `has_child`, `Y`, `id`, oldData.ParentId)
+		if n == 0 && oldParent.HasChild != common.BoolN {
+			err = oldData.UpdateField(nil, `has_child`, common.BoolN, `id`, oldData.ParentId)
+		} else if n > 0 && oldParent.HasChild == common.BoolN {
+			err = oldData.UpdateField(nil, `has_child`, common.BoolY, `id`, oldData.ParentId)
 		}
 	}
 	if err != nil && err == db.ErrNoMoreRows {
@@ -354,7 +368,7 @@ func (f *Category) ExistsOther(name string, id uint) error {
 func (f *Category) ListChildren(parentID uint) ([]*dbschema.OfficialCommonCategory, error) {
 	_, err := f.ListByOffset(nil, nil, 0, -1, db.And(
 		db.Cond{`parent_id`: parentID},
-		db.Cond{`disabled`: `N`},
+		db.Cond{`disabled`: common.BoolN},
 	))
 	if err != nil {
 		return nil, err
