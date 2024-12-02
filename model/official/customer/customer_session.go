@@ -12,12 +12,18 @@ import (
 
 // SetSession 记录登录信息
 func (f *Customer) SetSession(customers ...*dbschema.OfficialCustomer) {
+	if f.disabledSession {
+		return
+	}
 	customerCopy := f.ClearPasswordData(customers...)
 	f.Context().Session().Set(`customer`, &customerCopy)
 }
 
 // UnsetSession 退出登录
 func (f *Customer) UnsetSession() error {
+	if f.disabledSession {
+		return nil
+	}
 	err := FireSignOut(f.OfficialCustomer)
 	f.Context().Session().Delete(`customer`)
 	sessdata.ClearPermissionCache(f.Context(), f.OfficialCustomer.Id)

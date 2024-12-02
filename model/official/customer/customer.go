@@ -28,6 +28,12 @@ func NewCustomer(ctx echo.Context) *Customer {
 
 type Customer struct {
 	*dbschema.OfficialCustomer
+	disabledSession bool
+}
+
+func (f *Customer) DisabledSession(on bool) *Customer {
+	f.disabledSession = on
+	return f
 }
 
 func (f *Customer) GetDetail(cond db.Compound) (*CustomerAndGroup, error) {
