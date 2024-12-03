@@ -43,3 +43,7 @@ func GetDeviceInfo(c echo.Context) *DeviceInfo {
 	d, _ := c.Session().Get(`deviceInfo`).(*DeviceInfo)
 	return d
 }
+
+func HasSignedInOtherDevice(c echo.Context) bool {
+	return c.Internal().Bool(`hasSignedInOtherDevice`)
+}

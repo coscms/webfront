@@ -24,12 +24,16 @@ func (f *Customer) UnsetSession() error {
 	if f.disabledSession {
 		return nil
 	}
-	err := FireSignOut(f.OfficialCustomer)
-	f.Context().Session().Delete(`customer`)
 	deviceM := NewDevice(f.Context())
-	if exists, err := deviceM.ExistsCustomerID(f.Id); err != nil {
+	hasSignedInOtherDevice, err := deviceM.ExistsCustomerID(f.Id)
+	if err != nil {
 		f.Context().Logger().Error(err)
-	} else if !exists {
+	} else if hasSignedInOtherDevice {
+		f.Context().Internal().Set(`hasSignedInOtherDevice`, true)
+	}
+	err = FireSignOut(f.OfficialCustomer)
+	f.Context().Session().Delete(`customer`)
+	if !hasSignedInOtherDevice {
 		sessdata.ClearPermissionCache(f.Context(), f.OfficialCustomer.Id)
 	}
 	return err
