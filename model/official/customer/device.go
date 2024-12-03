@@ -170,16 +170,12 @@ func (f *Device) SignOut(mw func(db.Result) db.Result, args ...interface{}) erro
 	return err
 }
 
-func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, options ...CustomerOption) (err error) {
+func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, co *CustomerOptions) (err error) {
 	multideviceSignin, ok := CustomerRolePermissionForBehavior(f.Context(), multidivicesignin.BehaviorName, customer).(*multidivicesignin.MultideviceSignin)
 	cond := db.NewCompounds()
 	cond.Add(db.Cond{`customer_id`: customer.Id})
-	co := NewCustomerOptions(customer)
 	if !ok {
 		goto END
-	}
-	for _, option := range options {
-		option(co)
 	}
 	f.SetOptions(co)
 	f.SetDefaults()

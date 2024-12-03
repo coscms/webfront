@@ -35,6 +35,13 @@ type CustomerOptions struct {
 	IPAddress string
 }
 
+func (co *CustomerOptions) ApplyOptions(options ...CustomerOption) *CustomerOptions {
+	for _, option := range options {
+		option(co)
+	}
+	return co
+}
+
 type CustomerOption func(*CustomerOptions)
 
 func CustomerName(name string) CustomerOption {

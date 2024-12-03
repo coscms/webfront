@@ -23,9 +23,7 @@ func (f *Customer) SignIn(user, pass, signInType string, options ...CustomerOpti
 	co.Name = user
 	co.Password = pass
 	co.SignInType = signInType
-	for _, option := range options {
-		option(co)
-	}
+	co.ApplyOptions(options...)
 	baseCfg := config.Setting(`base`)
 	if baseCfg.String(`customerLogin`, `open`) == `close` {
 		return f.Context().NewError(code.DataStatusIncorrect, `本站已经暂时关闭登录，请稍后再尝试`)
@@ -87,10 +85,10 @@ func (f *Customer) SignIn(user, pass, signInType string, options ...CustomerOpti
 		}
 		return err
 	}
-	return f.FireSignInSuccess(co, model.AuthTypePassword, options...)
+	return f.FireSignInSuccess(co, model.AuthTypePassword)
 }
 
-func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, options ...CustomerOption) (err error) {
+func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string) (err error) {
 	loginLogM := f.NewLoginLog(co, authType)
 	loginLogM.OwnerId = f.Id
 	set := echo.H{
@@ -145,7 +143,7 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, optio
 		if f.SessionId != loginLogM.SessionId {
 			set[`session_id`] = loginLogM.SessionId
 			f.SessionId = loginLogM.SessionId
-			err = deviceM.CleanCustomer(f.OfficialCustomer, options...)
+			err = deviceM.CleanCustomer(f.OfficialCustomer, co)
 		} else {
 			permission := CustomerPermission(f.Context(), f.OfficialCustomer)
 			if permission != nil {
