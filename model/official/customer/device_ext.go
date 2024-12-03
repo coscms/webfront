@@ -35,6 +35,10 @@ func (d *DeviceInfo) SetSession(c echo.Context) {
 	c.Session().Set(`deviceInfo`, d)
 }
 
+func (d *DeviceInfo) UnsetSession(c echo.Context) {
+	c.Session().Delete(`deviceInfo`)
+}
+
 func GetDeviceInfo(c echo.Context) *DeviceInfo {
 	d, _ := c.Session().Get(`deviceInfo`).(*DeviceInfo)
 	return d

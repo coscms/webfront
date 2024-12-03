@@ -26,7 +26,12 @@ func (f *Customer) UnsetSession() error {
 	}
 	err := FireSignOut(f.OfficialCustomer)
 	f.Context().Session().Delete(`customer`)
-	sessdata.ClearPermissionCache(f.Context(), f.OfficialCustomer.Id)
+	deviceM := NewDevice(f.Context())
+	if exists, err := deviceM.ExistsCustomerID(f.Id); err != nil {
+		f.Context().Logger().Error(err)
+	} else if !exists {
+		sessdata.ClearPermissionCache(f.Context(), f.OfficialCustomer.Id)
+	}
 	return err
 }
 

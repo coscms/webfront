@@ -67,6 +67,16 @@ func (f *Device) ExistsSessionID(sessionID string) (bool, error) {
 	))
 }
 
+func (f *Device) ExistsCustomerID(customerID uint64) (bool, error) {
+	return f.OfficialCustomerDevice.Exists(nil, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Or(
+			db.Cond{`expired`: 0},
+			db.Cond{`expired`: db.Gt(time.Now().Unix())},
+		),
+	))
+}
+
 func (f *Device) SetDefaults() {
 	if len(f.SessionId) == 0 {
 		f.SessionId = f.Context().Session().MustID()
