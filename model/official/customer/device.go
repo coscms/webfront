@@ -179,6 +179,8 @@ func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, co *Customer
 	}
 	if co.OfficialCustomer == nil {
 		co.OfficialCustomer = customer
+	} else if co.OfficialCustomer.Id == 0 {
+		*co.OfficialCustomer = *customer
 	}
 	f.SetOptions(co)
 	f.SetDefaults()
