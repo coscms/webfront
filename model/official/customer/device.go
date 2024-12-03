@@ -202,12 +202,14 @@ END:
 		cond.Add(db.Cond{`id`: db.NotEq(f.Id)})
 	}
 	err = f.SignOut(nil, cond.And())
-	if err == nil {
-		err = f.CleanExpired()
+	if err != nil {
+		return
 	}
-	if err == nil {
-		err = f.CleanExceedLimit(customer.Id, multideviceSignin)
+	err = f.CleanExpired()
+	if err != nil {
+		return
 	}
+	err = f.CleanExceedLimit(customer.Id, multideviceSignin)
 	return
 }
 
