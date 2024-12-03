@@ -7,9 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo/middleware/tplfunc"
-	"github.com/webx-top/echo/subdomains"
 
 	uploadChecker "github.com/coscms/webcore/registry/upload/checker"
 )
@@ -55,17 +53,6 @@ func PictureHTML(picURL string, widthAndHeights ...string) template.HTML {
 	s += `<img src="` + picURL + `"/>`
 	s += `</picture>`
 	return template.HTML(s)
-}
-
-func URLFor(purl string) string {
-	return subdomains.Default.URL(purl, `frontend`)
-}
-
-func AbsoluteURL(purl string) string {
-	if !com.IsFullURL(purl) {
-		return URLFor(purl)
-	}
-	return purl
 }
 
 // ResizeImageURL ResizeImageURL(imageURL,`1000x1240`,`default.jpg`)

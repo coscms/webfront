@@ -6,6 +6,7 @@ import (
 
 var (
 	URLFor                 = top.URLFor
+	URLByName              = top.URLByName
 	AbsoluteURL            = top.AbsoluteURL
 	ImageProxyURL          = top.ImageProxyURL
 	ResizeImageURL         = top.ResizeImageURL
