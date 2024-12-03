@@ -66,7 +66,7 @@ func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string, optio
 
 	f.SetSession()
 
-	loginLogM := f.NewLoginLog(co.Name, authType)
+	loginLogM := f.NewLoginLog(co, authType)
 	loginLogM.Success = `Y`
 	loginLogM.AddAndSaveSession()
 	return

@@ -48,9 +48,20 @@ func (f *Customer) VerifySession(customers ...*dbschema.OfficialCustomer) error 
 		f.UnsetSession()
 		return nerrors.ErrUserNotFound
 	}
-	if detail.OfficialCustomer.SessionId != f.Context().Session().ID() {
-		f.UnsetSession()
-		return nerrors.ErrUserNotLoggedIn
+	sessionID := f.Context().Session().ID()
+	if detail.OfficialCustomer.SessionId != sessionID {
+		var exists bool
+		if len(sessionID) > 0 {
+			deviceM := NewDevice(f.Context())
+			exists, err = deviceM.ExistsSessionID(sessionID)
+			if err != nil {
+				return err
+			}
+		}
+		if !exists {
+			f.UnsetSession()
+			return nerrors.ErrUserNotLoggedIn
+		}
 	}
 	sessionguard.IgnoreBrowserUA(f.Context())
 	if !sessionguard.Validate(f.Context(), ``, `customer`, detail.Id) {

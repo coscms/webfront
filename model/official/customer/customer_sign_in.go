@@ -61,7 +61,7 @@ func (f *Customer) SignIn(user, pass, signInType string, options ...CustomerOpti
 	}
 	err := f.Get(nil, cond.And())
 	if err != nil {
-		loginLogM := f.NewLoginLog(co.Name, model.AuthTypePassword)
+		loginLogM := f.NewLoginLog(co, model.AuthTypePassword)
 		loginLogM.Errpwd = co.Password
 		if err == db.ErrNoMoreRows {
 			loginLogM.Failmsg = f.Context().T(`用户不存在`)
@@ -78,7 +78,7 @@ func (f *Customer) SignIn(user, pass, signInType string, options ...CustomerOpti
 	if err = f.CheckSignInPassword(co.Password); err != nil {
 		if !echo.IsErrorCode(err, code.UserDisabled) {
 			// 仅记录密码不正确的情况
-			loginLogM := f.NewLoginLog(co.Name, model.AuthTypePassword)
+			loginLogM := f.NewLoginLog(co, model.AuthTypePassword)
 			loginLogM.OwnerId = f.Id
 			loginLogM.Errpwd = co.Password
 			loginLogM.Failmsg = err.Error()
@@ -91,7 +91,7 @@ func (f *Customer) SignIn(user, pass, signInType string, options ...CustomerOpti
 }
 
 func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, options ...CustomerOption) (err error) {
-	loginLogM := f.NewLoginLog(co.Name, authType)
+	loginLogM := f.NewLoginLog(co, authType)
 	loginLogM.OwnerId = f.Id
 	set := echo.H{
 		`login_fails`: 0,
@@ -108,7 +108,12 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, optio
 			loginLogM.Add()
 		} else {
 			loginLogM.Success = `Y`
-			loginLogM.AddAndSaveSession()
+			if f.disabledSession {
+				loginLogM.InitLocation()
+				loginLogM.Add()
+			} else {
+				loginLogM.AddAndSaveSession()
+			}
 		}
 	}()
 	if err = f.LevelUpOnSignIn(set); err != nil {
@@ -139,6 +144,7 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, optio
 	if len(f.SessionId) > 0 {
 		if f.SessionId != loginLogM.SessionId {
 			set[`session_id`] = loginLogM.SessionId
+			f.SessionId = loginLogM.SessionId
 			err = deviceM.CleanCustomer(f.OfficialCustomer, options...)
 		} else {
 			permission := CustomerPermission(f.Context(), f.OfficialCustomer)
@@ -154,6 +160,7 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string, optio
 		}
 	} else {
 		set[`session_id`] = loginLogM.SessionId
+		f.SessionId = loginLogM.SessionId
 	}
 	if len(set) > 0 {
 		err = f.UpdateFields(nil, set, `id`, f.Id)

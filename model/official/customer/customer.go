@@ -204,13 +204,18 @@ func (f *Customer) Edit(mw func(db.Result) db.Result, args ...interface{}) error
 	return err
 }
 
-func (f *Customer) NewLoginLog(username string, authType string) *model.LoginLog {
+func (f *Customer) NewLoginLog(co *CustomerOptions, authType string) *model.LoginLog {
 	loginLogM := model.NewLoginLog(f.Context())
 	loginLogM.OwnerType = `customer`
-	loginLogM.Username = username
+	loginLogM.Username = co.Name
 	loginLogM.Success = `N`
-	loginLogM.SessionId = f.Context().Session().MustID()
+	if len(co.SessionID) > 0 {
+		loginLogM.SessionId = co.SessionID
+	} else {
+		loginLogM.SessionId = f.Context().Session().MustID()
+	}
 	loginLogM.AuthType = authType
+	loginLogM.IpAddress = co.IPAddress
 	return loginLogM
 }
 

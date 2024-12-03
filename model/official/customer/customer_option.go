@@ -29,6 +29,10 @@ type CustomerOptions struct {
 	Scense     string        // 场景
 	Platform   string        // 系统平台
 	DeviceNo   string        // 设备编号
+
+	// for qrcode scan login
+	SessionID string
+	IPAddress string
 }
 
 type CustomerOption func(*CustomerOptions)
@@ -81,6 +85,16 @@ func CustomerPlatform(platform string) CustomerOption {
 func CustomerDeviceNo(deviceNo string) CustomerOption {
 	return func(c *CustomerOptions) {
 		c.DeviceNo = deviceNo
+	}
+}
+func CustomerSessionID(sessionID string) CustomerOption {
+	return func(c *CustomerOptions) {
+		c.SessionID = sessionID
+	}
+}
+func CustomerIPAddress(ipAddr string) CustomerOption {
+	return func(c *CustomerOptions) {
+		c.IPAddress = ipAddr
 	}
 }
 func GenerateOptionsFromHeader(c echo.Context, maxAge ...int) []CustomerOption {
