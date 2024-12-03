@@ -15,9 +15,7 @@ func (f *Customer) SignUp(user, pass, mobile, email string, options ...CustomerO
 	co.Password = pass
 	co.Mobile = mobile
 	co.Email = email
-	for _, option := range options {
-		option(co)
-	}
+	co.ApplyOptions(options...)
 	if f.LevelId < 1 {
 		levelM := modelLevel.NewLevel(f.Context())
 		if level, err := levelM.CanAutoLevelUpByIntegral(0); err == nil {
@@ -36,10 +34,10 @@ func (f *Customer) SignUp(user, pass, mobile, email string, options ...CustomerO
 		return err
 	}
 
-	return f.FireSignUpSuccess(co, model.AuthTypePassword, options...)
+	return f.FireSignUpSuccess(co, model.AuthTypePassword)
 }
 
-func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string, options ...CustomerOption) (err error) {
+func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string) (err error) {
 	integral := config.Setting(`base`, `addExperience`).Float64(`register`)
 	if err = FireSignUp(f.OfficialCustomer); err != nil {
 		return err
@@ -65,9 +63,17 @@ func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string, optio
 	}
 
 	f.SetSession()
+	if !f.disabledSession {
+		co.SetSession(f.Context())
+	}
 
 	loginLogM := f.NewLoginLog(co, authType)
 	loginLogM.Success = `Y`
-	loginLogM.AddAndSaveSession()
+	if f.disabledSession {
+		loginLogM.InitLocation()
+		loginLogM.Add()
+	} else {
+		loginLogM.AddAndSaveSession()
+	}
 	return
 }

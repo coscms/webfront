@@ -30,3 +30,12 @@ func (d *DeviceInfo) Init(c echo.Context) {
 	d.Scense = c.Header(`X-Scense`)
 	d.DeviceNo = c.Header(`X-Device-Id`)
 }
+
+func (d *DeviceInfo) SetSession(c echo.Context) {
+	c.Session().Set(`deviceInfo`, d)
+}
+
+func GetDeviceInfo(c echo.Context) *DeviceInfo {
+	d, _ := c.Session().Get(`deviceInfo`).(*DeviceInfo)
+	return d
+}

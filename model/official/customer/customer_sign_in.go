@@ -168,6 +168,9 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string) (err 
 	}
 
 	f.SetSession()
+	if !f.disabledSession {
+		co.SetSession(f.Context())
+	}
 	return err
 }
 
