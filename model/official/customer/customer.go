@@ -223,7 +223,6 @@ func (f *Customer) APIData(customers ...*dbschema.OfficialCustomer) echo.H {
 	claims := echo.H{}
 	claims[`id`] = customer.Id
 	claims[`name`] = customer.Name
-	claims[`name`] = customer.Name
 	claims[`avatar`] = customer.Avatar
 	claims[`gender`] = customer.Gender
 	claims[`groupId`] = customer.GroupId
