@@ -17,6 +17,7 @@ import (
 
 func init() {
 	gob.Register(dbschema.NewOfficialCustomer(nil))
+	gob.Register(&DeviceInfo{})
 }
 
 func NewCustomer(ctx echo.Context) *Customer {
