@@ -11,6 +11,7 @@ import (
 	"github.com/coscms/webcore/initialize/backend"
 	backendLib "github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/config"
+	_ "github.com/coscms/webfront/library/setup"
 )
 
 var MinCustomerID = 1000
