@@ -177,11 +177,6 @@ func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, co *Customer
 	if !ok {
 		goto END
 	}
-	if co.OfficialCustomer == nil {
-		co.OfficialCustomer = customer
-	} else if co.OfficialCustomer.Id == 0 {
-		*co.OfficialCustomer = *customer
-	}
 	f.SetOptions(co)
 	f.SetDefaults()
 	switch multideviceSignin.Unique {
