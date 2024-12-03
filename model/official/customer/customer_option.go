@@ -26,9 +26,9 @@ type CustomerOptions struct {
 	*dbschema.OfficialCustomer
 	MaxAge     time.Duration // 登录状态有效时长
 	SignInType string        // 登录方式
-	Scense     string        // 场景
-	Platform   string        // 系统平台
-	DeviceNo   string        // 设备编号
+
+	// device information
+	DeviceInfo
 
 	// for qrcode scan login
 	SessionID string
@@ -104,11 +104,16 @@ func CustomerIPAddress(ipAddr string) CustomerOption {
 		c.IPAddress = ipAddr
 	}
 }
+func CustomerDeviceInfo(deviceInfo DeviceInfo) CustomerOption {
+	return func(c *CustomerOptions) {
+		c.DeviceInfo = deviceInfo
+	}
+}
 func GenerateOptionsFromHeader(c echo.Context, maxAge ...int) []CustomerOption {
+	d := DeviceInfo{}
+	d.Init(c)
 	co := []CustomerOption{
-		CustomerPlatform(c.Header(`X-Platform`)),
-		CustomerScense(c.Header(`X-Scense`)),
-		CustomerDeviceNo(c.Header(`X-Device-Id`)),
+		CustomerDeviceInfo(d),
 	}
 	if len(maxAge) > 0 {
 		co = append(co, CustomerMaxAgeSeconds(maxAge[0]))
