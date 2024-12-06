@@ -117,6 +117,8 @@ func (f *Customer) AddIntegral(amount float64, customerID uint64, sourceType str
 // LevelUpOnSignIn 登录时检查是否可升级
 func (f *Customer) LevelUpOnSignIn(set echo.H) error {
 	levelM := modelLevel.NewLevel(f.Context())
+
+	// 当前积分可以匹配的等级
 	level, err := levelM.CanAutoLevelUpByCustomerID(f.Id)
 	if err != nil {
 		return err
@@ -125,13 +127,19 @@ func (f *Customer) LevelUpOnSignIn(set echo.H) error {
 		return nil
 	}
 	if f.LevelId > 0 {
-		err = levelM.Get(nil, db.And(
+		currentLevelM := dbschema.NewOfficialCustomerLevel(f.Context())
+		// 当前等级
+		err = currentLevelM.Get(func(r db.Result) db.Result {
+			return r.Select(`score`)
+		}, db.And(
 			db.Cond{`id`: f.LevelId},
 			db.Cond{`disabled`: `N`},
 			db.Cond{`group`: `base`},
 		))
 		if err == nil {
-			if levelM.Score < level.Score {
+			if currentLevelM.Score != level.Score {
+				// currentLevelM.Score < level.Score 可以升级
+				// currentLevelM.Score > level.Score 需要降级
 				f.LevelId = level.Id
 				set.Set(`level_id`, f.LevelId)
 			}

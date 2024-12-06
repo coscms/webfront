@@ -43,11 +43,15 @@ func (f *Level) Than(
 	compare func(*dbschema.OfficialCustomerLevel, *dbschema.OfficialCustomerLevel) bool,
 ) (bool, error) {
 	row := dbschema.NewOfficialCustomerLevel(f.Context())
-	err := row.Get(nil, `id`, levelId)
+	err := row.Get(func(r db.Result) db.Result {
+		return r.Select(`score`, `group`)
+	}, `id`, levelId)
 	if err != nil {
 		return false, err
 	}
-	err = f.Get(nil, db.And(
+	err = f.Get(func(r db.Result) db.Result {
+		return r.Select(`score`)
+	}, db.And(
 		db.Cond{`id`: targetLevelId},
 		db.Cond{`group`: row.Group},
 	))
@@ -177,18 +181,24 @@ func (f *Level) ListLevelGroup() ([]*LevelGroup, error) {
 }
 
 func (f *Level) CanAutoLevelUpByCustomerID(customerID uint64) (*dbschema.OfficialCustomerLevel, error) {
+	return f.CanAutoLevelUpBy(customerID, `base`, `integral`)
+}
+
+func (f *Level) CanAutoLevelUpBy(customerID uint64, group string, assetType string) (*dbschema.OfficialCustomerLevel, error) {
 	walletM := dbschema.NewOfficialCustomerWallet(nil)
 	walletM.CPAFrom(f.OfficialCustomerLevel)
-	err := walletM.Get(nil, db.And(
+	err := walletM.Get(func(r db.Result) db.Result {
+		return r.Select(`balance`)
+	}, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`asset_type`: `integral`},
+		db.Cond{`asset_type`: assetType},
 	))
 	if err != nil {
 		if err != db.ErrNoMoreRows {
 			return nil, err
 		}
 	}
-	return f.CanAutoLevelUpByIntegral(walletM.Balance)
+	return f.CanAutoLevelUpByIntegralAsset(group, walletM.Balance, assetType)
 }
 
 func (f *Level) CanAutoLevelUpByIntegral(integral float64) (*dbschema.OfficialCustomerLevel, error) {

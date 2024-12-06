@@ -120,3 +120,7 @@ func (f *Level) Delete(mw func(db.Result) db.Result, args ...interface{}) error 
 	err := f.OfficialCustomerLevelRelation.Delete(mw, args...)
 	return err
 }
+
+func (f *Level) LevelUp() error {
+	return modelLevel.LevelUp(f.Context(), f.OfficialCustomerLevelRelation)
+}
