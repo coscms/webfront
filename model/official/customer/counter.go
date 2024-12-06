@@ -66,10 +66,20 @@ func (u *Counter) Decr(n uint64) error {
 	if err != nil || !exists {
 		return err
 	}
-	return u.OfficialCustomerCounter.UpdateField(nil, `total`, db.Raw("total-"+param.AsString(n)), db.And(
+	var affected int64
+	affected, err = u.OfficialCustomerCounter.UpdatexField(nil, `total`, db.Raw("total-"+param.AsString(n)), db.And(
 		db.Cond{`customer_id`: u.CustomerId},
 		db.Cond{`target`: u.Target},
+		db.Cond{`total`: db.Gte(n)},
 	))
+	if affected == 0 && n > 1 {
+		err = u.OfficialCustomerCounter.UpdateField(nil, `total`, 0, db.And(
+			db.Cond{`customer_id`: u.CustomerId},
+			db.Cond{`target`: u.Target},
+			db.Cond{`total`: db.Gt(0)},
+		))
+	}
+	return err
 }
 
 func (u *Counter) GetTotal() (uint64, error) {
