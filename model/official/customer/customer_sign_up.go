@@ -29,6 +29,14 @@ func (f *Customer) SignUp(user, pass, mobile, email string, options ...CustomerO
 		}
 	}
 	f.SessionId = f.Context().Session().MustID()
+	if inviter := f.Context().GetCookie(`inviter`); len(inviter) > 0 {
+		if inviterID := param.AsUint64(inviter); inviterID > 0 {
+			exists, _ := f.ExistsCustomerID(inviterID)
+			if exists {
+				f.InviterId = inviterID
+			}
+		}
+	}
 	_, err := f.Add()
 	if err != nil {
 		return err
@@ -76,4 +84,12 @@ func (f *Customer) FireSignUpSuccess(co *CustomerOptions, authType string) (err 
 		loginLogM.AddAndSaveSession()
 	}
 	return
+}
+
+func (f *Customer) UpdateInviterID(customerID uint64, inviterID uint64) error {
+	return f.OfficialCustomer.UpdateField(nil, `inviter_id`, inviterID, `id`, customerID)
+}
+
+func (f *Customer) ExistsCustomerID(customerID uint64) (bool, error) {
+	return f.OfficialCustomer.Exists(nil, `id`, customerID)
 }

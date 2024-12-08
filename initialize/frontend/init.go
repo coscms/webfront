@@ -208,6 +208,9 @@ func addMiddleware(e *echo.Echo) {
 	// 启用JWT
 	e.Use(xMW.JWT())
 
+	// Inviter
+	e.Use(xMW.Inviter)
+
 	e.Use(xMW.Middlewares...)
 
 	captcha.New(``).Wrapper(e)

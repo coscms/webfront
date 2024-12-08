@@ -24,7 +24,7 @@ func JWT(skippers ...func(echo.Context) bool) echo.MiddlewareFuncd {
 	jwtConfig := &mwJWT.JWTConfig{
 		Skipper:     defaultJWTSkipper,
 		SigningKey:  []byte(config.FromFile().Cookie.HashKey),
-		Claims:      &jwt.StandardClaims{},
+		Claims:      &jwt.RegisteredClaims{},
 		TokenLookup: "header:" + echo.HeaderAuthorization,
 	}
 	if len(skippers) > 0 && skippers[0] != nil {
