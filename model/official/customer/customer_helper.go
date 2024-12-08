@@ -58,6 +58,19 @@ func (f *Customer) IsSameDay(assetType string, sourceType string) error {
 	return nil
 }
 
+func (f *Customer) ExistsAssetSource(assetType string, sourceType string, sourceTable string, sourceID uint64) (bool, error) {
+	m := dbschema.NewOfficialCustomerWalletFlow(f.Context())
+	m.CPAFrom(f.OfficialCustomer)
+	return m.Exists(nil, db.And(
+		db.Cond{`customer_id`: f.Id},
+		db.Cond{`asset_type`: assetType},
+		db.Cond{`amount_type`: `balance`},
+		db.Cond{`source_type`: sourceType},
+		db.Cond{`source_table`: sourceTable},
+		db.Cond{`source_id`: sourceID},
+	))
+}
+
 // AddExperience 增加经验值
 func (f *Customer) AddExperience(amount float64, customerID uint64, sourceType string, sourceTable string, sourceID uint64, description string) error {
 	if amount <= 0 {
