@@ -30,7 +30,7 @@ func TestQRSignIn(t *testing.T) {
 
 	// -------------------------------
 
-	cs := GetQRSignInCase(`cache`)
+	cs := GetCase(`cache`)
 	ctx := defaults.NewMockContext()
 	qrcode, err = cs.Encode(ctx, qsi)
 	require.NoError(t, err)
