@@ -76,7 +76,7 @@ func GenerateUniqueKey(ip, ua string) string {
 	return com.Md5(com.String(time.Now().UnixMicro())+ua+ip) + com.RandomAlphanumeric(2)
 }
 
-type QRSignInCase interface {
+type QRSignInCodec interface {
 	Encode(echo.Context, QRSignIn) (string, error)
 	Decode(echo.Context, string) (QRSignIn, error)
 }
@@ -112,19 +112,19 @@ func (c defaultQRSignIn) Decode(ctx echo.Context, encrypted string) (QRSignIn, e
 	return signInData, err
 }
 
-var qrSignInCases = map[string]QRSignInCase{
+var qrSignInCodecs = map[string]QRSignInCodec{
 	`cache`:   cacheQRSignIn{},   // 缺点：占用存储空间；优点：字符串短，生成的二维码更容易识别
 	`default`: defaultQRSignIn{}, // 优点：不占用存储空间；缺点：加密字符串太长，生成的二维码元素图块小而多，不易识别
 }
 
-func GetCase(caseName string) QRSignInCase {
-	cs, ok := qrSignInCases[caseName]
+func Get(caseName string) QRSignInCodec {
+	cs, ok := qrSignInCodecs[caseName]
 	if ok {
 		return cs
 	}
-	return qrSignInCases[`default`]
+	return qrSignInCodecs[`default`]
 }
 
-func Register(caseName string, qrsic QRSignInCase) {
-	qrSignInCases[caseName] = qrsic
+func Register(caseName string, qrsic QRSignInCodec) {
+	qrSignInCodecs[caseName] = qrsic
 }
