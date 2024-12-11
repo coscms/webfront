@@ -1,12 +1,9 @@
 package qrsignin
 
 import (
-	"math"
-	"sync/atomic"
 	"time"
 
 	"github.com/coscms/webcore/library/config"
-	"github.com/coscms/webfront/library/cache"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -22,16 +19,6 @@ type QRSignIn struct {
 	Platform      string `json:"pf"`
 	Scense        string `json:"ss"`
 	DeviceNo      string `json:"dn"`
-}
-
-var autoIncr atomic.Uint64
-
-func GetMaxNumber() uint64 {
-	v := autoIncr.Add(1)
-	if v >= math.MaxUint64-1 {
-		autoIncr.Store(0)
-	}
-	return v
 }
 
 func (q QRSignIn) Encode() (string, error) {
@@ -74,57 +61,4 @@ func NewQRSignIn(ctx echo.Context, cookieMaxAge int, expireTime time.Time) QRSig
 
 func GenerateUniqueKey(ip, ua string) string {
 	return com.Md5(com.String(time.Now().UnixMicro())+ua+ip) + com.RandomAlphanumeric(2)
-}
-
-type QRSignInCodec interface {
-	Encode(echo.Context, QRSignIn) (string, error)
-	Decode(echo.Context, string) (QRSignIn, error)
-}
-
-type cacheQRSignIn struct {
-}
-
-func (c cacheQRSignIn) Encode(ctx echo.Context, signInData QRSignIn) (string, error) {
-	key := GenerateUniqueKey(ctx.RealIP(), ctx.Request().UserAgent())
-	err := cache.Put(ctx, `qrsignin_`+key, signInData, signInData.Expires-time.Now().Unix())
-	return key, err
-}
-
-func (c cacheQRSignIn) Decode(ctx echo.Context, key string) (QRSignIn, error) {
-	signInData := QRSignIn{}
-	if !com.StrIsAlphaNumeric(key) {
-		return signInData, ctx.NewError(code.InvalidParameter, `无效字符`).SetZone(`data`)
-	}
-	err := cache.Get(ctx, `qrsignin_`+key, &signInData)
-	return signInData, err
-}
-
-type defaultQRSignIn struct {
-}
-
-func (c defaultQRSignIn) Encode(_ echo.Context, signInData QRSignIn) (string, error) {
-	return signInData.Encode()
-}
-
-func (c defaultQRSignIn) Decode(ctx echo.Context, encrypted string) (QRSignIn, error) {
-	signInData := QRSignIn{}
-	err := signInData.Decode(ctx, encrypted)
-	return signInData, err
-}
-
-var qrSignInCodecs = map[string]QRSignInCodec{
-	`cache`:   cacheQRSignIn{},   // 缺点：占用存储空间；优点：字符串短，生成的二维码更容易识别
-	`default`: defaultQRSignIn{}, // 优点：不占用存储空间；缺点：加密字符串太长，生成的二维码元素图块小而多，不易识别
-}
-
-func Get(caseName string) QRSignInCodec {
-	cs, ok := qrSignInCodecs[caseName]
-	if ok {
-		return cs
-	}
-	return qrSignInCodecs[`default`]
-}
-
-func Register(caseName string, qrsic QRSignInCodec) {
-	qrSignInCodecs[caseName] = qrsic
 }
