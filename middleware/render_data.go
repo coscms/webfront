@@ -18,6 +18,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/middleware/tplfunc"
+	"github.com/webx-top/echo/param"
 )
 
 func init() {
@@ -135,7 +136,15 @@ func (r *RenderData) Price(price float64) float64 {
 func (r *RenderData) PriceFormat(price float64) template.HTML {
 	conv, ok := r.ctx.Internal().Get(`currencyRate`).(echo.RenderContextWithData)
 	if !ok {
-		return xcommon.HTMLCurrency(r.ctx, price, true).(template.HTML)
+		h := xcommon.HTMLCurrency(r.ctx, price, true)
+		switch r := h.(type) {
+		case template.HTML:
+			return r
+		case string:
+			return template.HTML(r)
+		default:
+			return template.HTML(param.AsString(r))
+		}
 	}
 	return conv.RenderWithData(r.ctx, price)
 }
