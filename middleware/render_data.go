@@ -11,6 +11,7 @@ import (
 	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/logic/articlelogic"
+	"github.com/coscms/webfront/library/xcommon"
 	"github.com/coscms/webfront/model/official"
 	modelAdvert "github.com/coscms/webfront/model/official/advert"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
@@ -121,4 +122,24 @@ func (r *RenderData) Advert(idents ...string) interface{} {
 
 func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
 	return httpserver.Frontend.Template.ThemeInfo(r.ctx)
+}
+
+func (r *RenderData) Price(price float64) float64 {
+	conv, ok := r.ctx.Internal().Get(`currencyRate`).(FloatConverter)
+	if !ok {
+		return price
+	}
+	return conv.Converter(price)
+}
+
+func (r *RenderData) PriceFormat(price float64) template.HTML {
+	conv, ok := r.ctx.Internal().Get(`currencyRate`).(echo.RenderContextWithData)
+	if !ok {
+		return template.HTML(xcommon.HTMLCurrency(r.ctx, price, true).(string))
+	}
+	return conv.RenderWithData(r.ctx, price)
+}
+
+type FloatConverter interface {
+	Converter(float64) float64
 }
