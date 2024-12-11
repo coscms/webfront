@@ -126,7 +126,7 @@ func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
 }
 
 func (r *RenderData) Price(price float64) float64 {
-	conv, ok := r.ctx.Internal().Get(`currencyRate`).(FloatConverter)
+	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(FloatConverter)
 	if !ok {
 		return price
 	}
@@ -134,7 +134,7 @@ func (r *RenderData) Price(price float64) float64 {
 }
 
 func (r *RenderData) PriceFormat(price float64) template.HTML {
-	conv, ok := r.ctx.Internal().Get(`currencyRate`).(echo.RenderContextWithData)
+	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(echo.RenderContextWithData)
 	if !ok {
 		h := xcommon.HTMLCurrency(r.ctx, price, true)
 		switch r := h.(type) {
@@ -149,6 +149,18 @@ func (r *RenderData) PriceFormat(price float64) template.HTML {
 	return conv.RenderWithData(r.ctx, price)
 }
 
+func (r *RenderData) Currency() string {
+	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(CurrencyGetter)
+	if !ok {
+		return xcommon.DefaultCurrency()
+	}
+	return conv.Currency()
+}
+
 type FloatConverter interface {
 	Convert(float64) float64
+}
+
+type CurrencyGetter interface {
+	Currency() string
 }
