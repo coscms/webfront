@@ -129,7 +129,7 @@ func (r *RenderData) Price(price float64) float64 {
 	if !ok {
 		return price
 	}
-	return conv.Converter(price)
+	return conv.Convert(price)
 }
 
 func (r *RenderData) PriceFormat(price float64) template.HTML {
@@ -141,5 +141,5 @@ func (r *RenderData) PriceFormat(price float64) template.HTML {
 }
 
 type FloatConverter interface {
-	Converter(float64) float64
+	Convert(float64) float64
 }
