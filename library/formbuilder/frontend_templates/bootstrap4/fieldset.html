@@ -1,10 +1,19 @@
-{{- if not .hasFormGroup }}<div class="form-group">{{ end }}
-	<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} col-form-label">{{.label}}</label>
-	<div class="col-sm-8{{if .classes }} {{.classes}}{{end}}"{{range .tags}} {{.}}{{end}}>
-		<div class="fieldset bg-fc">
-			{{- range .fields }}
-			{{- .Render }}
-			{{- end }}
-		</div>
+<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} col-form-label">{{.label}}</label>
+<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else}}8{{end}}{{if .classes }} {{.classes}}{{end}}"{{range .tags}} {{.}}{{end}}>
+	{{- if .helptext }}
+	<div class="help-block">
+		{{- if .helptext }}{{ .helptext | ToHTML }}{{ end }}
 	</div>
-{{ if not .hasFormGroup }}</div>{{ end }}
+	{{- end }}	
+	<div class="fieldset bg-fc">
+		{{- range $k, $g := .groups }}
+		{{- if gt (len $g.Elements) 0}}
+		<div class="form-group row{{if $g.HasError}} has-error{{end}}">
+		{{- range $g.Elements }}
+		{{ .Render }}
+		{{- end }}
+		</div>
+		{{- end }}
+		{{- end }}
+	</div>
+</div>
