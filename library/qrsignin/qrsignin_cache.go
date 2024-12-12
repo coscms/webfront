@@ -1,12 +1,14 @@
 package qrsignin
 
 import (
+	"strings"
 	"time"
 
 	cached "github.com/admpub/cache"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webfront/library/cache"
 )
@@ -36,6 +38,14 @@ func (c cacheQRSignIn) Encode(ctx echo.Context, signInData QRSignIn) (string, er
 	{
 		var oldKey string
 		if err := cache.Get(ctx, qrkeysKey, &oldKey); err == nil && len(oldKey) > 0 {
+			parts := strings.SplitN(oldKey, `|`, 2)
+			if len(parts) == 2 {
+				oldKey = parts[0]
+				expiresTs := param.AsInt64(parts[1])
+				if expiresTs-time.Now().Unix() >= 300 { //剩余时间不小于5分钟时可以直接使用旧的key，避免频繁读写缓存
+					return oldKey, err
+				}
+			}
 			cache.Delete(ctx, c.Prefix+oldKey)
 		}
 	}
@@ -43,7 +53,7 @@ func (c cacheQRSignIn) Encode(ctx echo.Context, signInData QRSignIn) (string, er
 	timeout := signInData.Expires - time.Now().Unix()
 	err := cache.Put(ctx, c.Prefix+key, signInData, timeout)
 	if err == nil {
-		err = cache.Put(ctx, qrkeysKey, key, timeout)
+		err = cache.Put(ctx, qrkeysKey, key+`|`+param.AsString(signInData.Expires), timeout)
 	}
 	return key, err
 }
