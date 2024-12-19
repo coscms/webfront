@@ -154,7 +154,7 @@ func CheckGlobalCustomerAdd(ctx echo.Context, customerID interface{}, typ string
 		maxPendingPerDay = cmtFrequency.Int64(`maxPendingPerDay`)
 	}
 	if maxPendingPerDay > 0 {
-		pendingPerDayCount, err := counter.CustomerPendingCount(customerID)
+		pendingPerDayCount, err := counter.CustomerPendingTodayCount(customerID)
 		if err != nil {
 			return err
 		}
