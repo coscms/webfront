@@ -13,15 +13,7 @@ import (
 func MakeSignature(timestamp, nonce, token string) string {
 	arr := []string{timestamp, nonce, token}
 	sort.Strings(arr)
-
-	n := len(timestamp) + len(nonce) + len(token)
-	var b strings.Builder
-	b.Grow(n)
-	for i := 0; i < len(arr); i++ {
-		b.WriteString(arr[i])
-	}
-
-	return com.Sha1(b.String())
+	return com.Sha1(strings.Join(arr, ""))
 }
 
 func CheckSignature(signature, timestamp, nonce, token string) bool {
