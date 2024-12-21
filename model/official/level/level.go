@@ -78,7 +78,9 @@ func (f *Level) check() error {
 		}
 		return f.Context().NewError(code.InvalidParameter, `group无效(仅支持: %v)`, validGroups).SetZone(`group`)
 	}
-	if !AmountTypes.Has(f.IntegralAmountType) {
+	if len(f.IntegralAmountType) == 0 {
+		f.IntegralAmountType = AmountTypeBalance
+	} else if !AmountTypes.Has(f.IntegralAmountType) {
 		var validAmountTypes string
 		for i, g := range AmountTypes.Slice() {
 			if i > 0 {
