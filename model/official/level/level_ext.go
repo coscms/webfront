@@ -6,11 +6,17 @@ import (
 )
 
 const (
+	// 等级状态
 	LevelStatusActived = `actived`
 	LevelStatusExpired = `expired`
+
+	// 金额类型
+	AmountTypeBalance     = `balance`
+	AmountTypeAccumulated = `accumulated`
 )
 
 var LevelStatuses = echo.NewKVData().Add(LevelStatusActived, `有效`).Add(LevelStatusExpired, `过期`)
+var AmountTypes = echo.NewKVData().Add(AmountTypeBalance, `余额`).Add(AmountTypeAccumulated, `累积总收入`)
 
 type LevelGroup struct {
 	Group string

@@ -809,6 +809,7 @@ CREATE TABLE `official_customer_level` (
   `bgcolor` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '背景色',
   `price` decimal(10,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '升级价格(0为免费)',
   `integral_asset` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'integral' COMMENT '当作升级积分的资产',
+  `integral_amount_type` enum('balance','accumulated') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'balance' COMMENT '资产金额类型(balance-余额;accumulated-累积额)',
   `integral_min` decimal(30,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '最小积分',
   `integral_max` decimal(30,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '最大积分',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
@@ -1188,4 +1189,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-20 21:19:11
+-- Dump completed on 2024-12-21 15:06:02
