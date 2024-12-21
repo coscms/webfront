@@ -18,7 +18,7 @@ func (f *Customer) SignUp(user, pass, mobile, email string, options ...CustomerO
 	co.ApplyOptions(options...)
 	if f.LevelId < 1 {
 		levelM := modelLevel.NewLevel(f.Context())
-		if level, err := levelM.CanAutoLevelUpByIntegral(0); err == nil {
+		if level, err := levelM.CanAutoLevelUpByIntegral(0, 0); err == nil {
 			f.LevelId = level.Id
 		}
 	}

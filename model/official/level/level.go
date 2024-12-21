@@ -188,7 +188,7 @@ func (f *Level) CanAutoLevelUpBy(customerID uint64, group string, assetType stri
 	walletM := dbschema.NewOfficialCustomerWallet(nil)
 	walletM.CPAFrom(f.OfficialCustomerLevel)
 	err := walletM.Get(func(r db.Result) db.Result {
-		return r.Select(`balance`)
+		return r.Select(`balance`, `accumulated`)
 	}, db.And(
 		db.Cond{`customer_id`: customerID},
 		db.Cond{`asset_type`: assetType},
@@ -198,24 +198,18 @@ func (f *Level) CanAutoLevelUpBy(customerID uint64, group string, assetType stri
 			return nil, err
 		}
 	}
-	return f.CanAutoLevelUpByIntegralAsset(group, walletM.Balance, assetType)
+	return f.CanAutoLevelUpByIntegralAsset(group, walletM.Balance, walletM.Accumulated, assetType)
 }
 
-func (f *Level) CanAutoLevelUpByIntegral(integral float64) (*dbschema.OfficialCustomerLevel, error) {
-	return f.CanAutoLevelUpByIntegralAsset(`base`, integral, `integral`)
+func (f *Level) CanAutoLevelUpByIntegral(balance float64, accumulated float64) (*dbschema.OfficialCustomerLevel, error) {
+	return f.CanAutoLevelUpByIntegralAsset(`base`, balance, accumulated, `integral`)
 }
 
-func (f *Level) CanAutoLevelUpByIntegralAsset(group string, integral float64, asset string) (*dbschema.OfficialCustomerLevel, error) {
+func (f *Level) CanAutoLevelUpByIntegralAsset(group string, balance float64, accumulated float64, asset string) (*dbschema.OfficialCustomerLevel, error) {
+	cond := MakeFreeCond(group, balance, accumulated, asset)
 	err := f.Get(func(r db.Result) db.Result {
 		return r.OrderBy(`-score`)
-	}, db.And(
-		db.Cond{`disabled`: `N`},
-		db.Cond{`group`: group},
-		db.Cond{`price`: 0},
-		db.Cond{`integral_asset`: asset},
-		db.Cond{`integral_min`: db.Lte(integral)},
-		db.Cond{`integral_max`: db.Gte(integral)},
-	))
+	}, cond.And())
 	if err != nil {
 		if err != db.ErrNoMoreRows {
 			return nil, err
@@ -224,17 +218,11 @@ func (f *Level) CanAutoLevelUpByIntegralAsset(group string, integral float64, as
 	return f.OfficialCustomerLevel, nil
 }
 
-func (f *Level) CanPaymentLevelUpByIntegralAsset(group string, integral float64, asset string) (*dbschema.OfficialCustomerLevel, error) {
+func (f *Level) CanPaymentLevelUpByIntegralAsset(group string, balance float64, accumulated float64, asset string) (*dbschema.OfficialCustomerLevel, error) {
+	cond := MakePayCond(group, balance, accumulated, asset)
 	err := f.Get(func(r db.Result) db.Result {
 		return r.OrderBy(`-score`)
-	}, db.And(
-		db.Cond{`disabled`: `N`},
-		db.Cond{`group`: group},
-		db.Cond{`price`: db.Gt(0)},
-		db.Cond{`integral_asset`: asset},
-		db.Cond{`integral_min`: db.Lte(integral)},
-		db.Cond{`integral_max`: db.Gte(integral)},
-	))
+	}, cond.And())
 	if err != nil {
 		if err != db.ErrNoMoreRows {
 			return nil, err
