@@ -128,7 +128,7 @@ func InitWebServer() {
 
 	// 前台服务设置
 	addMiddleware(e)
-	e.Get(`/favicon.ico`, faviconHandler)
+	e.Get(`/favicon.ico`, faviconHandler).SetMetaKV(httpserver.PermGuestKV())
 	e.Use(xMW.SessionInfo)
 	if config.IsInstalled() {
 		routepage.Apply(e, frontend.GlobalFuncMap())
@@ -213,13 +213,14 @@ func addMiddleware(e *echo.Echo) {
 
 	e.Use(xMW.Middlewares...)
 
-	captcha.New(``).Wrapper(e)
-	captchaGoG := e.Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo))
+	captcha.New(``).Wrapper(e).SetMetaKV(httpserver.PermGuestKV())
+	captchaGoG := e.Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo)).SetMetaKV(httpserver.PermGuestKV())
 	captcha_go.RegisterRoute(captchaGoG)
 
-	e.Route("GET", `/qrcode`, backendLib.QrCode)
+	e.Route("GET", `/qrcode`, backendLib.QrCode).SetMetaKV(httpserver.PermGuestKV())
 
-	httpserver.Frontend.I18n().Handler(e, `App.i18n`)
+	i18nG := e.Group(`/i18n`).SetMetaKV(httpserver.PermGuestKV())
+	httpserver.Frontend.I18n().Handler(i18nG, `App.i18n`)
 }
 
 func URLFor(purl string) string {

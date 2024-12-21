@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/webx-top/echo"
@@ -68,12 +67,9 @@ func SessionInfo(h echo.Handler) echo.HandlerFunc {
 			c.Internal().Set(`customer`, customer)
 		} else {
 			if siteClose == xconst.SiteOnlyMember || siteClose == xconst.SiteOnlyAdmin {
-				switch path.Base(ppath) {
-				case `sign_up`, `sign_in`, `sign_out`:
-				default:
-					if c.Path() != c.Echo().Prefix()+`/captcha/*` && !strings.HasPrefix(ppath, c.Echo().Prefix()+`/oauth/`) {
-						return goToSignIn(c)
-					}
+				handlerPermission := c.Route().String(httpserver.MetaKeyPermission)
+				if handlerPermission != httpserver.PermissionGuest {
+					return goToSignIn(c)
 				}
 			}
 			ouser, exists, err := oauth2client.GetSession(c)
@@ -166,7 +162,7 @@ func permCheck(c echo.Context, customer *dbschema.OfficialCustomer) error {
 }
 
 func checkPermission(ctx echo.Context, customer *dbschema.OfficialCustomer, permission *xrole.RolePermission, routePath string) error {
-	handlerPermission := ctx.Route().String(`permission`)
+	handlerPermission := ctx.Route().String(httpserver.MetaKeyPermission)
 	if handlerPermission == httpserver.PermissionPublic {
 		return nil
 	}
