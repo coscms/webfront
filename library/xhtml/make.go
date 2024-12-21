@@ -29,7 +29,9 @@ func Make(method string, path string, saveAs string, reqRewrite ...func(*http.Re
 	}
 	rec := test.Request(method, siteURL+path, route.IRegister().Echo(), reqRewrite...)
 	if rec.Code != http.StatusOK {
-		return fmt.Errorf(`%w: [%d] %v`, ErrGenerateHTML, rec.Code, rec.Body.String())
+		err := fmt.Errorf(`%w: [%d] %v`, ErrGenerateHTML, rec.Code, rec.Body.String())
+		log.Error(err)
+		return err
 	}
 	body := rec.Body.String()
 	err := cache.Put(context.Background(), saveAs, body+`<!-- Generated at `+time.Now().Format(time.DateTime)+` -->`, 0)
