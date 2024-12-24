@@ -95,7 +95,7 @@ require (
 	github.com/admpub/ccs-gm v0.0.5 // indirect
 	github.com/admpub/checksum v1.1.0 // indirect
 	github.com/admpub/confl v0.2.4 // indirect
-	github.com/admpub/cove v0.0.0-20241122083715-bed56dafdfee // indirect
+	github.com/admpub/cove v0.0.0-20241224063114-4fdd53c948a6 // indirect
 	github.com/admpub/cron v0.1.1 // indirect
 	github.com/admpub/email v2.4.1+incompatible // indirect
 	github.com/admpub/events v1.3.6 // indirect
