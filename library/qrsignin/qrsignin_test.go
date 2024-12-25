@@ -21,7 +21,8 @@ func TestQRSignIn(t *testing.T) {
 		Scense:        `qrcode_web`,
 		DeviceNo:      `1323232324545656075970860458045045083949`,
 	}
-	r, err := qsi.Encode()
+	dec := newDefaultQRSignIn()
+	r, err := dec.Encode(nil, qsi)
 	require.NoError(t, err)
 	t.Logf(`%s: %d`, r, len(r))
 
