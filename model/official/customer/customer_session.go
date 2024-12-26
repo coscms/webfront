@@ -72,7 +72,6 @@ func (f *Customer) VerifySession(customers ...*dbschema.OfficialCustomer) error 
 			return nerrors.ErrUserNotLoggedIn
 		}
 	}
-	sessionguard.IgnoreBrowserUA(f.Context())
 	if !sessionguard.Validate(f.Context(), ``, `customer`, detail.Id) {
 		log.Warn(f.Context().T(`客户“%s”的会话环境发生改变，需要重新登录`, detail.Name))
 		f.UnsetSession()
