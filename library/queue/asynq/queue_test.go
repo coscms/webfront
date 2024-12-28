@@ -12,7 +12,11 @@ import (
 )
 
 func TestQueue(t *testing.T) {
-	a, err := New(nil)
+	redisOptions := &asynq.RedisClientOpt{
+		Addr: "127.0.0.1:6379",
+		//Addr: "127.0.0.1:6380",
+	}
+	a, err := New(redisOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +33,7 @@ func TestQueue(t *testing.T) {
 	defer a.Close()
 	go a.StartWorker()
 
-	a1, err := New(nil)
+	a1, err := New(redisOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +50,7 @@ func TestQueue(t *testing.T) {
 	defer a1.Close()
 	go a1.StartWorker()
 
-	a2, err := New(nil)
+	a2, err := New(redisOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +67,7 @@ func TestQueue(t *testing.T) {
 	defer a2.Close()
 	go a2.StartWorker()
 
-	c, err := New(nil)
+	c, err := New(redisOptions)
 	if err != nil {
 		panic(err)
 	}
