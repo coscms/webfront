@@ -18,10 +18,10 @@ import (
 )
 
 var ErrGenerateHTML = errors.New(`failed to generate html`)
-var makeSinglefight = singleflight.Group{}
+var makerSingleflight = singleflight.Group{}
 
 func Make(method string, path string, saveAs string, reqRewrite ...func(*http.Request)) error {
-	_, err, _ := makeSinglefight.Do(method+`_`+path, func() (interface{}, error) {
+	_, err, _ := makerSingleflight.Do(method+`_`+path, func() (interface{}, error) {
 		return nil, makeDo(method, path, saveAs, reqRewrite...)
 	})
 	return err

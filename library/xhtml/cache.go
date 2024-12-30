@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/coscms/webfront/library/cache"
-	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
+
+	"github.com/coscms/webfront/library/cache"
+	"github.com/coscms/webfront/middleware/sessdata"
 )
 
 func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bool, error) {

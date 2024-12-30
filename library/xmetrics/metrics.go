@@ -46,7 +46,7 @@ func RequestSkipper() echo.Skipper {
 		if !ok || !mc.Enable {
 			return true
 		}
-		return c.Request().URL().Path() == `/metrics`
+		return c.Request().URL().Path() == c.Route().Prefix+`/metrics`
 	}
 }
 
