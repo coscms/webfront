@@ -170,7 +170,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 func (f *Wallet) ListPage(cond *db.Compounds, orderby ...interface{}) ([]*WalletExt, error) {
 	list := []*WalletExt{}
 	_, err := common.NewLister(f.OfficialCustomerWallet, &list, func(r db.Result) db.Result {
-		return r.OrderBy(orderby...).Relation(`Customer`, CusomterSafeFieldsSelector)
+		return r.OrderBy(orderby...)
 	}, cond.And()).Paging(f.Context())
 	if err != nil {
 		return list, err
@@ -185,7 +185,7 @@ func (f *Wallet) ListPage(cond *db.Compounds, orderby ...interface{}) ([]*Wallet
 func (f *Wallet) FlowListPage(cond *db.Compounds, orderby ...interface{}) ([]*WalletFlowExt, error) {
 	list := []*WalletFlowExt{}
 	_, err := common.NewLister(f.Flow, &list, func(r db.Result) db.Result {
-		return r.OrderBy(orderby...).Relation(`Customer`, CusomterSafeFieldsSelector).Relation(`SourceCustomer`, CusomterSafeFieldsSelector)
+		return r.OrderBy(orderby...)
 	}, cond.And()).Paging(f.Context())
 	if err != nil {
 		return list, err
