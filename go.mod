@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.34
+require github.com/coscms/webcore v0.6.35
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,14 +47,14 @@ require (
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/com v1.3.20
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.13.7
+	github.com/webx-top/echo v1.14.2
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/pagination v0.3.1
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yanyiwu/gojieba v1.4.5
-	golang.org/x/oauth2 v0.24.0
+	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.10.0
 	gopkg.in/redis.v5 v5.2.9
 )
@@ -161,7 +161,7 @@ require (
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fynelabs/selfupdate v0.2.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.21.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -227,7 +227,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
-	github.com/phuslu/iploc v1.0.20241129 // indirect
+	github.com/phuslu/iploc v1.0.20241230 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
@@ -283,13 +283,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
+	golang.org/x/exp v0.0.0-20250103183323-7d7fa50e5329 // indirect
 	golang.org/x/image v0.23.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/time v0.8.0 // indirect
+	golang.org/x/time v0.9.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/api v0.214.0 // indirect
@@ -304,7 +304,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.61.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.8.0 // indirect
+	modernc.org/memory v1.8.1 // indirect
 	modernc.org/sqlite v1.34.4 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
