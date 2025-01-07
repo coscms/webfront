@@ -9,7 +9,7 @@ import (
 )
 
 // GroupList base-普通会员(基础组),其它名称为扩展组。客户只能有一个基础组等级,可以有多个扩展组等级
-var GroupList = echo.NewKVData().Add(`base`, `普通会员`)
+var GroupList = echo.NewKVData().Add(`base`, echo.T(`普通会员`))
 
 func AddGroup(k string, v string) {
 	GroupList.Add(k, v)

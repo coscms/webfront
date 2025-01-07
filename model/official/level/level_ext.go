@@ -15,8 +15,8 @@ const (
 	AmountTypeAccumulated = `accumulated`
 )
 
-var LevelStatuses = echo.NewKVData().Add(LevelStatusActived, `有效`).Add(LevelStatusExpired, `过期`)
-var AmountTypes = echo.NewKVData().Add(AmountTypeBalance, `余额`).Add(AmountTypeAccumulated, `累积总收入`)
+var LevelStatuses = echo.NewKVData().Add(LevelStatusActived, echo.T(`有效`)).Add(LevelStatusExpired, echo.T(`过期`))
+var AmountTypes = echo.NewKVData().Add(AmountTypeBalance, echo.T(`余额`)).Add(AmountTypeAccumulated, echo.T(`累积总收入`))
 
 type LevelGroup struct {
 	Group string

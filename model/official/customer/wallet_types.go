@@ -86,13 +86,13 @@ func init() {
 	})
 
 	// 注册金额类型
-	AmountTypes.Add(AmountTypeBalance, `余额`)
-	AmountTypes.Add(AmountTypeFreeze, `冻结`)
+	AmountTypes.Add(AmountTypeBalance, echo.T(`余额`))
+	AmountTypes.Add(AmountTypeFreeze, echo.T(`冻结`))
 
 	// 注册资金流水数据的状态
-	FlowStatus.Add(FlowStatusPending, `待确认`)
-	FlowStatus.Add(FlowStatusConfirmed, `已确认`)
-	FlowStatus.Add(FlowStatusCanceled, `已取消`)
+	FlowStatus.Add(FlowStatusPending, echo.T(`待确认`))
+	FlowStatus.Add(FlowStatusConfirmed, echo.T(`已确认`))
+	FlowStatus.Add(FlowStatusCanceled, echo.T(`已取消`))
 }
 
 func AssetTypeList() []*echo.KV {

@@ -7,7 +7,7 @@ var (
 )
 
 func init() {
-	Contype.Add(`text`, `纯文本`)
-	Contype.Add(`html`, `富文本`)
+	Contype.Add(`text`, echo.T(`纯文本`))
+	Contype.Add(`html`, echo.T(`富文本`))
 	Contype.Add(`markdown`, `Markdown`)
 }

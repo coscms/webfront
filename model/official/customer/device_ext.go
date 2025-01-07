@@ -10,13 +10,13 @@ var (
 )
 
 func init() {
-	DevicePlatforms.Add(`ios`, `iOS手机`)
-	DevicePlatforms.Add(`android`, `安卓手机`)
-	DevicePlatforms.Add(`pc`, `个人电脑`)
-	DevicePlatforms.Add(`micro-program`, `小程序`)
+	DevicePlatforms.Add(`ios`, echo.T(`iOS手机`))
+	DevicePlatforms.Add(`android`, echo.T(`安卓手机`))
+	DevicePlatforms.Add(`pc`, echo.T(`个人电脑`))
+	DevicePlatforms.Add(`micro-program`, echo.T(`小程序`))
 
-	DeviceScenses.Add(`app`, `App应用`)
-	DeviceScenses.Add(`web`, `网页`)
+	DeviceScenses.Add(`app`, echo.T(`App应用`))
+	DeviceScenses.Add(`web`, echo.T(`网页`))
 }
 
 type DeviceInfo struct {

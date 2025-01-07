@@ -16,9 +16,9 @@ var RoutePageTypes = echo.NewKVData()
 func init() {
 	RoutePageTypes.Add(`html`, `HTML`)
 	RoutePageTypes.Add(`json`, `JSON`)
-	RoutePageTypes.Add(`text`, `纯文本`)
+	RoutePageTypes.Add(`text`, echo.T(`纯文本`))
 	RoutePageTypes.Add(`xml`, `XML`)
-	RoutePageTypes.Add(`redirect`, `跳转网址`)
+	RoutePageTypes.Add(`redirect`, echo.T(`跳转网址`))
 }
 
 func NewRoutePage(ctx echo.Context) *RoutePage {

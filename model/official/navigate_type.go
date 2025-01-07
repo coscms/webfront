@@ -10,8 +10,8 @@ var (
 )
 
 func init() {
-	NavigateTypes.Add(`default`,`前台菜单`)
-	NavigateTypes.Add(`userCenter`,`用户中心菜单`)
+	NavigateTypes.Add(`default`, echo.T(`前台菜单`))
+	NavigateTypes.Add(`userCenter`, echo.T(`用户中心菜单`))
 }
 
 // AddNavigateType 登记新的类别
