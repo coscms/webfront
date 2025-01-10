@@ -32,9 +32,9 @@ var recvTypes = map[string]*RecvType{
 	`mobile`: &RecvType{
 		On:            true,
 		Key:           `mobile`,
-		Label:         `手机`,
-		Placeholder:   `手机号码`,
-		InputName:     `手机号码`,
+		Label:         echo.T(`手机`),
+		Placeholder:   echo.T(`手机号码`),
+		InputName:     echo.T(`手机号码`),
 		Validate:      mobileValidate,
 		Send:          mobileSend,
 		GetAccount:    mobileGetAccount,
@@ -43,9 +43,9 @@ var recvTypes = map[string]*RecvType{
 	`email`: &RecvType{
 		On:            true,
 		Key:           `email`,
-		Label:         `E-mail`,
-		Placeholder:   `E-mail地址`,
-		InputName:     `E-mail地址`,
+		Label:         echo.T(`E-mail`),
+		Placeholder:   echo.T(`E-mail地址`),
+		InputName:     echo.T(`E-mail地址`),
 		Validate:      emailValidate,
 		Send:          emailSend,
 		GetAccount:    emailGetAccount,
@@ -77,9 +77,7 @@ func Open(name string) {
 }
 
 func Unregister(name string) {
-	if _, y := recvTypes[name]; y {
-		delete(recvTypes, name)
-	}
+	delete(recvTypes, name)
 }
 
 func List() []*RecvType {
