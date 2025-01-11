@@ -43,7 +43,7 @@ func init() {
 	// 注册资产类型
 	AssetTypes.AddItem(&echo.KV{
 		K: AssetTypeMoney,
-		V: `人民币`,
+		V: echo.T(`人民币`),
 		H: echo.H{
 			`icon`:   `icon ion-cash`,
 			`bg`:     `warning`,
@@ -52,7 +52,7 @@ func init() {
 	})
 	AssetTypes.AddItem(&echo.KV{
 		K: AssetTypeIntegral,
-		V: `积分`,
+		V: echo.T(`积分`),
 		H: echo.H{
 			`icon`: `icon ion-android-cart`,
 			`bg`:   `indigo-light`,
@@ -60,17 +60,17 @@ func init() {
 	})
 	AssetTypes.AddItem(&echo.KV{
 		K: AssetTypeCredit,
-		V: `信用分`,
+		V: echo.T(`信用分`),
 		H: echo.H{
 			`icon`:              `icon ion-heart`,
 			`bg`:                `pink-light`,
-			`comment`:           `满分10`,
+			`comment`:           echo.T(`满分10`),
 			`ignoreAccumulated`: true, // 不支持累计历史值
 		},
 	})
 	AssetTypes.AddItem(&echo.KV{
 		K: AssetTypePoint,
-		V: `点数`,
+		V: echo.T(`点数`),
 		H: echo.H{
 			`icon`: `iconfont icon-dengji-11`,
 			`bg`:   `gray`,
@@ -78,7 +78,7 @@ func init() {
 	})
 	AssetTypes.AddItem(&echo.KV{
 		K: AssetTypeExperience,
-		V: `经验`,
+		V: echo.T(`经验`),
 		H: echo.H{
 			`icon`: `iconfont icon-youxiu`,
 			`bg`:   `info`,
