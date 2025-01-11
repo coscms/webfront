@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
@@ -13,24 +14,29 @@ const (
 )
 
 var GroupPackageTimeUnits = echo.NewKVData().
-	Add(GroupPackageTimeDay, `天`).
-	Add(GroupPackageTimeWeek, `周`).
-	Add(GroupPackageTimeMonth, `月`).
-	Add(GroupPackageTimeYear, `年`).
-	Add(GroupPackageTimeForever, `永久`)
+	Add(GroupPackageTimeDay, echo.T(`天`)).   // echo.T(`%d天`)
+	Add(GroupPackageTimeWeek, echo.T(`周`)).  // echo.T(`%d周`)
+	Add(GroupPackageTimeMonth, echo.T(`月`)). // echo.T(`%d月`) echo.T(`%d个月`)
+	Add(GroupPackageTimeYear, echo.T(`年`)).  // echo.T(`%d年`)
+	Add(GroupPackageTimeForever, echo.T(`永久`))
+
+func i18nUnit(c echo.Context, unit string) string {
+	return com.UpperCaseFirst(c.T(GroupPackageTimeUnits.Get(unit)))
+}
 
 func GroupPackageTimeUnitSuffix(c echo.Context, n uint, unit string) string {
-	if unit == GroupPackageTimeMonth {
+	switch unit {
+	case GroupPackageTimeMonth:
 		if n > 1 {
-			return c.T(`/ %d个月`, n)
+			return `/ ` + c.T(`%d个月`, n)
 		}
-		return c.T(`/ ` + GroupPackageTimeUnits.Get(unit))
+		return `/ ` + i18nUnit(c, unit)
+	case GroupPackageTimeForever:
+		return i18nUnit(c, unit)
+	default:
+		if n > 1 {
+			return `/ ` + c.T(`%d`+unit, n)
+		}
+		return `/ ` + i18nUnit(c, unit)
 	}
-	if unit == GroupPackageTimeForever {
-		return c.T(GroupPackageTimeUnits.Get(unit))
-	}
-	if n > 1 {
-		return c.T(`/ %d`+GroupPackageTimeUnits.Get(unit), n)
-	}
-	return c.T(`/ ` + GroupPackageTimeUnits.Get(unit))
 }
