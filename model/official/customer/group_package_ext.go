@@ -1,7 +1,6 @@
 package customer
 
 import (
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
@@ -21,7 +20,7 @@ var GroupPackageTimeUnits = echo.NewKVData().
 	Add(GroupPackageTimeForever, echo.T(`永久`))
 
 func i18nUnit(c echo.Context, unit string) string {
-	return com.UpperCaseFirst(c.T(GroupPackageTimeUnits.Get(unit)))
+	return c.T(GroupPackageTimeUnits.Get(unit))
 }
 
 func GroupPackageTimeUnitSuffix(c echo.Context, n uint, unit string) string {
