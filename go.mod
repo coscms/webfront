@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.6.40
+require github.com/coscms/webcore v0.6.41
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -64,7 +64,7 @@ require (
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/websocket v1.0.4
-	github.com/coscms/captcha v0.1.3
+	github.com/coscms/captcha v0.2.0
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.29.0
@@ -103,6 +103,7 @@ require (
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 // indirect
+	github.com/admpub/go-captcha-assets v0.0.0-20250118155016-6be2fe25ee51 // indirect
 	github.com/admpub/go-captcha/v2 v2.0.5 // indirect
 	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
@@ -265,7 +266,6 @@ require (
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
 	github.com/webx-top/validator v0.3.0 // indirect
-	github.com/wenlng/go-captcha-assets v1.0.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
