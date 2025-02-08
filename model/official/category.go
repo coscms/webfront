@@ -145,6 +145,9 @@ func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compoun
 			ParentID:   parentID,
 			Categories: f.ListByParentID(typ, parentID, extraConds...),
 		}
+		if len(sc.Categories) == 0 {
+			return categories
+		}
 		categories = append(categories, sc)
 		parentID = catID
 	}
@@ -153,6 +156,9 @@ func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compoun
 			SelectedID: 0,
 			ParentID:   parentID,
 			Categories: f.ListByParentID(typ, parentID, extraConds...),
+		}
+		if len(sc.Categories) == 0 {
+			return categories
 		}
 		categories = append(categories, sc)
 	}
