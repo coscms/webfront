@@ -70,7 +70,8 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 	if len(flows) > 0 {
 		flow = flows[0]
 	}
-	err = f.Context().Begin()
+	ctx := f.Context()
+	err = ctx.Begin()
 	if err != nil {
 		return
 	}
@@ -81,7 +82,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 	var exists bool
 	exists, err = f.Exists(nil, cond)
 	if err != nil {
-		f.Context().Rollback()
+		ctx.Rollback()
 		return err
 	}
 	if !exists {
@@ -89,8 +90,8 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		f.Balance = 0
 		if flow.AmountType == `balance` { // 余额操作
 			if flow.Amount < 0 { // 扣款操作
-				f.Context().Rollback()
-				return nerrors.ErrBalanceNoEnough.SetZone(`balance`)
+				ctx.Rollback()
+				return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
 			}
 			// 加款操作
 			f.Balance = flow.Amount
@@ -100,8 +101,8 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 			}
 		} else { // 冻结金额操作
 			if flow.Amount < 0 { // 扣除冻结
-				f.Context().Rollback()
-				return f.Context().NewError(code.BalanceNoEnough, `冻结额不能小于0`).SetZone(`freeze`)
+				ctx.Rollback()
+				return ctx.NewError(code.BalanceNoEnough, `冻结额不能小于0`).SetZone(`freeze`)
 			}
 			// 增加冻结
 			f.Freeze = flow.Amount
@@ -113,7 +114,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 	} else {
 		err = xdatabase.GetAndLock(f.OfficialCustomerWallet, cond)
 		if err != nil {
-			f.Context().Rollback()
+			ctx.Rollback()
 			return err
 		}
 		incrAmount := param.AsString(flow.Amount)
@@ -135,16 +136,16 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(2)
 		flow.WalletAmount, _ = newAmountDecimal.Float64()
 		if flow.WalletAmount < 0 { //处理flow.Amount为负数(即扣除余额)的情况。扣款操作时检查余额是否足够
-			f.Context().Rollback()
-			if sessdata.User(f.Context()) != nil {
-				return f.Context().NewError(code.BalanceNoEnough, `扣除余额(%v)失败！客户(ID:%d)的余额不足`, flow.Amount, flow.CustomerId).SetZone(`balance`)
+			ctx.Rollback()
+			if sessdata.User(ctx) != nil {
+				return ctx.NewError(code.BalanceNoEnough, `扣除余额(%v)失败！客户(ID:%d)的余额不足`, flow.Amount, flow.CustomerId).SetZone(`balance`)
 			}
-			return nerrors.ErrBalanceNoEnough
+			return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
 		}
 		err = f.UpdateFields(nil, kvset, cond)
 	}
 	if err != nil {
-		f.Context().Rollback()
+		ctx.Rollback()
 		return
 	}
 	/*
@@ -163,7 +164,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		}
 	*/
 	_, err = flow.Insert()
-	f.Context().End(err == nil)
+	ctx.End(err == nil)
 	return
 }
 
