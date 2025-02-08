@@ -81,8 +81,15 @@ func (f *Category) ListAllParent(typ string, excludeId uint, maxLevels ...uint) 
 }
 
 func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
-	queryMW := func(r db.Result) db.Result {
-		return r.OrderBy(`level`, `parent_id`, `sort`, `id`)
+	var queryMW func(r db.Result) db.Result
+	if maxLevel == 0 {
+		queryMW = func(r db.Result) db.Result {
+			return r.OrderBy(`sort`, `id`)
+		}
+	} else {
+		queryMW = func(r db.Result) db.Result {
+			return r.OrderBy(`level`, `parent_id`, `sort`, `id`)
+		}
 	}
 	cond := db.NewCompounds()
 	cond.AddKV(`type`, typ)
@@ -103,7 +110,7 @@ func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, ex
 
 func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
 	queryMW := func(r db.Result) db.Result {
-		return r.OrderBy(`level`, `parent_id`, `sort`, `id`)
+		return r.OrderBy(`sort`, `id`)
 	}
 	cond := db.NewCompounds()
 	cond.AddKV(`type`, typ)
