@@ -135,7 +135,7 @@ func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compoun
 	}
 	posIds, err := f.PositionIds(id)
 	if err != nil {
-		return nil
+		return []*SelectedCategory{}
 	}
 	categories := make([]*SelectedCategory, 0, len(posIds)+1)
 	var parentID uint
