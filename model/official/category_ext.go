@@ -9,3 +9,8 @@ type ICategory interface {
 	GetCategoryID() uint
 	AddCategory(*dbschema.OfficialCommonCategory)
 }
+
+type SelectedCategory struct {
+	SelectedID uint
+	Categories []*dbschema.OfficialCommonCategory
+}

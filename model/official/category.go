@@ -116,6 +116,31 @@ func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Co
 	return f.Objects()
 }
 
+func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compound) []*SelectedCategory {
+	posIds, err := f.PositionIds(id)
+	if err == nil {
+		return nil
+	}
+	categories := make([]*SelectedCategory, 0, len(posIds)+1)
+	var parentID uint
+	for _, catID := range posIds {
+		sc := &SelectedCategory{
+			SelectedID: catID,
+			Categories: f.ListByParentID(typ, parentID, extraConds...),
+		}
+		categories = append(categories, sc)
+		parentID = catID
+	}
+	if parentID > 0 {
+		sc := &SelectedCategory{
+			SelectedID: 0,
+			Categories: f.ListByParentID(typ, parentID, extraConds...),
+		}
+		categories = append(categories, sc)
+	}
+	return categories
+}
+
 func SortCategoryByParent(list []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
 	mp := map[uint][]*dbschema.OfficialCommonCategory{} // {parent_id:[]}
 	for _, row := range list {
@@ -143,11 +168,17 @@ func (f *Category) ListIndent(categoryList []*dbschema.OfficialCommonCategory) [
 	return categoryList
 }
 
-func (f *Category) Parents(parentID uint) ([]dbschema.OfficialCommonCategory, error) {
+func (f *Category) Parents(parentID uint, onlyID ...bool) ([]dbschema.OfficialCommonCategory, error) {
 	categories := []dbschema.OfficialCommonCategory{}
 	r := map[uint]bool{}
+	var _mw func(db.Result) db.Result
+	if len(onlyID) > 0 && onlyID[0] {
+		_mw = func(r db.Result) db.Result {
+			return r.Select(`id`, `parent_id`)
+		}
+	}
 	for parentID > 0 && !r[parentID] {
-		err := f.Get(nil, `id`, parentID)
+		err := f.Get(_mw, `id`, parentID)
 		if err != nil {
 			if err == db.ErrNoMoreRows {
 				break
@@ -179,7 +210,7 @@ func (f *Category) Positions(id uint) ([]dbschema.OfficialCommonCategory, error)
 }
 
 func (f *Category) PositionIds(id uint) ([]uint, error) {
-	parents, err := f.Parents(id)
+	parents, err := f.Parents(id, true)
 	if err != nil {
 		return nil, err
 	}
