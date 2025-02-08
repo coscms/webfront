@@ -117,6 +117,14 @@ func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Co
 }
 
 func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compound) []*SelectedCategory {
+	if id == 0 {
+		return []*SelectedCategory{
+			{
+				SelectedID: 0,
+				Categories: f.ListByParentID(typ, 0, extraConds...),
+			},
+		}
+	}
 	posIds, err := f.PositionIds(id)
 	if err == nil {
 		return nil
