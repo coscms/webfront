@@ -12,5 +12,6 @@ type ICategory interface {
 
 type SelectedCategory struct {
 	SelectedID uint
+	ParentID   uint
 	Categories []*dbschema.OfficialCommonCategory
 }
