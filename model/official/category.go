@@ -101,6 +101,21 @@ func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, ex
 	return f.Objects()
 }
 
+func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
+	queryMW := func(r db.Result) db.Result {
+		return r.OrderBy(`level`, `parent_id`, `sort`, `id`)
+	}
+	cond := db.NewCompounds()
+	cond.AddKV(`type`, typ)
+	cond.AddKV(`disabled`, common.BoolN)
+	cond.AddKV(`parent_id`, parentID)
+	if len(extraConds) > 0 {
+		cond.Add(extraConds...)
+	}
+	f.ListByOffset(nil, queryMW, 0, -1, cond.And())
+	return f.Objects()
+}
+
 func SortCategoryByParent(list []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
 	mp := map[uint][]*dbschema.OfficialCommonCategory{} // {parent_id:[]}
 	for _, row := range list {
