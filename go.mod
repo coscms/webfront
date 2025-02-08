@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.3
+require github.com/coscms/webcore v0.7.4
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -22,7 +22,7 @@ require (
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ipfilter v1.0.6
 	github.com/admpub/license_gen v0.1.1
-	github.com/admpub/log v1.3.6
+	github.com/admpub/log v1.4.0
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5
 	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/once v0.0.1
