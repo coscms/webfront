@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.4
+require github.com/coscms/webcore v0.7.5
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -64,7 +64,7 @@ require (
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/websocket v1.0.4
-	github.com/coscms/captcha v0.2.1
+	github.com/coscms/captcha v0.2.2
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.30.0
@@ -104,7 +104,7 @@ require (
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
-	github.com/admpub/go-captcha/v2 v2.0.5 // indirect
+	github.com/admpub/go-captcha/v2 v2.0.6 // indirect
 	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
@@ -114,7 +114,7 @@ require (
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.4.5 // indirect
+	github.com/admpub/i18n v0.4.6 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/ini v1.38.2 // indirect
@@ -183,7 +183,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
-	github.com/google/pprof v0.0.0-20250202011525-fc3143867406 // indirect
+	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -282,8 +282,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c // indirect
+	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/exp v0.0.0-20250207012021-f9890c6ad9f3 // indirect
 	golang.org/x/image v0.24.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
@@ -297,12 +297,12 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250204164813-702378808489 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250204164813-702378808489 // indirect
 	google.golang.org/grpc v1.70.0 // indirect
-	google.golang.org/protobuf v1.36.4 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.61.11 // indirect
+	modernc.org/libc v1.61.12 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
 	modernc.org/sqlite v1.34.5 // indirect
