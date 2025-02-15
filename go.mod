@@ -4,7 +4,7 @@ go 1.23
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.7-0.20250213112421-565f7438d08c
+require github.com/coscms/webcore v0.7.7
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -29,7 +29,7 @@ require (
 	github.com/admpub/pinyin-golang v1.0.1
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/redsync/v4 v4.0.3
-	github.com/admpub/resty/v2 v2.7.1
+	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/sensitive v0.0.0-20230925121413-6c7ffc3addbb
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
@@ -77,18 +77,18 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.118.1 // indirect
+	cloud.google.com/go v0.118.2 // indirect
 	cloud.google.com/go/auth v0.14.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
-	cloud.google.com/go/iam v1.3.1 // indirect
+	cloud.google.com/go/iam v1.4.0 // indirect
 	cloud.google.com/go/pubsub v1.47.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	gitee.com/admpub/certmagic v0.8.8 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
-	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 // indirect
+	github.com/admpub/9t v0.0.1 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.7 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
@@ -102,16 +102,17 @@ require (
 	github.com/admpub/fasthttp v0.0.5 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
-	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 // indirect
+	github.com/admpub/go-bindata-assetfs v0.0.1 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
 	github.com/admpub/go-captcha/v2 v2.0.6 // indirect
-	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c // indirect
+	github.com/admpub/go-figure v0.0.2 // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
 	github.com/admpub/go-pretty/v6 v6.0.4 // indirect
 	github.com/admpub/go-ps v0.0.1 // indirect
-	github.com/admpub/go-reuseport v0.0.4 // indirect
+	github.com/admpub/go-reuseport v0.5.0 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
+	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
 	github.com/admpub/i18n v0.4.6 // indirect
@@ -292,10 +293,10 @@ require (
 	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.30.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.220.0 // indirect
-	google.golang.org/genproto v0.0.0-20250204164813-702378808489 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250204164813-702378808489 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250204164813-702378808489 // indirect
+	google.golang.org/api v0.221.0 // indirect
+	google.golang.org/genproto v0.0.0-20250212204824-5a70512c5d8b // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250212204824-5a70512c5d8b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
@@ -305,6 +306,6 @@ require (
 	modernc.org/libc v1.61.13 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
-	modernc.org/sqlite v1.34.5 // indirect
+	modernc.org/sqlite v1.35.0 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
