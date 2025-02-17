@@ -88,5 +88,6 @@ func (f *Customer) VerifySession(customers ...*dbschema.OfficialCustomer) error 
 	safeCustomer := f.ClearPasswordData(detail.OfficialCustomer)
 	detail.OfficialCustomer = &safeCustomer
 	f.Context().Internal().Set(`customerDetail`, detail)
+	f.OfficialCustomer = detail.OfficialCustomer
 	return nil
 }
