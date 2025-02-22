@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.11
+require github.com/coscms/webcore v0.7.12
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -42,11 +42,11 @@ require (
 	github.com/gosimple/slug v1.15.0
 	github.com/hibiken/asynq v0.25.1
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
-	github.com/prometheus/client_golang v1.20.5
+	github.com/prometheus/client_golang v1.21.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wangbin/jiebago v0.3.2
-	github.com/webx-top/client v0.9.5
+	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.25
 	github.com/webx-top/db v1.28.2
 	github.com/webx-top/echo v1.14.5
@@ -86,13 +86,13 @@ require (
 	cloud.google.com/go/iam v1.4.0 // indirect
 	cloud.google.com/go/pubsub v1.47.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	gitee.com/admpub/certmagic v0.8.8 // indirect
+	gitee.com/admpub/certmagic v0.8.9 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
 	github.com/admpub/9t v0.0.1 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
-	github.com/admpub/caddy v1.2.7 // indirect
+	github.com/admpub/caddy v1.2.8 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
 	github.com/admpub/checksum v1.1.0 // indirect
@@ -101,7 +101,7 @@ require (
 	github.com/admpub/cron v0.1.1 // indirect
 	github.com/admpub/email v2.4.1+incompatible // indirect
 	github.com/admpub/events v1.3.6 // indirect
-	github.com/admpub/fasthttp v0.0.5 // indirect
+	github.com/admpub/fasthttp v0.0.6 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.1 // indirect
@@ -208,7 +208,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
@@ -240,7 +240,7 @@ require (
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
-	github.com/quic-go/quic-go v0.49.0 // indirect
+	github.com/quic-go/quic-go v0.50.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -286,8 +286,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	golang.org/x/crypto v0.33.0 // indirect
-	golang.org/x/exp v0.0.0-20250215185904-eff6e970281f // indirect
+	golang.org/x/crypto v0.34.0 // indirect
+	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
 	golang.org/x/image v0.24.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
