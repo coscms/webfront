@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.12
+require github.com/coscms/webcore v0.7.13
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -49,7 +49,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.25
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.14.5
+	github.com/webx-top/echo v1.15.0
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -136,7 +136,7 @@ require (
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/securecookie v1.3.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
-	github.com/admpub/sessions v0.2.3 // indirect
+	github.com/admpub/sessions v0.3.0 // indirect
 	github.com/admpub/sonyflake v0.0.1 // indirect
 	github.com/admpub/tail v1.1.1 // indirect
 	github.com/admpub/timeago v1.2.2 // indirect
