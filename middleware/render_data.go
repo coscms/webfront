@@ -117,6 +117,13 @@ func (r *RenderData) SoftwareName() string {
 	return bootconfig.SoftwareName
 }
 
+// Advert 广告
+//
+//	{{$ads := Advert `test`}}
+//	{{$ads.Rand.HTML}} {{$ads.First.HTML}} {{$ads.Last.HTML}} {{range $adk,$adv := $ads}}...{{end}}
+//
+//	{{$ads := Advert `test` `test2`}}
+//	{{($ads.Place `test`).Rand.HTML}} {{($ads.Place `test`).First.HTML}} {{($ads.Place `test`).Last.HTML}}  {{range $adk,$adv := $ads.Place `test`}}...{{end}}
 func (r *RenderData) Advert(idents ...string) interface{} {
 	return modelAdvert.GetAdvertForHTML(r.ctx, idents...)
 }

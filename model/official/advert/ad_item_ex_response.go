@@ -19,22 +19,37 @@ type ItemResponse struct {
 }
 
 func (i *ItemResponse) GetWidth() uint {
+	if i == nil {
+		return 0
+	}
 	return i.Width
 }
 
 func (i *ItemResponse) GetHeight() uint {
+	if i == nil {
+		return 0
+	}
 	return i.Height
 }
 
 func (i *ItemResponse) GetURL() string {
+	if i == nil {
+		return ``
+	}
 	return i.URL
 }
 
 func (i *ItemResponse) GetContent() string {
+	if i == nil {
+		return ``
+	}
 	return i.Content
 }
 
 func (i *ItemResponse) GetContype() string {
+	if i == nil {
+		return ``
+	}
 	return i.Contype
 }
 
@@ -71,10 +86,14 @@ func NewItemResponse(item *dbschema.OfficialAdItem, position *dbschema.OfficialA
 type ItemsResponse []*ItemResponse
 
 func (i ItemsResponse) Rand() *ItemResponse {
-	if len(i) < 1 {
+	switch len(i) {
+	case 1:
+		return i[0]
+	case 0:
 		return nil
+	default:
+		return com.RandSlicex(i)
 	}
-	return com.RandSlicex(i)
 }
 
 func (i ItemsResponse) Valid() bool {
@@ -121,4 +140,8 @@ func (c *PositionAdverts) GenHTML() *PositionAdverts {
 
 func (c PositionAdverts) Place(ident string) ItemsResponse {
 	return c[ident]
+}
+
+func (c PositionAdverts) Valid() bool {
+	return len(c) > 0
 }

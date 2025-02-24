@@ -71,10 +71,11 @@ func GetCachedAdvert(ctx echo.Context, idents ...string) (*CachedAdvert, error) 
 	if res.List == nil {
 		res.List = PositionAdverts{}
 	}
-	echo.Dump(echo.H{`idents`: idents, `result`: res})
+	//echo.Dump(echo.H{`idents`: idents, `result`: res})
 	return res, nil
 }
 
+// GetAdvertForHTML(ctx,`home1`).Place(`home1`).HTML()
 func GetAdvertForHTML(ctx echo.Context, idents ...string) interface{} {
 	sz := len(idents)
 	if sz < 1 || (sz == 1 && len(idents[0]) == 0) {
