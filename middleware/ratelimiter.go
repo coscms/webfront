@@ -59,7 +59,7 @@ func UnderAttack() echo.MiddlewareFunc {
 				parts := strings.SplitN(cookieValue, `|`, 2)
 				if len(parts) != 2 {
 					cookieValue = ``
-				} else if parts[0] != c.RealIP() && parts[1] != com.Md5(c.Request().UserAgent()) {
+				} else if parts[0] != c.RealIP() || parts[1] != com.Md5(c.Request().UserAgent()) {
 					cookieValue = ``
 				}
 			}
@@ -79,6 +79,8 @@ func UnderAttack() echo.MiddlewareFunc {
 				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, 86400)
 				return c.Redirect(c.FullRequestURI())
 			}
+			_, captchaType := captchabiz.GetCaptchaType()
+			c.Set(`captchaType`, captchaType)
 			return c.Render(`under_attack`, nil)
 		})
 	}
