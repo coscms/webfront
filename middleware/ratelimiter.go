@@ -40,12 +40,13 @@ func underAttackSkipper(c echo.Context) bool {
 	switch c.Path() {
 	case `/captcha/*`, `/captchago/:driver/:type`:
 		return true
+	default:
+		underAttack, ok := config.Setting(`frequency`).Get(`underAttack`).(string)
+		if !ok {
+			return true
+		}
+		return underAttack != `1`
 	}
-	underAttack, ok := config.Setting(`frequency`).Get(`underAttack`).(string)
-	if !ok {
-		return true
-	}
-	return underAttack != `1`
 }
 
 func UnderAttack(maxAge int) echo.MiddlewareFunc {
