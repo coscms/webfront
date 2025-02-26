@@ -12,6 +12,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
+	"github.com/coscms/webfront/dbschema"
 	cfgIPFilter "github.com/coscms/webfront/library/ipfilter"
 	mwRateLimiter "github.com/webx-top/echo/middleware/ratelimiter"
 )
@@ -46,7 +47,14 @@ func underAttackSkipper(c echo.Context) bool {
 		if !ok {
 			return true
 		}
-		return underAttack != `1`
+		if underAttack != `1` {
+			return true
+		}
+		customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
+		if ok && customer != nil {
+			return true
+		}
+		return false
 	}
 }
 
@@ -56,20 +64,15 @@ func UnderAttack(maxAge int) echo.MiddlewareFunc {
 			if underAttackSkipper(c) {
 				return h.Handle(c)
 			}
-			cookieValue := c.Cookie().DecryptGet(`CaptVerified`)
-			if len(cookieValue) > 0 {
+			if cookieValue := c.Cookie().DecryptGet(`CaptVerified`); len(cookieValue) > 0 {
 				parts := strings.SplitN(cookieValue, `|`, 3)
-				if len(parts) != 3 {
-					cookieValue = ``
-				} else {
+				if len(parts) == 3 {
 					unixtime := com.Int64(parts[2])
-					if unixtime < time.Now().Unix() || parts[0] != c.RealIP() || parts[1] != com.Md5(c.Request().UserAgent()) {
-						cookieValue = ``
+					passed := unixtime >= time.Now().Unix() && parts[0] == c.RealIP() && parts[1] == com.Md5(c.Request().UserAgent())
+					if passed {
+						return h.Handle(c)
 					}
 				}
-			}
-			if len(cookieValue) > 0 {
-				return h.Handle(c)
 			}
 			if c.IsPost() {
 				data := captchabiz.VerifyCaptcha(c, httpserver.KindFrontend, `code`)
@@ -81,7 +84,7 @@ func UnderAttack(maxAge int) echo.MiddlewareFunc {
 					return err
 				}
 				duration := time.Second * time.Duration(maxAge)
-				cookieValue = c.RealIP() + `|` + com.Md5(c.Request().UserAgent()) + `|` + com.String(time.Now().Add(duration).Unix())
+				cookieValue := c.RealIP() + `|` + com.Md5(c.Request().UserAgent()) + `|` + com.String(time.Now().Add(duration).Unix())
 				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, duration)
 				return c.Redirect(c.FullRequestURI())
 			}
