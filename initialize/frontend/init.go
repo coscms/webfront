@@ -205,6 +205,9 @@ func addMiddleware(e *echo.Echo) {
 	// IPFilter
 	e.Use(xMW.IPFilter())
 
+	// UnderAttack
+	e.Use(xMW.UnderAttack())
+
 	// 启用JWT
 	e.Use(xMW.JWT())
 
