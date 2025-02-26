@@ -38,7 +38,7 @@ func RateLimiter() echo.MiddlewareFunc {
 
 func underAttackSkipper(c echo.Context) bool {
 	switch c.Path() {
-	case `/captcha/*`, `/captchago/:driver/:type`:
+	case c.Echo().Prefix() + `/captcha/*`, c.Echo().Prefix() + `/captchago/:driver/:type`:
 		return true
 	default:
 		underAttack, ok := config.Setting(`frequency`).Get(`underAttack`).(string)
