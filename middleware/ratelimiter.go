@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strings"
+	"time"
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -57,11 +58,14 @@ func UnderAttack(maxAge int) echo.MiddlewareFunc {
 			}
 			cookieValue := c.Cookie().DecryptGet(`CaptVerified`)
 			if len(cookieValue) > 0 {
-				parts := strings.SplitN(cookieValue, `|`, 2)
-				if len(parts) != 2 {
+				parts := strings.SplitN(cookieValue, `|`, 3)
+				if len(parts) != 3 {
 					cookieValue = ``
-				} else if parts[0] != c.RealIP() || parts[1] != com.Md5(c.Request().UserAgent()) {
-					cookieValue = ``
+				} else {
+					unixtime := com.Int64(parts[2])
+					if unixtime < time.Now().Unix() || parts[0] != c.RealIP() || parts[1] != com.Md5(c.Request().UserAgent()) {
+						cookieValue = ``
+					}
 				}
 			}
 			if len(cookieValue) > 0 {
@@ -76,8 +80,9 @@ func UnderAttack(maxAge int) echo.MiddlewareFunc {
 					}
 					return err
 				}
-				cookieValue = c.RealIP() + `|` + com.Md5(c.Request().UserAgent())
-				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, maxAge)
+				duration := time.Second * time.Duration(maxAge)
+				cookieValue = c.RealIP() + `|` + com.Md5(c.Request().UserAgent()) + `|` + com.String(time.Now().Add(duration).Unix())
+				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, duration)
 				return c.Redirect(c.FullRequestURI())
 			}
 			_, captchaType := captchabiz.GetCaptchaType()
