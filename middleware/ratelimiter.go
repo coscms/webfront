@@ -48,7 +48,7 @@ func underAttackSkipper(c echo.Context) bool {
 	return underAttack != `1`
 }
 
-func UnderAttack() echo.MiddlewareFunc {
+func UnderAttack(maxAge int) echo.MiddlewareFunc {
 	return func(h echo.Handler) echo.Handler {
 		return echo.HandlerFunc(func(c echo.Context) error {
 			if underAttackSkipper(c) {
@@ -76,7 +76,7 @@ func UnderAttack() echo.MiddlewareFunc {
 					return err
 				}
 				cookieValue = c.RealIP() + `|` + com.Md5(c.Request().UserAgent())
-				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, 86400)
+				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, maxAge)
 				return c.Redirect(c.FullRequestURI())
 			}
 			_, captchaType := captchabiz.GetCaptchaType()
