@@ -36,7 +36,11 @@ func RateLimiter() echo.MiddlewareFunc {
 	return mwRateLimiter.RateLimiterWithConfig(*rateLimiterConfig)
 }
 
-func underAttackSkipper(_ echo.Context) bool {
+func underAttackSkipper(c echo.Context) bool {
+	switch c.Path() {
+	case `/captcha/*`, `/captchago/:driver/:type`:
+		return true
+	}
 	underAttack, ok := config.Setting(`frequency`).Get(`underAttack`).(string)
 	if !ok {
 		return true
