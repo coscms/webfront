@@ -10,7 +10,6 @@ import (
 	"github.com/webx-top/echo/defaults"
 	ws "github.com/webx-top/echo/handler/websocket"
 
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -160,10 +159,6 @@ func GetNSenderFromConfig(cfg echo.H) NSender {
 	return noticeNS
 }
 
-func RegisterRoute(r echo.RouteRegister) {
-	cfg := config.FromFile().Extend.GetStore(`frontendNotice`)
-	if cfg.Bool(`disabled`) {
-		return
-	}
-	ws.New("/notice", MakeHandler(GetNSenderFromConfig(cfg), DefaultReceiver)).Wrapper(r)
+func RegisterRoute(r echo.RouteRegister, cfg echo.H) echo.IRouter {
+	return ws.New("/notice", MakeHandler(GetNSenderFromConfig(cfg), DefaultReceiver)).Wrapper(r)
 }

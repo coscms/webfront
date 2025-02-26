@@ -9,8 +9,8 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func RegisterRoute(e echo.RouteRegister) {
-	e.Post(`/segment`, segmentHandler, checkToken).SetMetaKV(`noAttack`, true)
+func RegisterRoute(e echo.RouteRegister) echo.IRouter {
+	return e.Post(`/segment`, segmentHandler, checkToken).SetMetaKV(`noAttack`, true)
 }
 
 func segmentHandler(ctx echo.Context) error {

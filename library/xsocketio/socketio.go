@@ -14,7 +14,7 @@ import (
 	"github.com/webx-top/echo/middleware"
 )
 
-func RegisterRoute(e echo.RouteRegister, cfg *Config, s ...func(*middleware.CORSConfig)) {
+func RegisterRoute(e echo.RouteRegister, cfg *Config, s ...func(*middleware.CORSConfig)) echo.IRouter {
 	cfgCORS := &middleware.CORSConfig{
 		AllowOrigins: []string{`Token`},
 	}
@@ -28,12 +28,12 @@ func RegisterRoute(e echo.RouteRegister, cfg *Config, s ...func(*middleware.CORS
 		cfg = GetConfig()
 	}
 	socket := SocketIO(nsp, cfg)
-	e.Any(`/socket.io/`, func(ctx echo.Context) error {
+	return e.Any(`/socket.io/`, func(ctx echo.Context) error {
 		if common.Setting(`socketio`).String(`enabled`) != `1` {
 			return echo.ErrNotFound
 		}
 		return socket.Handle(ctx)
-	}, middleware.CORSWithConfig(*cfgCORS))
+	}, middleware.CORSWithConfig(*cfgCORS)).SetMetaKV(`noAttack`, true)
 }
 
 var RequestChecker engineio.CheckerFunc = func(req *http.Request) (http.Header, error) {
