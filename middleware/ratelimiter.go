@@ -76,7 +76,7 @@ func UnderAttack() echo.MiddlewareFunc {
 					return err
 				}
 				cookieValue = c.RealIP() + `|` + com.Md5(c.Request().UserAgent())
-				c.Cookie().EncryptSet(`CaptVerified`, cookieValue)
+				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, 86400)
 				return c.Redirect(c.FullRequestURI())
 			}
 			return c.Render(`under_attack`, nil)
