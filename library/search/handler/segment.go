@@ -10,7 +10,7 @@ import (
 )
 
 func RegisterRoute(e echo.RouteRegister) {
-	e.Post(`/segment`, segmentHandler, checkToken)
+	e.Post(`/segment`, segmentHandler, checkToken).SetMetaKV(`noAttack`, true)
 }
 
 func segmentHandler(ctx echo.Context) error {

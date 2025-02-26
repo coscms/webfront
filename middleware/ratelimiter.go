@@ -39,23 +39,19 @@ func RateLimiter() echo.MiddlewareFunc {
 }
 
 func underAttackSkipper(c echo.Context) bool {
-	switch c.Path() {
-	case c.Echo().Prefix() + `/captcha/*`, c.Echo().Prefix() + `/captchago/:driver/:type`:
+	if c.Route().Bool(`noAttack`) {
 		return true
-	default:
-		underAttack, ok := config.Setting(`frequency`).Get(`underAttack`).(string)
-		if !ok {
-			return true
-		}
-		if underAttack != `1` {
-			return true
-		}
-		customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
-		if ok && customer != nil {
-			return true
-		}
-		return false
 	}
+
+	underAttack := config.Setting(`frequency`).String(`underAttack`, `0`)
+	if underAttack != `1` {
+		return true
+	}
+	customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
+	if ok && customer != nil {
+		return true
+	}
+	return false
 }
 
 func UnderAttack(maxAge int) echo.MiddlewareFunc {
