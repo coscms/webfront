@@ -75,7 +75,7 @@ func UnderAttack(maxAge int) echo.MiddlewareFunc {
 				data := captchabiz.VerifyCaptcha(c, httpserver.KindFrontend, `code`)
 				if nerrors.IsFailureCode(data.GetCode()) {
 					err := c.NewError(code.InvalidParameter, `验证码不正确`).SetZone(`code`)
-					if c.Format() == `json` {
+					if c.Format() == echo.ContentTypeJSON {
 						return c.JSON(data)
 					}
 					return err
