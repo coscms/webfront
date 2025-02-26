@@ -7,5 +7,5 @@ import (
 
 func Register(r echo.RouteRegister) {
 	r.Use(RequestMiddleware())
-	r.Get("/metrics", echo.WrapHandler(promhttp.Handler()), ResponseMiddleware())
+	r.Get("/metrics", echo.WrapHandler(promhttp.Handler()), ResponseMiddleware()).SetMetaKV(`noAttack`, true)
 }
