@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.7.19
+require github.com/coscms/webcore v0.7.20
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
