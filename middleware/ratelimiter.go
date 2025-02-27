@@ -7,6 +7,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/defaults"
 
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
@@ -25,6 +26,9 @@ func getRateLimiterConfig() (*cfgIPFilter.RateLimiterConfig, bool) {
 func RateLimiter() echo.MiddlewareFunc {
 	rateLimiterConfig := &mwRateLimiter.RateLimiterConfig{
 		Skipper: func(c echo.Context) bool {
+			if defaults.IsMockContext(c) {
+				return true
+			}
 			opts, ok := getRateLimiterConfig()
 			if !ok || !opts.On {
 				return true
@@ -39,7 +43,7 @@ func RateLimiter() echo.MiddlewareFunc {
 }
 
 func underAttackSkipper(c echo.Context) bool {
-	if c.Route().Bool(`noAttack`) {
+	if defaults.IsMockContext(c) || c.Route().Bool(`noAttack`) {
 		return true
 	}
 

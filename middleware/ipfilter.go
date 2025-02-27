@@ -10,6 +10,7 @@ import (
 	cfgIPFilter "github.com/coscms/webfront/library/ipfilter"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 	mwIPFilter "github.com/webx-top/echo/middleware/ipfilter"
 )
 
@@ -49,6 +50,9 @@ func IPFilter() echo.MiddlewareFuncd {
 	}
 	return mwIPFilter.IPFilter(mwIPFilter.Config{
 		Skipper: func(c echo.Context) bool {
+			if defaults.IsMockContext(c) {
+				return true
+			}
 			opts, ok := getIPFilterConfig()
 			if !ok || !opts.On || com.InSlice(c.RealIP(), cfgIPFilter.LocalIPs) {
 				return true
