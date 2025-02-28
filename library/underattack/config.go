@@ -50,6 +50,11 @@ func (c *Config) Validate(ctx echo.Context) error {
 
 func (c *Config) IsAllowed(ctx echo.Context) bool {
 	c.sg.Do(c.initFilter)
+	if c.regexp != nil {
+		if c.regexp.MatchString(ctx.Request().UserAgent()) {
+			return true
+		}
+	}
 	return c.filter.IsAllowed(ctx.RealIP())
 }
 
