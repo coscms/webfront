@@ -74,7 +74,7 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 }
 
 func (c *Config) initFilter() {
-	c.filter = ipfilter.NewWithIP(``, c.IPWhitelist)
+	c.filter = ipfilter.NewWithIP(``, c.IPWhitelist).SetDisallow(true)
 	if len(c.UAWhitelist) > 0 {
 		rows := com.TrimSpaceForRows(c.UAWhitelist)
 		c.regexp = regexp.MustCompile(strings.Join(rows, `|`))

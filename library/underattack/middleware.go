@@ -20,6 +20,10 @@ func underAttackSkipper(c echo.Context) bool {
 	if defaults.IsMockContext(c) || c.Route().Bool(`noAttack`) {
 		return true
 	}
+	customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
+	if ok && customer != nil {
+		return true
+	}
 	cfg := config.Setting(`frequency`).Get(`underAttack`)
 	switch v := cfg.(type) {
 	case *Config:
@@ -31,10 +35,6 @@ func underAttackSkipper(c echo.Context) bool {
 			return true
 		}
 	default:
-		return true
-	}
-	customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
-	if ok && customer != nil {
 		return true
 	}
 	return false
