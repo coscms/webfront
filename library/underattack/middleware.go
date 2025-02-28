@@ -27,17 +27,12 @@ func underAttackSkipper(c echo.Context) bool {
 	cfg := config.Setting(`frequency`).Get(`underAttack`)
 	switch v := cfg.(type) {
 	case *Config:
-		if !v.On || v.IsAllowed(c) {
-			return true
-		}
+		return !v.On || v.IsAllowed(c)
 	case string:
-		if v != `1` {
-			return true
-		}
+		return v != `1`
 	default:
 		return true
 	}
-	return false
 }
 
 func Middleware(maxAge int) echo.MiddlewareFunc {
