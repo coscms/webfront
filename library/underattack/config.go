@@ -19,6 +19,8 @@ type Config struct {
 	On          bool
 	IPWhitelist string
 	UAWhitelist string
+	HeaderName  string
+	HeaderValue string
 	filter      *ipfilter.IPFilter
 	regexp      *regexp.Regexp
 	sg          sync.Once
@@ -28,6 +30,8 @@ func (c *Config) FromStore(r echo.H) *Config {
 	c.On = r.Bool(`On`)
 	c.IPWhitelist = strings.TrimSpace(r.String(`IPWhitelist`))
 	c.UAWhitelist = strings.TrimSpace(r.String(`UAWhitelist`))
+	c.HeaderName = strings.TrimSpace(r.String(`HeaderName`))
+	c.HeaderValue = strings.TrimSpace(r.String(`HeaderValue`))
 	return c
 }
 
@@ -49,6 +53,17 @@ func (c *Config) Validate(ctx echo.Context) error {
 }
 
 func (c *Config) IsAllowed(ctx echo.Context) bool {
+	if len(c.HeaderName) > 0 {
+		if len(c.HeaderValue) > 0 {
+			if ctx.Header(c.HeaderName) == c.HeaderValue {
+				return true
+			}
+		} else {
+			if len(ctx.Request().Header().Values(c.HeaderName)) > 0 {
+				return true
+			}
+		}
+	}
 	c.sg.Do(c.initFilter)
 	if c.regexp != nil {
 		if c.regexp.MatchString(ctx.Request().UserAgent()) {
