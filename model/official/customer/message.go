@@ -118,9 +118,10 @@ func (f *Message) check() error {
 	if f.CustomerA > 0 {
 		f.UserA = 0
 	}
-	if f.CustomerB > 0 {
-		f.UserB = 0
-	}
+	// 允许关联了后台账号的客户的消息在前后台均可以查看
+	// if f.CustomerB > 0 {
+	// 	f.UserB = 0
+	// }
 	if f.CustomerGroupId > 0 {
 		f.UserRoleId = 0
 		f.CustomerB = 0
