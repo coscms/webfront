@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.3
+require github.com/coscms/webcore v0.8.4
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -91,7 +91,7 @@ require (
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
 	github.com/admpub/9t v0.0.1 // indirect
-	github.com/admpub/bart v0.0.0-20250228043657-ac611bda7852 // indirect
+	github.com/admpub/bart v0.0.0-20250301070216-7c20c680ac55 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.8 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
