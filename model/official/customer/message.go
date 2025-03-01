@@ -377,19 +377,19 @@ func (f *Message) WithViewedByRecipient(rows []*dbschema.OfficialCommonMessage, 
 		if row.HasNewReply == 0 { //没有新回复的情况才查询我是否已读
 			msgIDs[idx] = row.Id
 		}
-		if row.UserA > 0 {
+		if row.CustomerA > 0 {
+			if !com.InUint64Slice(row.CustomerA, cstIDs) {
+				cstIDs = append(cstIDs, row.CustomerA)
+			}
+			item.MsgFrom.Type = `customer`
+			item.MsgFrom.Id = row.CustomerA
+		} else if row.UserA > 0 {
 			uid := uint64(row.UserA)
 			if !com.InUint64Slice(uid, usrIDs) {
 				usrIDs = append(usrIDs, uid)
 			}
 			item.MsgFrom.Type = `user`
 			item.MsgFrom.Id = uid
-		} else if row.CustomerA > 0 {
-			if !com.InUint64Slice(row.CustomerA, cstIDs) {
-				cstIDs = append(cstIDs, row.CustomerA)
-			}
-			item.MsgFrom.Type = `customer`
-			item.MsgFrom.Id = row.CustomerA
 		}
 		list[idx] = item
 	}
@@ -491,19 +491,19 @@ func (f *Message) WithViewedBySender(rows []*dbschema.OfficialCommonMessage) ([]
 			IsViewed:              row.ViewProgress == 100,
 		}
 		msgIDs[idx] = row.Id
-		if row.UserB > 0 {
+		if row.CustomerB > 0 {
+			if !com.InUint64Slice(row.CustomerB, cstIDs) {
+				cstIDs = append(cstIDs, row.CustomerB)
+			}
+			item.MsgTo.Type = `customer`
+			item.MsgTo.Id = row.CustomerB
+		} else if row.UserB > 0 {
 			uid := uint64(row.UserB)
 			if !com.InUint64Slice(uid, usrIDs) {
 				usrIDs = append(usrIDs, uid)
 			}
 			item.MsgTo.Type = `user`
 			item.MsgTo.Id = uid
-		} else if row.CustomerB > 0 {
-			if !com.InUint64Slice(row.CustomerB, cstIDs) {
-				cstIDs = append(cstIDs, row.CustomerB)
-			}
-			item.MsgTo.Type = `customer`
-			item.MsgTo.Id = row.CustomerB
 		}
 		list[idx] = item
 	}
@@ -581,33 +581,33 @@ func (f *Message) WithViewedByAll(rows []*dbschema.OfficialCommonMessage) ([]*Me
 			IsViewed:              row.ViewProgress == 100,
 		}
 		msgIDs[idx] = row.Id
-		if row.UserA > 0 {
+		if row.CustomerA > 0 {
+			if !com.InUint64Slice(row.CustomerA, cstIDs) {
+				cstIDs = append(cstIDs, row.CustomerA)
+			}
+			item.MsgFrom.Type = `customer`
+			item.MsgFrom.Id = row.CustomerA
+		} else if row.UserA > 0 {
 			uid := uint64(row.UserA)
 			if !com.InUint64Slice(uid, usrIDs) {
 				usrIDs = append(usrIDs, uid)
 			}
 			item.MsgFrom.Type = `user`
 			item.MsgFrom.Id = uid
-		} else if row.CustomerA > 0 {
-			if !com.InUint64Slice(row.CustomerA, cstIDs) {
-				cstIDs = append(cstIDs, row.CustomerA)
-			}
-			item.MsgFrom.Type = `customer`
-			item.MsgFrom.Id = row.CustomerA
 		}
-		if row.UserB > 0 {
+		if row.CustomerB > 0 {
+			if !com.InUint64Slice(row.CustomerB, cstIDs) {
+				cstIDs = append(cstIDs, row.CustomerB)
+			}
+			item.MsgTo.Type = `customer`
+			item.MsgTo.Id = row.CustomerB
+		} else if row.UserB > 0 {
 			uid := uint64(row.UserB)
 			if !com.InUint64Slice(uid, usrIDs) {
 				usrIDs = append(usrIDs, uid)
 			}
 			item.MsgTo.Type = `user`
 			item.MsgTo.Id = uid
-		} else if row.CustomerB > 0 {
-			if !com.InUint64Slice(row.CustomerB, cstIDs) {
-				cstIDs = append(cstIDs, row.CustomerB)
-			}
-			item.MsgTo.Type = `customer`
-			item.MsgTo.Id = row.CustomerB
 		}
 		list[idx] = item
 	}
@@ -669,33 +669,33 @@ func (f *Message) GetWithViewed(row *dbschema.OfficialCommonMessage) (*MessageWi
 		MsgTo:                 &MsgUser{},
 		IsViewed:              row.ViewProgress == 100,
 	}
-	if row.UserA > 0 {
+	if row.CustomerA > 0 {
+		if !com.InUint64Slice(row.CustomerA, cstIDs) {
+			cstIDs = append(cstIDs, row.CustomerA)
+		}
+		item.MsgFrom.Type = `customer`
+		item.MsgFrom.Id = row.CustomerA
+	} else if row.UserA > 0 {
 		uid := uint64(row.UserA)
 		if !com.InUint64Slice(uid, usrIDs) {
 			usrIDs = append(usrIDs, uid)
 		}
 		item.MsgFrom.Type = `user`
 		item.MsgFrom.Id = uid
-	} else if row.CustomerA > 0 {
-		if !com.InUint64Slice(row.CustomerA, cstIDs) {
-			cstIDs = append(cstIDs, row.CustomerA)
-		}
-		item.MsgFrom.Type = `customer`
-		item.MsgFrom.Id = row.CustomerA
 	}
-	if row.UserB > 0 {
+	if row.CustomerB > 0 {
+		if !com.InUint64Slice(row.CustomerB, cstIDs) {
+			cstIDs = append(cstIDs, row.CustomerB)
+		}
+		item.MsgTo.Type = `customer`
+		item.MsgTo.Id = row.CustomerB
+	} else if row.UserB > 0 {
 		uid := uint64(row.UserB)
 		if !com.InUint64Slice(uid, usrIDs) {
 			usrIDs = append(usrIDs, uid)
 		}
 		item.MsgTo.Type = `user`
 		item.MsgTo.Id = uid
-	} else if row.CustomerB > 0 {
-		if !com.InUint64Slice(row.CustomerB, cstIDs) {
-			cstIDs = append(cstIDs, row.CustomerB)
-		}
-		item.MsgTo.Type = `customer`
-		item.MsgTo.Id = row.CustomerB
 	}
 	if len(cstIDs) > 0 {
 		customerM := NewCustomer(f.Context())
@@ -829,20 +829,20 @@ func (f *Message) setViewProgress(row *dbschema.OfficialCommonMessage) (err erro
 
 func (f *Message) MsgUser() *MsgUser {
 	msgUser := &MsgUser{}
-	if f.UserA > 0 {
-		userM := model.NewUser(f.Context())
-		userM.Get(nil, `id`, f.UserA)
-		msgUser.Id = uint64(f.UserA)
-		msgUser.Name = userM.Username
-		msgUser.Type = `user`
-		msgUser.Avatar = userM.Avatar
-	} else if f.CustomerA > 0 {
+	if f.CustomerA > 0 {
 		customerM := NewCustomer(f.Context())
 		customerM.Get(nil, `id`, f.CustomerA)
 		msgUser.Id = f.CustomerA
 		msgUser.Name = customerM.Name
 		msgUser.Type = `customer`
 		msgUser.Avatar = customerM.Avatar
+	} else if f.UserA > 0 {
+		userM := model.NewUser(f.Context())
+		userM.Get(nil, `id`, f.UserA)
+		msgUser.Id = uint64(f.UserA)
+		msgUser.Name = userM.Username
+		msgUser.Type = `user`
+		msgUser.Avatar = userM.Avatar
 	}
 	return msgUser
 }
