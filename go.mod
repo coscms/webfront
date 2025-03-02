@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.6-0.20250302094430-3e33488990bd
+require github.com/coscms/webcore v0.8.6-0.20250302135854-1098c6343a60
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -62,6 +62,7 @@ require (
 )
 
 require (
+	github.com/admpub/events v1.3.6
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
@@ -101,7 +102,6 @@ require (
 	github.com/admpub/cove v0.0.0-20241224063114-4fdd53c948a6 // indirect
 	github.com/admpub/cron v0.1.1 // indirect
 	github.com/admpub/email v2.4.1+incompatible // indirect
-	github.com/admpub/events v1.3.6 // indirect
 	github.com/admpub/fasthttp v0.0.6 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
