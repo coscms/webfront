@@ -30,14 +30,20 @@ func init() {
 func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) error {
 	ctx := f.Context()
 	var sender string
+	var senderAvatar string
+	var senderGender string
 	var isAdmin bool
 	if fromCustomer != nil {
 		sender = fromCustomer.Name
+		senderAvatar = fromCustomer.Avatar
+		senderGender = fromCustomer.Gender
 	} else if fromUser != nil {
 		sender = fromUser.Username
+		senderAvatar = fromUser.Avatar
+		senderGender = fromUser.Gender
 		isAdmin = true
 	}
-	sendMessage := func(receiver, avatar, gender, visitURL string) {
+	sendMessage := func(receiver, visitURL string) {
 		Notify.Send(
 			receiver,
 			notice.NewMessageWithValue(
@@ -46,8 +52,8 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 				echo.H{
 					`url`:     visitURL,
 					`author`:  sender,
-					`avatar`:  avatar,
-					`gender`:  gender,
+					`avatar`:  senderAvatar,
+					`gender`:  senderGender,
 					`isAdmin`: isAdmin,
 					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
 				},
@@ -57,26 +63,26 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 	if f.CustomerB > 0 {
 		custM := dbschema.NewOfficialCustomer(ctx)
 		err := custM.Get(func(r db.Result) db.Result {
-			return r.Select(`name`, `avatar`, `gender`, `id`)
+			return r.Select(`name`, `id`)
 		}, `id`, f.CustomerB)
 		if err != nil {
 			return err
 		}
 		if len(custM.Name) > 0 {
 			visitURL := top.URLByName(`#frontend#user.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(custM.Name, custM.Avatar, custM.Gender, visitURL)
+			sendMessage(custM.Name, visitURL)
 		}
 	} else if f.UserB > 0 {
 		userM := dbschemaNging.NewNgingUser(ctx)
 		err := userM.Get(func(r db.Result) db.Result {
-			return r.Select(`username`, `avatar`, `gender`, `id`)
+			return r.Select(`username`, `id`)
 		}, `id`, f.CustomerB)
 		if err != nil {
 			return err
 		}
 		if len(userM.Username) > 0 {
 			visitURL := top.URLByName(`#backend#admin.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(userM.Username, userM.Avatar, userM.Gender, visitURL)
+			sendMessage(userM.Username, visitURL)
 		}
 	}
 	return nil
