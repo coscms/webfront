@@ -17,8 +17,8 @@ import (
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
-type NSender func(context.Context, *dbschema.OfficialCustomer) (close func(), msg <-chan *notice.Message, err error)
-type NReceiver func(context.Context, *dbschema.OfficialCustomer, []byte) ([]byte, error)
+type NSender func(ctx context.Context, customer *dbschema.OfficialCustomer, messageTypes ...string) (close func(), msg <-chan *notice.Message, err error)
+type NReceiver func(ctx context.Context, customer *dbschema.OfficialCustomer, message []byte) ([]byte, error)
 
 var (
 	DefaultSender   = MemoryNoticeSender
@@ -105,11 +105,11 @@ func ResetClientCount() {
 	m.ResetClientCount(true)
 }
 
-func MemoryNoticeSender(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
-	return frontend.Notify.MakeMessageGetter(customer.Name)
+func MemoryNoticeSender(ctx context.Context, customer *dbschema.OfficialCustomer, messageTypes ...string) (func(), <-chan *notice.Message, error) {
+	return frontend.Notify.MakeMessageGetter(customer.Name, messageTypes...)
 }
 
-func OnlineStatusDBUpdater(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
+func OnlineStatusDBUpdater(ctx context.Context, customer *dbschema.OfficialCustomer, messageTypes ...string) (func(), <-chan *notice.Message, error) {
 	c := ctx.(echo.Context)
 	sessionID := c.Session().ID()
 	if len(sessionID) > 0 || customer != nil {
@@ -129,7 +129,7 @@ func OnlineStatusDBUpdater(ctx context.Context, customer *dbschema.OfficialCusto
 	return nil, nil, nil
 }
 
-func OnlineStatusQueueUpdater(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
+func OnlineStatusQueueUpdater(ctx context.Context, customer *dbschema.OfficialCustomer, messageTypes ...string) (func(), <-chan *notice.Message, error) {
 	c := ctx.(echo.Context)
 	sessionID := c.Session().ID()
 	if len(sessionID) > 0 || customer != nil {
