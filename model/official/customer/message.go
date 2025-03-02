@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/admpub/events"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/sqlbuilder"
@@ -205,37 +206,38 @@ func (f *Message) SendSystemMessage(customerID uint64, title string, contype str
 // AddData 添加消息
 // * customer 操作客户
 // * user 操作后台用户
-func (f *Message) AddData(customer *dbschema.OfficialCustomer, user *dbschemaNging.NgingUser) (pk interface{}, err error) {
+func (f *Message) AddData(fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) (pk interface{}, err error) {
 	if err = f.check(); err != nil {
 		return
 	}
-	f.Context().Begin()
+	ctx := f.Context()
+	ctx.Begin()
 	if f.ReplyId > 0 {
-		msgM := dbschema.NewOfficialCommonMessage(f.Context())
+		msgM := dbschema.NewOfficialCommonMessage(ctx)
 		err = msgM.Get(nil, `id`, f.ReplyId)
 		if err != nil {
-			f.Context().Rollback()
+			ctx.Rollback()
 			if err == db.ErrNoMoreRows {
-				return nil, f.Context().E(`您要回复的消息不存在`)
+				return nil, ctx.E(`您要回复的消息不存在`)
 			}
 			return
 		}
-		if customer != nil {
-			if !((msgM.CustomerB > 0 && customer.Id == msgM.CustomerB) ||
-				(msgM.CustomerA > 0 && customer.Id == msgM.CustomerA) ||
-				(msgM.CustomerGroupId > 0 && customer.GroupId == msgM.CustomerGroupId)) {
-				f.Context().Rollback()
-				return nil, f.Context().E(`您无权回复此消息`)
+		if fromCustomer != nil {
+			if !((msgM.CustomerB > 0 && fromCustomer.Id == msgM.CustomerB) ||
+				(msgM.CustomerA > 0 && fromCustomer.Id == msgM.CustomerA) ||
+				(msgM.CustomerGroupId > 0 && fromCustomer.GroupId == msgM.CustomerGroupId)) {
+				ctx.Rollback()
+				return nil, ctx.E(`您无权回复此消息`)
 			}
-		} else if user != nil {
-			if !((msgM.UserB > 0 && user.Id == msgM.UserB) ||
-				(msgM.UserA > 0 && user.Id == msgM.UserA) ||
-				(msgM.UserRoleId > 0 && com.InSlice(param.AsString(msgM.UserRoleId), strings.Split(user.RoleIds, `,`)))) {
-				f.Context().Rollback()
-				return nil, f.Context().E(`您无权回复此消息`)
+		} else if fromUser != nil {
+			if !((msgM.UserB > 0 && fromUser.Id == msgM.UserB) ||
+				(msgM.UserA > 0 && fromUser.Id == msgM.UserA) ||
+				(msgM.UserRoleId > 0 && com.InSlice(param.AsString(msgM.UserRoleId), strings.Split(fromUser.RoleIds, `,`)))) {
+				ctx.Rollback()
+				return nil, ctx.E(`您无权回复此消息`)
 			}
 		} else {
-			f.Context().Rollback()
+			ctx.Rollback()
 			return nil, nerrors.ErrUserNotLoggedIn
 		}
 		if msgM.RootId > 0 {
@@ -246,17 +248,18 @@ func (f *Message) AddData(customer *dbschema.OfficialCustomer, user *dbschemaNgi
 		if !(f.CustomerA == f.CustomerB || f.UserA == f.UserB) {
 			err = msgM.UpdateField(nil, `has_new_reply`, 1, db.Cond{`id`: f.RootId})
 			if err != nil {
-				f.Context().Rollback()
+				ctx.Rollback()
 				return
 			}
 		}
 	}
 	pk, err = f.OfficialCommonMessage.Insert()
 	if err != nil {
-		f.Context().Rollback()
+		ctx.Rollback()
 		return
 	}
-	f.Context().End(err == nil)
+	echo.FireByNameWithMap(`message.send`, events.Map{`data`: f.OfficialCommonMessage, `fromCustomer`: fromCustomer, `fromUser`: fromUser})
+	ctx.Commit()
 	return
 }
 
