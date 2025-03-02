@@ -37,7 +37,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 		sender = fromUser.Username
 		isAdmin = true
 	}
-	sendMessage := func(receiver string, visitURL string) {
+	sendMessage := func(receiver, avatar, gender, visitURL string) {
 		Notify.Send(
 			receiver,
 			notice.NewMessageWithValue(
@@ -46,6 +46,8 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 				echo.H{
 					`url`:     visitURL,
 					`author`:  sender,
+					`avatar`:  avatar,
+					`gender`:  gender,
 					`isAdmin`: isAdmin,
 					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
 				},
@@ -55,26 +57,26 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 	if f.CustomerB > 0 {
 		custM := dbschema.NewOfficialCustomer(ctx)
 		err := custM.Get(func(r db.Result) db.Result {
-			return r.Select(`name`, `id`)
+			return r.Select(`name`, `avatar`, `gender`, `id`)
 		}, `id`, f.CustomerB)
 		if err != nil {
 			return err
 		}
 		if len(custM.Name) > 0 {
 			visitURL := top.URLByName(`#frontend#user.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(custM.Name, visitURL)
+			sendMessage(custM.Name, custM.Avatar, custM.Gender, visitURL)
 		}
 	} else if f.UserB > 0 {
 		userM := dbschemaNging.NewNgingUser(ctx)
 		err := userM.Get(func(r db.Result) db.Result {
-			return r.Select(`username`, `id`)
+			return r.Select(`username`, `avatar`, `gender`, `id`)
 		}, `id`, f.CustomerB)
 		if err != nil {
 			return err
 		}
 		if len(userM.Username) > 0 {
 			visitURL := top.URLByName(`#backend#admin.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(userM.Username, visitURL)
+			sendMessage(userM.Username, userM.Avatar, userM.Gender, visitURL)
 		}
 	}
 	return nil
