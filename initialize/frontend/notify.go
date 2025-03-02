@@ -30,12 +30,27 @@ func init() {
 func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) error {
 	ctx := f.Context()
 	var sender string
-	var badge string
+	var isAdmin bool
 	if fromCustomer != nil {
 		sender = fromCustomer.Name
 	} else if fromUser != nil {
 		sender = fromUser.Username
-		badge = `<span class="badge badge-warning">` + ctx.T(`管理员`) + `</span>`
+		isAdmin = true
+	}
+	sendMessage := func(receiver string, visitURL string) {
+		Notify.Send(
+			receiver,
+			notice.NewMessageWithValue(
+				`message`,
+				ctx.T(`收到新消息`),
+				echo.H{
+					`url`:     visitURL,
+					`author`:  sender,
+					`isAdmin`: isAdmin,
+					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
+				},
+			).SetID(f.Id),
+		)
 	}
 	if f.CustomerB > 0 {
 		custM := dbschema.NewOfficialCustomer(ctx)
@@ -47,14 +62,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 		}
 		if len(custM.Name) > 0 {
 			visitURL := top.URLByName(`#frontend#user.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			Notify.Send(
-				custM.Name,
-				notice.NewMessageWithValue(
-					`message`,
-					ctx.T(`收到新消息`),
-					`<a href="`+visitURL+`">`+sender+badge+`: `+com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`))+`</a>`,
-				),
-			)
+			sendMessage(custM.Name, visitURL)
 		}
 	} else if f.UserB > 0 {
 		userM := dbschemaNging.NewNgingUser(ctx)
@@ -66,14 +74,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 		}
 		if len(userM.Username) > 0 {
 			visitURL := top.URLByName(`#backend#admin.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			notice.Send(
-				userM.Username,
-				notice.NewMessageWithValue(
-					`message`,
-					ctx.T(`收到新消息`),
-					`<a href="`+visitURL+`">`+sender+badge+`: `+com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`))+`</a>`,
-				),
-			)
+			sendMessage(userM.Username, visitURL)
 		}
 	}
 	return nil
