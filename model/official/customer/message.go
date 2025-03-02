@@ -113,6 +113,7 @@ func (f *Message) check() error {
 			f.Title = com.Substr(com.StripTags(f.Content), `...`, 50)
 		}
 	}
+	f.Title = common.MyCleanText(f.Title)
 	if len(f.Contype) == 0 {
 		f.Contype = common.ContentTypeText
 	}
