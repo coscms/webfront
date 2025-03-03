@@ -6,6 +6,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/subdomains"
 
 	dbschemaNging "github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/notice"
@@ -56,6 +57,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 					`gender`:  senderGender,
 					`isAdmin`: isAdmin,
 					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
+					`sound`:   subdomains.Default.URL(`/public/assets/backend/audio/notify-cough.mp3`, `backend`),
 				},
 			).SetID(f.Id),
 		)
