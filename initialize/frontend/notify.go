@@ -1,6 +1,8 @@
 package frontend
 
 import (
+	"strings"
+
 	"github.com/admpub/events"
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
@@ -9,6 +11,7 @@ import (
 	"github.com/webx-top/echo/subdomains"
 
 	dbschemaNging "github.com/coscms/webcore/dbschema"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/top"
@@ -44,6 +47,17 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 		senderGender = fromUser.Gender
 		isAdmin = true
 	}
+	notifyAudioCfg := config.FromFile().Extend.GetStore(`notifyAudio`)
+	var notifyAudio string
+	disabled := notifyAudioCfg.Bool(`disabled`)
+	if !disabled {
+		notifyAudio = notifyAudioCfg.String(`audio`)
+		if len(notifyAudio) == 0 {
+			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/notify-dingdong.mp3`, `backend`)
+		} else if !strings.Contains(notifyAudio, `/`) {
+			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/`+notifyAudio, `backend`)
+		}
+	}
 	sendMessage := func(receiver, visitURL string) {
 		Notify.Send(
 			receiver,
@@ -57,7 +71,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 					`gender`:  senderGender,
 					`isAdmin`: isAdmin,
 					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
-					`sound`:   subdomains.Default.URL(`/public/assets/backend/audio/notify-cough.mp3`, `backend`),
+					`sound`:   notifyAudio,
 				},
 			).SetID(f.Id),
 		)
