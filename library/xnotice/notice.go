@@ -36,33 +36,32 @@ func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn,
 			}
 			if close != nil {
 				defer close()
-			} else if ch == nil {
+			}
+			if ch == nil {
 				return nil
 			}
-			if ch != nil {
-				go func() {
-					for {
-						select {
-						case message, ok := <-ch:
-							if !ok || message == nil {
-								c.Close()
-								return
-							}
-							msgBytes, err := json.Marshal(message)
-							message.Release()
-							if err != nil {
-								log.Error(`Push error (json.Marshal): `, err.Error())
-								c.Close()
-								return
-							}
-							log.Debugf(`Push message: %s`, msgBytes)
-							c.WriteMessage(websocket.TextMessage, msgBytes)
-						case <-ctx.Done():
+			go func() {
+				for {
+					select {
+					case message, ok := <-ch:
+						if !ok || message == nil {
+							c.Close()
 							return
 						}
+						msgBytes, err := json.Marshal(message)
+						message.Release()
+						if err != nil {
+							log.Error(`Push error (json.Marshal): `, err.Error())
+							c.Close()
+							return
+						}
+						log.Debugf(`Push message: %s`, msgBytes)
+						c.WriteMessage(websocket.TextMessage, msgBytes)
+					case <-ctx.Done():
+						return
 					}
-				}()
-			}
+				}
+			}()
 		}
 
 		//echo

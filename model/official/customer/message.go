@@ -282,6 +282,22 @@ func (f *Message) CountUnread(viewerID uint64, groupIDs []uint, isSystemMessage 
 	return n
 }
 
+func (f *Message) LastUnread(viewerID uint64, groupIDs []uint, isSystemMessage bool, viewerTypes ...string) error {
+	viewerType := `customer`
+	if len(viewerTypes) > 0 {
+		viewerType = viewerTypes[0]
+	}
+	cond := f.makeCond(viewerType, viewerID, groupIDs, isSystemMessage)
+	cond = append(cond, db.Or(
+		db.Cond{`has_new_reply`: 1},
+		db.Raw(`NOT EXISTS (SELECT 1 FROM `+f.ToTable(f.Viewed)+` b WHERE b.message_id=`+f.ToTable(f)+`.id AND b.viewer_id=? AND b.viewer_type=?)`, viewerID, viewerType),
+	))
+	err := f.Get(func(r db.Result) db.Result {
+		return r.OrderBy(`-id`)
+	}, db.And(cond...))
+	return err
+}
+
 func (f *Message) ToTable(m sqlbuilder.Name_) string {
 	return config.FromFile().DB.ToTable(m)
 }
