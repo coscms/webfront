@@ -25,6 +25,22 @@ var (
 	DefaultReceiver NReceiver
 )
 
+func send(c *websocket.Conn, message *notice.Message) {
+	defer message.Release()
+	msgBytes, err := json.Marshal(message)
+	if err != nil {
+		message.Failure()
+		log.Error(`Push error (json.Marshal): `, err.Error())
+		c.Close()
+		return
+	}
+	log.Debugf(`Push message: %s`, msgBytes)
+	err = c.WriteMessage(websocket.TextMessage, msgBytes)
+	if err == nil {
+		message.Success()
+	}
+}
+
 func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn, ctx echo.Context) error {
 	return func(c *websocket.Conn, ctx echo.Context) error {
 		customer := sessdata.Customer(ctx)
@@ -48,15 +64,7 @@ func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn,
 							c.Close()
 							return
 						}
-						msgBytes, err := json.Marshal(message)
-						message.Release()
-						if err != nil {
-							log.Error(`Push error (json.Marshal): `, err.Error())
-							c.Close()
-							return
-						}
-						log.Debugf(`Push message: %s`, msgBytes)
-						c.WriteMessage(websocket.TextMessage, msgBytes)
+						send(c, message)
 					case <-ctx.Done():
 						return
 					}
