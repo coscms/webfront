@@ -25,20 +25,21 @@ var (
 	DefaultReceiver NReceiver
 )
 
-func send(c *websocket.Conn, message *notice.Message) {
+func send(c *websocket.Conn, message *notice.Message) error {
 	defer message.Release()
 	msgBytes, err := json.Marshal(message)
 	if err != nil {
 		message.Failure()
 		log.Error(`Push error (json.Marshal): `, err.Error())
 		c.Close()
-		return
+		return err
 	}
 	log.Debugf(`Push message: %s`, msgBytes)
 	err = c.WriteMessage(websocket.TextMessage, msgBytes)
 	if err == nil {
 		message.Success()
 	}
+	return err
 }
 
 func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn, ctx echo.Context) error {
@@ -64,7 +65,9 @@ func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn,
 							c.Close()
 							return
 						}
-						send(c, message)
+						if send(c, message) != nil {
+							return
+						}
 					case <-ctx.Done():
 						return
 					}
