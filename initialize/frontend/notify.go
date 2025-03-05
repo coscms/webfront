@@ -43,20 +43,92 @@ var noticeDefaultCallback = &notice.Callback{
 	Failure: onSendMessageNotifyFail,
 }
 
+func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) error {
+	ctx := f.Context()
+	var sender string
+	var senderAvatar string
+	var senderGender string
+	var isAdmin bool
+	if fromCustomer != nil {
+		sender = fromCustomer.Name
+		senderAvatar = fromCustomer.Avatar
+		senderGender = fromCustomer.Gender
+	} else if fromUser != nil {
+		sender = fromUser.Username
+		senderAvatar = fromUser.Avatar
+		senderGender = fromUser.Gender
+		isAdmin = true
+	}
+	notifyAudioCfg := config.FromFile().Extend.GetStore(`notifyAudio`)
+	var notifyAudio string
+	disabled := notifyAudioCfg.Bool(`disabled`)
+	if !disabled {
+		notifyAudio = notifyAudioCfg.String(`audio`)
+		if len(notifyAudio) == 0 {
+			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/notify-dingdong.mp3`, `backend`)
+		} else if !strings.Contains(notifyAudio, `/`) {
+			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/`+notifyAudio, `backend`)
+		}
+	}
+	sendMessage := func(receiver, visitURL string) {
+		Notify.Send(
+			receiver,
+			notice.NewMessageWithValue(
+				`message`,
+				ctx.T(`收到新消息`),
+				echo.H{
+					`url`:     visitURL,
+					`author`:  sender,
+					`avatar`:  senderAvatar,
+					`gender`:  senderGender,
+					`isAdmin`: isAdmin,
+					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
+					`sound`:   notifyAudio,
+				},
+			).SetID(f.Id).SetCallback(noticeDefaultCallback),
+		)
+	}
+	if f.CustomerB > 0 {
+		custM := dbschema.NewOfficialCustomer(ctx)
+		err := custM.Get(func(r db.Result) db.Result {
+			return r.Select(`name`, `id`)
+		}, `id`, f.CustomerB)
+		if err != nil {
+			return err
+		}
+		if len(custM.Name) > 0 {
+			visitURL := top.URLByName(`#frontend#user.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
+			sendMessage(custM.Name, visitURL)
+		}
+	} else if f.UserB > 0 {
+		userM := dbschemaNging.NewNgingUser(ctx)
+		err := userM.Get(func(r db.Result) db.Result {
+			return r.Select(`username`, `id`)
+		}, `id`, f.UserB)
+		if err != nil {
+			return err
+		}
+		if len(userM.Username) > 0 {
+			visitURL := top.URLByName(`#backend#admin.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
+			sendMessage(userM.Username, visitURL)
+		}
+	}
+	return nil
+}
+
 func onSendMessageNotifyFail(m *notice.Message) {
 	msgID := param.AsUint64(m.ID)
 	data := m.Content.(echo.H)
 	ctx := defaults.AcquireMockContext()
 	defer defaults.ReleaseMockContext(ctx)
 	msgM := dbschema.NewOfficialCommonMessage(ctx)
-	err := msgM.Get(nil, `id`, msgID)
+	err := msgM.Get(func(r db.Result) db.Result {
+		return r.Select(`customer_b`, `user_b`)
+	}, `id`, msgID)
 	if err != nil {
 		return
 	}
-	var email string
-	var mobile string
-	var username string
-	var siteURL string
+	var email, mobile, username, siteURL string
 	if msgM.CustomerB > 0 {
 		custM := dbschema.NewOfficialCustomer(ctx)
 		err = custM.Get(func(r db.Result) db.Result {
@@ -133,77 +205,4 @@ func onSendMessageNotifyFail(m *notice.Message) {
 			return
 		}
 	}
-}
-
-func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) error {
-	ctx := f.Context()
-	var sender string
-	var senderAvatar string
-	var senderGender string
-	var isAdmin bool
-	if fromCustomer != nil {
-		sender = fromCustomer.Name
-		senderAvatar = fromCustomer.Avatar
-		senderGender = fromCustomer.Gender
-	} else if fromUser != nil {
-		sender = fromUser.Username
-		senderAvatar = fromUser.Avatar
-		senderGender = fromUser.Gender
-		isAdmin = true
-	}
-	notifyAudioCfg := config.FromFile().Extend.GetStore(`notifyAudio`)
-	var notifyAudio string
-	disabled := notifyAudioCfg.Bool(`disabled`)
-	if !disabled {
-		notifyAudio = notifyAudioCfg.String(`audio`)
-		if len(notifyAudio) == 0 {
-			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/notify-dingdong.mp3`, `backend`)
-		} else if !strings.Contains(notifyAudio, `/`) {
-			notifyAudio = subdomains.Default.URL(`/public/assets/backend/audio/`+notifyAudio, `backend`)
-		}
-	}
-	sendMessage := func(receiver, visitURL string) {
-		Notify.Send(
-			receiver,
-			notice.NewMessageWithValue(
-				`message`,
-				ctx.T(`收到新消息`),
-				echo.H{
-					`url`:     visitURL,
-					`author`:  sender,
-					`avatar`:  senderAvatar,
-					`gender`:  senderGender,
-					`isAdmin`: isAdmin,
-					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
-					`sound`:   notifyAudio,
-				},
-			).SetID(f.Id).SetCallback(noticeDefaultCallback),
-		)
-	}
-	if f.CustomerB > 0 {
-		custM := dbschema.NewOfficialCustomer(ctx)
-		err := custM.Get(func(r db.Result) db.Result {
-			return r.Select(`name`, `id`)
-		}, `id`, f.CustomerB)
-		if err != nil {
-			return err
-		}
-		if len(custM.Name) > 0 {
-			visitURL := top.URLByName(`#frontend#user.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(custM.Name, visitURL)
-		}
-	} else if f.UserB > 0 {
-		userM := dbschemaNging.NewNgingUser(ctx)
-		err := userM.Get(func(r db.Result) db.Result {
-			return r.Select(`username`, `id`)
-		}, `id`, f.UserB)
-		if err != nil {
-			return err
-		}
-		if len(userM.Username) > 0 {
-			visitURL := top.URLByName(`#backend#admin.message.view`, echo.H{`type`: `inbox`, `id`: f.Id})
-			sendMessage(userM.Username, visitURL)
-		}
-	}
-	return nil
 }
