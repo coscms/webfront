@@ -187,8 +187,8 @@ func onSendMessageNotifyFail(m *notice.Message) {
 			smsConfig := sms.NewConfig()
 			smsConfig.Mobile = mobile
 			smsConfig.Content = message
-			//smsConfig.Template = ``
-			//smsConfig.SignName = ``
+			smsConfig.Template = notifySMSCfg.String(`messageTemplate`)
+			smsConfig.SignName = notifySMSCfg.String(`messageSignName`)
 			//smsConfig.ExtraData =
 			err = provider.Send(smsConfig)
 			if err != nil {
