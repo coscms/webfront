@@ -175,6 +175,7 @@ func onSendMessageNotifyFail(m *notice.Message) {
 			} else {
 				placeholders := map[string]string{
 					`sender`:   data.String(`author`),
+					`receiver`: username,
 					`name`:     username,
 					`url`:      visitURL,
 					`siteName`: baseCfg.String(`siteName`),
