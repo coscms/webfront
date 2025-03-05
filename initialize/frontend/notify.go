@@ -88,15 +88,15 @@ func onSendMessageNotifyFail(m *notice.Message) {
 	}
 	baseCfg := config.Setting().GetStore(`base`)
 	if len(mobile) > 0 {
-		//发送短信
-		provider, smsProviderName := sms.AnyOne()
-		if provider == nil || len(smsProviderName) == 0 {
-			err = ctx.NewError(code.DataUnavailable, `找不到短信发送服务`).SetZone(`provider`)
-			log.Error(err)
-			return
-		}
 		notifySMSCfg := config.FromFile().Extend.GetStore(`notifySMS`)
 		if notifySMSCfg.Bool(`on`) {
+			//发送短信
+			provider, smsProviderName := sms.AnyOne()
+			if provider == nil || len(smsProviderName) == 0 {
+				err = ctx.NewError(code.DataUnavailable, `找不到短信发送服务`).SetZone(`provider`)
+				log.Error(err)
+				return
+			}
 			message := notifySMSCfg.String(`messageTemplateContent`)
 			if len(message) == 0 {
 				message = ctx.T(`亲爱的客户: %s，用户「%s」给你发送了站内信，请进入网站查看 %s [%s]`, username, data.String(`author`), visitURL, baseCfg.String(`siteName`))
