@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.7
+require github.com/coscms/webcore v0.8.8
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -32,7 +32,7 @@ require (
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/redsync/v4 v4.0.3
 	github.com/admpub/resty/v2 v2.7.2
-	github.com/admpub/sensitive v0.0.0-20230925121413-6c7ffc3addbb
+	github.com/admpub/sensitive v0.0.1
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/coscms/forms v1.13.10

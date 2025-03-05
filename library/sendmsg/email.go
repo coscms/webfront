@@ -83,7 +83,7 @@ func EmailSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, titl
 
 	//邮件内容
 	title := `[` + baseCfg.String(`siteName`) + `]` + ctx.T(`请查收验证码`)
-	content := com.Str2bytes(ctx.T(`亲爱的客户: %s，您正在进行邮箱验证，本次验证码为：%s (%d分钟内有效)。<br /><br /> 来自：%s<br />时间：%s`, m.Name, verifyCode, lifetime, siteURL+`/`, time.Now().Format(time.RFC3339)))
+	content := com.Str2bytes(ctx.T(`亲爱的客户: %s，您正在进行邮箱验证，本次验证码为：%s (%d分钟内有效)。<br /><br />来自：%s<br />时间：%s`, m.Name, verifyCode, lifetime, siteURL+`/`, time.Now().Format(time.RFC3339)))
 
 	if len(titleAndMessage) > 0 {
 		placeholders := map[string]string{

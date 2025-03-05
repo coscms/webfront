@@ -2,19 +2,27 @@ package frontend
 
 import (
 	"strings"
+	"time"
 
 	"github.com/admpub/events"
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/defaults"
+	"github.com/webx-top/echo/param"
 	"github.com/webx-top/echo/subdomains"
 
+	"github.com/coscms/sms"
 	dbschemaNging "github.com/coscms/webcore/dbschema"
+	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/cron"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/top"
+	"github.com/coscms/webfront/library/xcommon"
 )
 
 var Notify = notice.NewUserNotices(false, nil)
@@ -29,6 +37,102 @@ func init() {
 		}
 		return nil
 	})
+}
+
+var noticeDefaultCallback = &notice.Callback{
+	Failure: onSendMessageNotifyFail,
+}
+
+func onSendMessageNotifyFail(m *notice.Message) {
+	msgID := param.AsUint64(m.ID)
+	data := m.Content.(echo.H)
+	ctx := defaults.AcquireMockContext()
+	defer defaults.ReleaseMockContext(ctx)
+	msgM := dbschema.NewOfficialCommonMessage(ctx)
+	err := msgM.Get(nil, `id`, msgID)
+	if err != nil {
+		return
+	}
+	var email string
+	var mobile string
+	var username string
+	var siteURL string
+	if msgM.CustomerB > 0 {
+		custM := dbschema.NewOfficialCustomer(ctx)
+		err = custM.Get(func(r db.Result) db.Result {
+			return r.Select(`name`, `mobile`, `mobile_bind`, `email`, `email_bind`, `id`)
+		}, `id`, msgM.CustomerB)
+		if err != nil {
+			return
+		}
+		mobile = custM.Mobile
+		email = custM.Email
+		username = custM.Name
+		siteURL = xcommon.FrontendURL(ctx)
+	} else if msgM.UserB > 0 {
+		userM := dbschemaNging.NewNgingUser(ctx)
+		err = userM.Get(func(r db.Result) db.Result {
+			return r.Select(`username`, `mobile`, `email`, `id`)
+		}, `id`, msgM.UserB)
+		if err != nil {
+			return
+		}
+		mobile = userM.Mobile
+		email = userM.Email
+		username = userM.Username
+		siteURL = common.BackendURL(ctx)
+	}
+	visitURL := data.String(`url`)
+	if strings.HasPrefix(visitURL, `/`) {
+		visitURL = siteURL + visitURL
+	}
+	baseCfg := config.Setting().GetStore(`base`)
+	if len(mobile) > 0 {
+		//发送短信
+		provider, smsProviderName := sms.AnyOne()
+		if provider == nil || len(smsProviderName) == 0 {
+			err = ctx.NewError(code.DataUnavailable, `找不到短信发送服务`).SetZone(`provider`)
+			log.Error(err)
+			return
+		}
+		notifySMSCfg := config.FromFile().Extend.GetStore(`notifySMS`)
+		if notifySMSCfg.Bool(`on`) {
+			message := notifySMSCfg.String(`messageTemplateContent`)
+			if len(message) == 0 {
+				message = ctx.T(`亲爱的客户: %s，用户「%s」给你发送了站内信，请进入网站查看 %s [%s]`, username, data.String(`author`), visitURL, baseCfg.String(`siteName`))
+			} else {
+				placeholders := map[string]string{
+					`sender`:   data.String(`author`),
+					`name`:     username,
+					`url`:      visitURL,
+					`siteName`: baseCfg.String(`siteName`),
+				}
+				for find, to := range placeholders {
+					message = strings.ReplaceAll(message, `{`+find+`}`, to)
+				}
+			}
+			smsConfig := sms.NewConfig()
+			smsConfig.Mobile = mobile
+			smsConfig.Content = message
+			smsConfig.Template = ``
+			smsConfig.SignName = ``
+			//smsConfig.ExtraData =
+			err = provider.Send(smsConfig)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		}
+	}
+	if len(email) > 0 {
+		link := `<a href="` + visitURL + `" target="_blank">` + data.String(`content`) + `</a>`
+		content := ctx.T(`亲爱的客户: %s，用户「%s」给你发送了站内信，请进入网站查看 %s<br /><br /> 来自：%s<br />时间：%s`, username, data.String(`author`), link, siteURL+`/`, time.Now().Format(time.RFC3339))
+		err = cron.SendMail(email, username, m.Title, com.Str2bytes(content))
+		if err != nil {
+			log.Error(err)
+			return
+		}
+	}
 }
 
 func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema.OfficialCustomer, fromUser *dbschemaNging.NgingUser) error {
@@ -73,7 +177,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 					`content`: com.IfTrue(len(f.Title) > 0, f.Title, ctx.T(`无标题`)),
 					`sound`:   notifyAudio,
 				},
-			).SetID(f.Id),
+			).SetID(f.Id).SetCallback(noticeDefaultCallback),
 		)
 	}
 	if f.CustomerB > 0 {
@@ -92,7 +196,7 @@ func sendMessageNotify(f *dbschema.OfficialCommonMessage, fromCustomer *dbschema
 		userM := dbschemaNging.NewNgingUser(ctx)
 		err := userM.Get(func(r db.Result) db.Result {
 			return r.Select(`username`, `id`)
-		}, `id`, f.CustomerB)
+		}, `id`, f.UserB)
 		if err != nil {
 			return err
 		}
