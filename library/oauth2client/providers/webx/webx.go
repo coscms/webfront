@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/admpub/goth"
@@ -26,6 +27,7 @@ var (
 // You should always call `webx.New` to get a new Provider. Never try to create
 // one manually.
 func New(clientKey, secret, callbackURL, hostURL string, scopes ...string) *Provider {
+	hostURL = strings.TrimSuffix(hostURL, `/`)
 	return NewCustomisedURL(clientKey, secret, callbackURL, hostURL+AuthURL, hostURL+TokenURL, hostURL+ProfileURL, scopes...)
 }
 
