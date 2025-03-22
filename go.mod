@@ -1,12 +1,10 @@
 module github.com/coscms/webfront
 
-go 1.23.6
-
-toolchain go1.24.0
+go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.9
+require github.com/coscms/webcore v0.8.11
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -36,7 +34,7 @@ require (
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/coscms/forms v1.13.10
-	github.com/coscms/oauth2s v0.4.2
+	github.com/coscms/oauth2s v0.4.3
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/gosimple/slug v1.15.0
@@ -49,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.28
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.15.2
+	github.com/webx-top/echo v1.16.0
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -128,7 +126,7 @@ require (
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/map2struct v0.1.3 // indirect
 	github.com/admpub/mysql-schema-sync v0.2.6 // indirect
-	github.com/admpub/oauth2/v4 v4.0.2 // indirect
+	github.com/admpub/oauth2/v4 v4.0.3 // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/qrcode v0.0.3 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
@@ -141,6 +139,7 @@ require (
 	github.com/admpub/sonyflake v0.0.1 // indirect
 	github.com/admpub/tail v1.1.1 // indirect
 	github.com/admpub/timeago v1.2.2 // indirect
+	github.com/admpub/xencoding v0.0.2 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aws/aws-sdk-go v1.55.6 // indirect
@@ -185,6 +184,7 @@ require (
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
