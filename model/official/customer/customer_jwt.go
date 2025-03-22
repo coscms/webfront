@@ -8,7 +8,7 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/webx-top/db"
 	mwJWT "github.com/webx-top/echo/middleware/jwt"
 	"github.com/webx-top/echo/param"

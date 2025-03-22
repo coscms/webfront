@@ -7,7 +7,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/codec"
 	"github.com/coscms/webcore/library/config"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 	mwJWT "github.com/webx-top/echo/middleware/jwt"
