@@ -1,6 +1,6 @@
 module github.com/coscms/webfront
 
-go 1.24.0
+go 1.24
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
