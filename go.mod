@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.11
+require github.com/coscms/webcore v0.8.12
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.28
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.16.0
+	github.com/webx-top/echo v1.16.1
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
