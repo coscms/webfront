@@ -20,46 +20,46 @@ var navigateIdentRegexps = lru.NewLRUCache[string, *regexp.Regexp](100)
 
 func init() {
 	NavigateLinkType.Add(`custom`, echo.T(`自定义链接`))
-	item := echo.NewKV(`article-category`, echo.T(`文章分类`))
-	item.SetFn(func(c context.Context) interface{} {
-		ctx := c.(echo.Context)
-		m := NewCategory(ctx)
-		categories := m.ListAllParentBy(`article`, 0, 2, db.Cond{`show_on_menu`: `Y`})
-		var (
-			list     []*NavigateExt
-			children = map[uint][]*NavigateExt{}
-			ext      = ctx.DefaultExtension()
-		)
-		for _, category := range categories {
-			navExt := &NavigateExt{
-				OfficialCommonNavigate: &dbschema.OfficialCommonNavigate{
-					Id:       category.Id,
-					ParentId: category.ParentId,
-					Title:    category.Name,
-					Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
-				},
-				Extra: echo.H{
-					`object`: category,
-				},
-				isActive: GenActiveDetector(`categoryId`, category.Id),
-			}
-			navExt.Init().SetContext(ctx)
-			if category.ParentId < 1 {
-				list = append(list, navExt)
-				continue
-			}
-			if _, ok := children[category.ParentId]; !ok {
-				children[category.ParentId] = []*NavigateExt{}
-			}
-			children[category.ParentId] = append(children[category.ParentId], navExt)
-		}
-		FillChildren(&list, children)
-		return list
-	})
-	NavigateLinkType.AddItem(item)
+	NavigateLinkType.Add(`article-category`, echo.T(`文章分类`), echo.KVOptFn(queryArticleCategory))
 }
 
-func FillChildren(list *[]*NavigateExt, children map[uint][]*NavigateExt) {
+func queryArticleCategory(c context.Context) interface{} {
+	ctx := c.(echo.Context)
+	m := NewCategory(ctx)
+	categories := m.ListAllParentBy(`article`, 0, 2, db.Cond{`show_on_menu`: `Y`})
+	var (
+		list     []*NavigateExt
+		children = map[uint][]*NavigateExt{}
+		ext      = ctx.DefaultExtension()
+	)
+	for _, category := range categories {
+		navExt := &NavigateExt{
+			OfficialCommonNavigate: &dbschema.OfficialCommonNavigate{
+				Id:       category.Id,
+				ParentId: category.ParentId,
+				Title:    category.Name,
+				Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
+			},
+			Extra: echo.H{
+				`object`: category,
+			},
+			isActive: GenActiveDetector(`categoryId`, category.Id),
+		}
+		navExt.Init().SetContext(ctx)
+		if category.ParentId < 1 {
+			list = append(list, navExt)
+			continue
+		}
+		if _, ok := children[category.ParentId]; !ok {
+			children[category.ParentId] = []*NavigateExt{}
+		}
+		children[category.ParentId] = append(children[category.ParentId], navExt)
+	}
+	fillArticleChildrenCategory(&list, children)
+	return list
+}
+
+func fillArticleChildrenCategory(list *[]*NavigateExt, children map[uint][]*NavigateExt) {
 	if len(children) == 0 {
 		return
 	}
@@ -70,7 +70,7 @@ func FillChildren(list *[]*NavigateExt, children map[uint][]*NavigateExt) {
 		}
 		item.Children = &subItems
 		delete(children, item.Id)
-		FillChildren(item.Children, children)
+		fillArticleChildrenCategory(item.Children, children)
 	}
 }
 
@@ -89,7 +89,7 @@ type NavigateExt struct {
 	identRegexp *regexp.Regexp
 	isInside    null.Bool // 是否是内部链接
 	isActive    func(echo.Context) bool
-	Children    *[]*NavigateExt
+	Children    *[]*NavigateExt //`db:",relation=parent_id:id|eq(has_child,Y)"`
 	Extra       echo.H
 }
 

@@ -19,7 +19,6 @@
 package middleware
 
 import (
-	"fmt"
 	"html/template"
 
 	"github.com/webx-top/db"
@@ -57,38 +56,36 @@ func CustomerDetail(c echo.Context) *modelCustomer.CustomerAndGroup {
 
 func NavigateList(ctx echo.Context, m *dbschema.OfficialCommonNavigate, navType string, parentIDs ...uint) []*official.NavigateExt {
 	internalKey := `navigate.` + navType
-	nav, ok := ctx.Internal().Get(internalKey).([]*official.NavigateExt)
+	childrenMapping, ok := ctx.Internal().Get(internalKey).(map[uint][]*official.NavigateExt)
 	if !ok {
-		nav = []*official.NavigateExt{}
+		nav := []*official.NavigateExt{}
 		m.ListByOffset(&nav, func(r db.Result) db.Result {
 			return r.OrderBy(`level`, `sort`, `id`)
 		}, 0, -1, db.And(
 			db.Cond{`disabled`: `N`},
 			db.Cond{`type`: navType},
 		))
+		childrenMapping = map[uint][]*official.NavigateExt{}
 		for _, _nav := range nav {
 			_nav.Init().SetContext(ctx)
+			if _, ok := childrenMapping[_nav.ParentId]; !ok {
+				childrenMapping[_nav.ParentId] = []*official.NavigateExt{}
+			}
+			childrenMapping[_nav.ParentId] = append(childrenMapping[_nav.ParentId], _nav)
 		}
-		ctx.Internal().Set(internalKey, nav)
+		for _, _nav := range nav {
+			children, ok := childrenMapping[_nav.Id]
+			if !ok {
+				continue
+			}
+			_nav.Children = &children
+		}
+		ctx.Internal().Set(internalKey, childrenMapping)
 	}
 	if len(parentIDs) > 0 {
-		key := internalKey + `.` + fmt.Sprint(parentIDs[0])
-		navList, ok := ctx.Internal().Get(key).([]*official.NavigateExt)
-		if !ok {
-			navList = []*official.NavigateExt{}
-			for _, v := range nav {
-				if v.ParentId == parentIDs[0] {
-					navList = append(navList, v)
-				}
-			}
-			for _, _nav := range navList {
-				_nav.SetContext(ctx)
-			}
-			ctx.Internal().Set(key, navList)
-		}
-		return navList
+		return childrenMapping[parentIDs[0]]
 	}
-	return nav
+	return childrenMapping[0]
 }
 
 func FuncMap() echo.MiddlewareFunc {
