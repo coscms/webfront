@@ -2,7 +2,6 @@ package xhtml
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 	"strings"
 
@@ -56,25 +55,26 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 			return cached, err
 		}
 	}
-	var cachedETag sql.NullString
-	getHash := func() string {
-		if !cachedETag.Valid {
-			cache.Get(context.Background(), cacheKey+`.hash`, &cachedETag.String)
-			cachedETag.Valid = true
-		}
-		return cachedETag.String
-	}
-	getContent := func() (string, error) {
-		var cachedHTML string
-		err := cache.Get(context.Background(), cacheKey, &cachedHTML)
-		return cachedHTML, err
-	}
-	err := ETagCallback(ctx, getHash, getContent)
+	err := ETagCallback(ctx, cacheKey)
 	return err == nil, err
 }
 
-func ETagCallback(ctx echo.Context, contentEtag func() string, callback func() (string, error), weak ...bool) error {
+func getHash(c context.Context, cacheKey string) string {
+	var etag string
+	cache.Get(c, cacheKey+`.hash`, &etag)
+	return etag
+}
+
+func getContent(c context.Context, cacheKey string) (string, error) {
+	var cachedHTML string
+	err := cache.Get(c, cacheKey, &cachedHTML)
+	return cachedHTML, err
+}
+
+func ETagCallback(ctx echo.Context, cacheKey string, weak ...bool) error {
 	var _weak bool
+	var tagValue string
+	var tagGetted bool
 	if len(weak) > 0 {
 		_weak = weak[0]
 	}
@@ -82,16 +82,21 @@ func ETagCallback(ctx echo.Context, contentEtag func() string, callback func() (
 		if _weak {
 			reqETag = strings.TrimPrefix(reqETag, `W/`)
 		}
-		if reqETag == `"`+contentEtag()+`"` {
+		tagValue = getHash(ctx, cacheKey)
+		tagGetted = true
+		if reqETag == `"`+tagValue+`"` {
 			return ctx.NotModified()
 		}
 	}
-	cachedHTML, err := callback()
+	cachedHTML, err := getContent(ctx, cacheKey)
 	if err != nil {
 		return err
 	}
-	if len(contentEtag()) > 0 {
-		eTag := `"` + contentEtag() + `"`
+	if !tagGetted {
+		tagValue = getHash(ctx, cacheKey)
+	}
+	if len(tagValue) > 0 {
+		eTag := `"` + tagValue + `"`
 		if _weak { // 弱ETag是指在资源内容发生变化时，ETag值不一定会随之改变的标识符
 			eTag = `W/` + eTag
 		}
