@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.8.13
+require github.com/coscms/webcore v0.8.14
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -46,7 +46,7 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.28
-	github.com/webx-top/db v1.28.2
+	github.com/webx-top/db v1.28.3
 	github.com/webx-top/echo v1.16.1
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
@@ -69,7 +69,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.31.0
-	github.com/nging-plugins/dbmanager v1.8.4
+	github.com/nging-plugins/dbmanager v1.8.5
 	github.com/phuslu/lru v1.0.18
 	github.com/silenceper/wechat/v2 v2.1.8
 	github.com/tdewolff/minify/v2 v2.23.1
