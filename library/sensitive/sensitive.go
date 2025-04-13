@@ -61,11 +61,13 @@ func initDefaultFilter() {
 		return
 	}
 	if len(cfg.DictPath) > 0 {
+		log.Info(`[sensitive] load word dict: ` + cfg.DictPath)
 		if err := defaultFilter.LoadWordDict(cfg.DictPath); err != nil {
 			log.Error(err)
 		}
 	}
 	if len(cfg.DictURL) > 0 {
+		log.Info(`[sensitive] load word dict: ` + cfg.DictURL)
 		if err := defaultFilter.LoadNetWordDict(cfg.DictURL); err != nil {
 			log.Error(err)
 		}
