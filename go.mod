@@ -45,7 +45,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
-	github.com/webx-top/com v1.3.28
+	github.com/webx-top/com v1.3.29
 	github.com/webx-top/db v1.28.3
 	github.com/webx-top/echo v1.16.1
 	github.com/webx-top/echo-prometheus v1.1.2
