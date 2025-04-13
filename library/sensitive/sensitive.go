@@ -1,16 +1,31 @@
 package sensitive
 
 import (
+	"errors"
 	"io"
 	"strings"
 
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo/defaults"
 
+	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
 	"github.com/admpub/sensitive"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webfront/dbschema"
 )
+
+func init() {
+	extend.Register(`sensitive`, func() interface{} {
+		return &Config{}
+	})
+}
+
+type Config struct {
+	DictPath string `json:"dictPath"`
+	DictURL  string `json:"dictURL"`
+}
 
 var (
 	defaultFilter *sensitive.Filter
@@ -40,6 +55,20 @@ func initDefaultFilter() {
 	}
 	if len(noises) > 0 {
 		defaultFilter.UpdateNoisePattern(strings.Join(noises, `|`))
+	}
+	cfg, ok := config.FromFile().Extend.Get(`sensitive`).(*Config)
+	if !ok {
+		return
+	}
+	if len(cfg.DictPath) > 0 {
+		if err := defaultFilter.LoadWordDict(cfg.DictPath); err != nil {
+			log.Error(err)
+		}
+	}
+	if len(cfg.DictURL) > 0 {
+		if err := defaultFilter.LoadNetWordDict(cfg.DictURL); err != nil {
+			log.Error(err)
+		}
 	}
 }
 
@@ -112,3 +141,5 @@ func Validate(text string) (bool, string) {
 func RemoveNoise(text string) string {
 	return Default().RemoveNoise(text)
 }
+
+var ErrSensitive = errors.New("发送失败: 不能包含违禁词。(failed to send: cannot contain prohibited words)")
