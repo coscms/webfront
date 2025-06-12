@@ -1,6 +1,8 @@
 package customer
 
 import (
+	"time"
+
 	"github.com/admpub/decimal"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -120,6 +122,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		incrAmount := param.AsString(flow.Amount)
 		kvset := echo.H{
 			flow.AmountType: db.Raw(flow.AmountType + `+` + incrAmount),
+			`updated`:       time.Now().Unix(),
 		}
 		var amount float64
 		if flow.AmountType == `balance` {
