@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.13
+require github.com/coscms/webcore v0.9.14-0.20250613041248-41836f56e761
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -65,7 +65,7 @@ require (
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/websocket v1.0.4
-	github.com/coscms/captcha v0.2.2
+	github.com/coscms/captcha v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.32.0
@@ -105,7 +105,7 @@ require (
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.1 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
-	github.com/admpub/go-captcha/v2 v2.0.6 // indirect
+	github.com/admpub/go-captcha/v2 v2.0.7 // indirect
 	github.com/admpub/go-figure v0.0.2 // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
