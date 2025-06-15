@@ -992,9 +992,9 @@ DROP TABLE IF EXISTS `official_customer_wallet`;
 CREATE TABLE `official_customer_wallet` (
   `customer_id` bigint unsigned NOT NULL COMMENT '客户ID',
   `asset_type` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'money' COMMENT '资产类型(money-钱;point-点数;credit-信用分;integral-积分;gold-金币;silver-银币;copper-铜币;experience-经验)',
-  `balance` decimal(15,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '余额',
-  `freeze` decimal(15,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '冻结金额',
-  `accumulated` decimal(15,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '累计总金额',
+  `balance` decimal(18,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '余额',
+  `freeze` decimal(18,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '冻结金额',
+  `accumulated` decimal(18,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '累计总金额',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`customer_id`,`asset_type`)
@@ -1013,8 +1013,8 @@ CREATE TABLE `official_customer_wallet_flow` (
   `customer_id` bigint unsigned NOT NULL COMMENT '客户ID',
   `asset_type` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型',
   `amount_type` enum('balance','freeze') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'balance' COMMENT '金额类型(balance-余额;freeze-冻结额)',
-  `amount` decimal(10,4) NOT NULL COMMENT '金额(正数为收入;负数为支出)',
-  `wallet_amount` decimal(15,4) NOT NULL DEFAULT '0.0000' COMMENT '变动后钱包总金额',
+  `amount` decimal(18,4) NOT NULL COMMENT '金额(正数为收入;负数为支出)',
+  `wallet_amount` decimal(18,4) NOT NULL DEFAULT '0.0000' COMMENT '变动后钱包总金额',
   `source_customer` bigint unsigned NOT NULL DEFAULT '0' COMMENT '来自谁',
   `source_type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '来源类型(组)',
   `source_table` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '来源表(来自物品表)',
@@ -1189,4 +1189,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-12 16:37:12
+-- Dump completed on 2025-06-15 21:01:13
