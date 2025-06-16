@@ -19,8 +19,7 @@ type Config struct {
 	Watermark     *image.WatermarkOptions
 	Crop          *imageproxy.Options
 	PrepareData   *uploadPrepare.PrepareData
-	NoticeSender  notice.Noticer
-	Progress      *notice.Progress
+	NProgressor   notice.NProgressor
 	MaxMB         int64
 	MaxRetries    int
 	RetryInterval time.Duration
@@ -85,15 +84,9 @@ func OptionsPrepareData(data *uploadPrepare.PrepareData) Options {
 	}
 }
 
-func OptionsNoticeSender(noticeSender notice.Noticer) Options {
+func OptionsNProgressor(np notice.NProgressor) Options {
 	return func(c *Config) {
-		c.NoticeSender = noticeSender
-	}
-}
-
-func OptionsProgress(pro *notice.Progress) Options {
-	return func(c *Config) {
-		c.Progress = pro
+		c.NProgressor = np
 	}
 }
 

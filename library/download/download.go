@@ -36,6 +36,9 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 	for _, option := range options {
 		option(config)
 	}
+	if config.NProgressor == nil {
+		config.NProgressor = notice.NewWithProgress(notice.DefaultNoticer)
+	}
 	var thumbURL string
 	result := &uploadClient.Result{
 		FileType: uploadClient.FileType(config.PrepareData.FileType),
@@ -43,16 +46,13 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 	if len(config.FileURL) == 0 {
 		return result, thumbURL, nil
 	}
-	if config.NoticeSender == nil {
-		config.NoticeSender = notice.DefaultNoticer
-	}
 	fileURL := config.FileURL
 	if idx := strings.LastIndex(fileURL, `?`); idx != -1 {
 		fileURL = fileURL[:idx]
 	} else if idx := strings.LastIndex(fileURL, `#`); idx != -1 {
 		fileURL = fileURL[:idx]
 	}
-	if sendErr := config.NoticeSender(`下载图片 "`+fileURL+`"`, 1, config.Progress); sendErr != nil {
+	if sendErr := config.NProgressor.Send(`下载图片 "`+fileURL+`"`, 1); sendErr != nil {
 		return result, thumbURL, sendErr
 	}
 	result.FileName = path.Base(fileURL)
@@ -81,7 +81,7 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 			if config.MaxRetries > i {
 				retryMsg = fmt.Sprintf(` (Will retry in %f seconds. %d retries left.)`, config.RetryInterval.Seconds(), config.MaxRetries-i)
 			}
-			config.NoticeSender(`下载图片 "`+fileURL+`" 失败: `+err.Error()+retryMsg, 0, config.Progress)
+			config.NProgressor.Send(`下载图片 "`+fileURL+`" 失败: `+err.Error()+retryMsg, 0)
 		}
 		printRetryMsg(0)
 		for i := 1; i <= config.MaxRetries; i++ {
@@ -89,7 +89,7 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 			iStr := strconv.Itoa(i)
 			b, err = dl()
 			if err == nil {
-				config.NoticeSender(`(重试`+iStr+`)下载图片 "`+fileURL+`" 成功`, 1, config.Progress)
+				config.NProgressor.Send(`(重试`+iStr+`)下载图片 "`+fileURL+`" 成功`, 1)
 				break
 			}
 			printRetryMsg(i)
@@ -100,14 +100,14 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 	}
 	defer func() {
 		if e := recover(); e != nil {
-			config.NoticeSender(ctx.T(`下载图片 "`+fileURL+`" 出错: %v`, e), 0, config.Progress)
+			config.NProgressor.Send(ctx.T(`下载图片 "`+fileURL+`" 出错: %v`, e), 0)
 			err = fmt.Errorf(`下载图片 "`+fileURL+`" 出错: %v`, e)
 		}
 	}()
 
 	if config.Watermark != nil && config.Watermark.IsEnabled() {
 		if wmb, err := watermark.Bytes(b, extension, config.Watermark); err != nil {
-			if sendErr := config.NoticeSender(`下载图片 "`+fileURL+`", 添加水印失败`, 0, config.Progress); sendErr != nil {
+			if sendErr := config.NProgressor.Send(`下载图片 "`+fileURL+`", 添加水印失败`, 0); sendErr != nil {
 				return result, thumbURL, sendErr
 			}
 			//return result, thumbURL, err
