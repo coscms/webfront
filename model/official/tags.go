@@ -87,6 +87,23 @@ func (f *Tags) IncrNum(group, name string, n ...int) error {
 	return err
 }
 
+func (f *Tags) IncrNumByNames(group, names []string, n ...int) error {
+	var _n int
+	if len(n) > 0 {
+		_n = n[0]
+	} else {
+		_n = 1
+	}
+	if _n == 0 {
+		return nil
+	}
+	err := f.UpdateField(nil, `num`, db.Raw(`num+`+param.AsString(_n)), db.And(
+		db.Cond{`name`: db.In(names)},
+		db.Cond{`group`: group},
+	))
+	return err
+}
+
 func (f *Tags) DecrNum(group string, name []string, n ...int) error {
 	var _n int
 	if len(n) > 0 {
