@@ -87,7 +87,7 @@ func (f *Tags) IncrNum(group, name string, n ...int) error {
 	return err
 }
 
-func (f *Tags) IncrNumByNames(group, names []string, n ...int) error {
+func (f *Tags) IncrNumByNames(group string, names []string, n ...int) error {
 	var _n int
 	if len(n) > 0 {
 		_n = n[0]
