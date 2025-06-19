@@ -27,15 +27,11 @@ type Level struct {
 }
 
 func (f *Level) GreaterOrEqualThan(levelId uint, targetLevelId uint) (bool, error) {
-	return f.Than(levelId, targetLevelId, func(a *dbschema.OfficialCustomerLevel, b *dbschema.OfficialCustomerLevel) bool {
-		return a.Score >= b.Score
-	})
+	return f.Than(levelId, targetLevelId, compareGreaterOrEqual)
 }
 
 func (f *Level) LessThan(levelId uint, targetLevelId uint) (bool, error) {
-	return f.Than(levelId, targetLevelId, func(a *dbschema.OfficialCustomerLevel, b *dbschema.OfficialCustomerLevel) bool {
-		return a.Score < b.Score
-	})
+	return f.Than(levelId, targetLevelId, compareLess)
 }
 
 func (f *Level) Than(

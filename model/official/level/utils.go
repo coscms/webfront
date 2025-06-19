@@ -1,6 +1,9 @@
 package level
 
-import "github.com/webx-top/db"
+import (
+	"github.com/coscms/webfront/dbschema"
+	"github.com/webx-top/db"
+)
 
 func MakeFreeCond(group string, balance float64, accumulated float64, asset string) *db.Compounds {
 	cond := db.NewCompounds()
@@ -50,4 +53,12 @@ func MakePayCond(group string, balance float64, accumulated float64, asset strin
 		),
 	)
 	return cond
+}
+
+func compareGreaterOrEqual(a *dbschema.OfficialCustomerLevel, b *dbschema.OfficialCustomerLevel) bool {
+	return a.Score >= b.Score
+}
+
+func compareLess(a *dbschema.OfficialCustomerLevel, b *dbschema.OfficialCustomerLevel) bool {
+	return a.Score < b.Score
 }
