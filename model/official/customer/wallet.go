@@ -136,8 +136,8 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		//flow.WalletAmount = amount+flow.Amount
 		oldAmountDecimal := decimal.NewFromFloat(amount)
 		newAmountDecimal := decimal.NewFromFloat(flow.Amount)
-		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(2)
-		flow.WalletAmount, _ = newAmountDecimal.Float64()
+		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(4)
+		flow.WalletAmount = newAmountDecimal.InexactFloat64()
 		if flow.WalletAmount < 0 { //处理flow.Amount为负数(即扣除余额)的情况。扣款操作时检查余额是否足够
 			ctx.Rollback()
 			if sessdata.User(ctx) != nil {
