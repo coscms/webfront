@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.20
+require github.com/coscms/webcore v0.9.21
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -46,12 +46,12 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.30
-	github.com/webx-top/db v1.28.4
+	github.com/webx-top/db v1.28.5
 	github.com/webx-top/echo v1.16.7
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
-	github.com/webx-top/pagination v0.3.1
+	github.com/webx-top/pagination v0.3.2
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yanyiwu/gojieba v1.4.6
 	golang.org/x/oauth2 v0.30.0
@@ -92,7 +92,7 @@ require (
 	github.com/admpub/9t v0.0.1 // indirect
 	github.com/admpub/bart v0.0.1 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
-	github.com/admpub/caddy v1.2.8 // indirect
+	github.com/admpub/caddy v1.2.9 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
 	github.com/admpub/checksum v1.1.0 // indirect
@@ -229,7 +229,6 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/onsi/gomega v1.36.3 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
 	github.com/phuslu/iploc v1.0.20250601 // indirect
