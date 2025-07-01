@@ -1,4 +1,4 @@
-package multidivicesignin
+package multidevicesignin
 
 import (
 	"github.com/coscms/webcore/library/perm"

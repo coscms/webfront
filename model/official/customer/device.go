@@ -9,7 +9,7 @@ import (
 	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webfront/dbschema"
-	multidivicesignin "github.com/coscms/webfront/library/multidevicesignin"
+	multidevicesignin "github.com/coscms/webfront/library/multidevicesignin"
 )
 
 // NewDevice 客户登录设备
@@ -181,7 +181,7 @@ func (f *Device) SignOut(mw func(db.Result) db.Result, args ...interface{}) erro
 }
 
 func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, co *CustomerOptions) (err error) {
-	multideviceSignin, ok := CustomerRolePermissionForBehavior(f.Context(), multidivicesignin.BehaviorName, customer).(*multidivicesignin.MultideviceSignin)
+	multideviceSignin, ok := CustomerRolePermissionForBehavior(f.Context(), multidevicesignin.BehaviorName, customer).(*multidevicesignin.MultideviceSignin)
 	cond := db.NewCompounds()
 	cond.Add(db.Cond{`customer_id`: customer.Id})
 	if !ok {
@@ -190,12 +190,12 @@ func (f *Device) CleanCustomer(customer *dbschema.OfficialCustomer, co *Customer
 	f.SetOptions(co)
 	f.SetDefaults()
 	switch multideviceSignin.Unique {
-	case multidivicesignin.UniquePlatform:
+	case multidevicesignin.UniquePlatform:
 		cond.Add(db.Cond{`scense`: f.Scense})
 		cond.Add(db.Cond{`platform`: f.Platform})
-	case multidivicesignin.UniqueScense:
+	case multidevicesignin.UniqueScense:
 		cond.Add(db.Cond{`scense`: f.Scense})
-	case multidivicesignin.UniqueDeviceID:
+	case multidevicesignin.UniqueDeviceID:
 		fallthrough
 	default:
 		cond.Add(db.Cond{`scense`: f.Scense})
@@ -219,7 +219,7 @@ END:
 	return
 }
 
-func (f *Device) CleanExceedLimit(customerID uint64, multideviceSignin *multidivicesignin.MultideviceSignin) error {
+func (f *Device) CleanExceedLimit(customerID uint64, multideviceSignin *multidevicesignin.MultideviceSignin) error {
 	if multideviceSignin == nil || multideviceSignin.MaxDevices <= 0 {
 		return nil
 	}

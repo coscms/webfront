@@ -10,7 +10,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/perm"
 	"github.com/coscms/webcore/model"
-	multidivicesignin "github.com/coscms/webfront/library/multidevicesignin"
+	multidevicesignin "github.com/coscms/webfront/library/multidevicesignin"
 	"github.com/coscms/webfront/library/xrole"
 )
 
@@ -148,7 +148,7 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string) (err 
 			permission := CustomerPermission(f.Context(), f.OfficialCustomer)
 			if permission != nil {
 				if bev, ok := permission.Get(f.Context(), xrole.CustomerRolePermissionTypeBehavior).(perm.BehaviorPerms); ok {
-					multideviceSignin, _ := bev.Get(multidivicesignin.BehaviorName).Value.(*multidivicesignin.MultideviceSignin)
+					multideviceSignin, _ := bev.Get(multidevicesignin.BehaviorName).Value.(*multidevicesignin.MultideviceSignin)
 					err = deviceM.CleanExceedLimit(deviceM.CustomerId, multideviceSignin)
 				}
 			}
