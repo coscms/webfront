@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.21
+require github.com/coscms/webcore v0.9.22
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -45,9 +45,9 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
-	github.com/webx-top/com v1.3.30
+	github.com/webx-top/com v1.3.31
 	github.com/webx-top/db v1.28.5
-	github.com/webx-top/echo v1.16.8
+	github.com/webx-top/echo v1.16.9
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -231,7 +231,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
-	github.com/phuslu/iploc v1.0.20250601 // indirect
+	github.com/phuslu/iploc v1.0.20250702 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
