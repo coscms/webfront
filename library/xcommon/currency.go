@@ -48,7 +48,11 @@ func DefaultCurrencySymbol() string {
 	return currencySymbol
 }
 
+const Precision = 4 // 小数位数
+
 // HTMLCurrency HTML模板函数：币种
+// withFlags[0]: 是否带货币符号
+// withFlags[1]: 是否清楚小数末尾的0
 func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
 	currencySymbol := DefaultCurrencySymbol()
 	if currency := ctx.Internal().String(`currency`); len(currency) > 0 {
@@ -59,16 +63,16 @@ func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
 	var numberFormatted string
 	if len(withFlags) > 0 {
 		if len(withFlags) > 1 && withFlags[1] {
-			numberFormatted = com.NumberFormat(v, 3)
+			numberFormatted = com.NumberFormat(v, Precision)
 			numberFormatted = com.NumberTrimZero(numberFormatted)
 		} else {
-			numberFormatted = fmt.Sprintf(`%v`, v)
+			numberFormatted = fmt.Sprintf(`%.*f`, Precision, v)
 		}
 		if withFlags[0] {
 			return template.HTML(currencySymbol + numberFormatted)
 		}
 	} else {
-		numberFormatted = fmt.Sprintf(`%v`, v)
+		numberFormatted = fmt.Sprintf(`%.*f`, Precision, v)
 	}
 	return numberFormatted
 }

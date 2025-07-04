@@ -12,6 +12,7 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/xcommon"
 	"github.com/coscms/webfront/library/xdatabase"
 	"github.com/coscms/webfront/middleware/sessdata"
 )
@@ -136,7 +137,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		//flow.WalletAmount = amount+flow.Amount
 		oldAmountDecimal := decimal.NewFromFloat(amount)
 		newAmountDecimal := decimal.NewFromFloat(flow.Amount)
-		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(4)
+		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(int32(xcommon.Precision))
 		flow.WalletAmount = newAmountDecimal.InexactFloat64()
 		if flow.WalletAmount < 0 { //处理flow.Amount为负数(即扣除余额)的情况。扣款操作时检查余额是否足够
 			ctx.Rollback()

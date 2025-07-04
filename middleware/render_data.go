@@ -143,7 +143,7 @@ func (r *RenderData) Price(price float64) float64 {
 func (r *RenderData) PriceFormat(price float64) template.HTML {
 	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(echo.RenderContextWithData)
 	if !ok {
-		h := xcommon.HTMLCurrency(r.ctx, price, true)
+		h := xcommon.HTMLCurrency(r.ctx, price, true, true)
 		switch r := h.(type) {
 		case template.HTML:
 			return r

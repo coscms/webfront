@@ -33,6 +33,9 @@ import (
 
 var TmplFuncGenerator = mwutils.TmplFuncGenerators{
 	`Currency`: func(ctx echo.Context) interface{} {
+
+		// withFlags[0]: 是否带货币符号
+		// withFlags[1]: 是否清楚小数末尾的0
 		return func(v float64, withFlags ...bool) interface{} {
 			return xcommon.HTMLCurrency(ctx, v, withFlags...)
 		}
