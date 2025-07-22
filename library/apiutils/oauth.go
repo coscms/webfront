@@ -79,11 +79,11 @@ func OauthProviders(ctx echo.Context) ([]*OauthProvider, error) {
 		return nil, err
 	}
 	platformList := &OauthProvidersResponse{}
-	data := echo.NewData(ctx)
-	data.Data = platformList
-	_, err = SubmitWithRecv(ctx, data, apiURL, url.Values{})
-	if err == nil && data.Code.Int() != 1 {
-		err = fmt.Errorf(`OauthProviders: %v`, data.Info)
+	apiResp := echo.NewData(ctx)
+	apiResp.Data = platformList
+	_, err = SubmitWithRecv(ctx, apiResp, apiURL, url.Values{})
+	if err == nil && apiResp.Code.Int() != 1 {
+		err = fmt.Errorf(`OauthProviders: %v`, apiResp.Info)
 	}
 	return platformList.List, err
 }

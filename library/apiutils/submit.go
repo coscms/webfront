@@ -5,16 +5,16 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/coscms/webcore/library/restclient"
 	"github.com/admpub/resty/v2"
+	"github.com/coscms/webcore/library/restclient"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
 func Submit(ctx echo.Context, apiURL string, formData url.Values, method ...string) (*echo.RawData, error) {
-	data := echo.NewData(ctx)
-	_, err := SubmitWithRecv(ctx, data, apiURL, formData, method...)
-	return data, err
+	apiResp := echo.NewData(ctx)
+	_, err := SubmitWithRecv(ctx, apiResp, apiURL, formData, method...)
+	return apiResp, err
 }
 
 func SubmitWithRecv(ctx echo.Context, recv interface{}, apiURL string, formData url.Values, method ...string) (*resty.Response, error) {
@@ -40,11 +40,11 @@ func SubmitWithRecv(ctx echo.Context, recv interface{}, apiURL string, formData 
 }
 
 func Submitx(ctx echo.Context, apiURL string, formData url.Values, method ...string) (echo.H, string, error) {
-	data := echo.H{}
+	apiResp := echo.H{}
 	var body string
-	resp, err := SubmitWithRecv(ctx, &data, apiURL, formData, method...)
+	resp, err := SubmitWithRecv(ctx, &apiResp, apiURL, formData, method...)
 	if resp != nil {
 		body = com.StripTags(resp.String())
 	}
-	return data, body, err
+	return apiResp, body, err
 }
