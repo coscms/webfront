@@ -4,7 +4,7 @@ go 1.24.0
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.30
+require github.com/coscms/webcore v0.9.31
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -66,7 +66,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
-	github.com/golang-jwt/jwt/v5 v5.2.3
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.32.0
 	github.com/nging-plugins/dbmanager v1.8.7
@@ -216,7 +216,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.29 // indirect
+	github.com/mattn/go-sqlite3 v1.14.30 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/miekg/dns v1.1.67 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -302,6 +302,6 @@ require (
 	modernc.org/libc v1.66.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.38.1 // indirect
+	modernc.org/sqlite v1.38.2 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
