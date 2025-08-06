@@ -14,7 +14,7 @@ type IndexConfig struct {
 	PrimaryKey           string
 	SearchableAttributes []string
 	SortableAttributes   []string
-	FilterableAttributes []string
+	FilterableAttributes []interface{}
 	Properties           interface{}
 }
 

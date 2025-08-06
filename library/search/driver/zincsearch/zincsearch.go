@@ -24,11 +24,11 @@ type ZincSearch struct {
 	doc.ZincDocSDK
 }
 
-func (m *ZincSearch) Add(index string, primaryKey string, docs ...interface{}) error {
+func (m *ZincSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
 	var err error
 	for _, doc := range docs {
 		row := param.AsStore(doc)
-		id := row.String(primaryKey)
+		id := row.String(*primaryKey)
 		err = m.ZincDocSDK.InsertDocumentWithID(index, id, doc)
 		if err != nil {
 			return err
@@ -37,10 +37,10 @@ func (m *ZincSearch) Add(index string, primaryKey string, docs ...interface{}) e
 	return err
 }
 
-func (m *ZincSearch) Update(index string, primaryKey string, docs ...interface{}) (err error) {
+func (m *ZincSearch) Update(index string, primaryKey *string, docs ...interface{}) (err error) {
 	for _, doc := range docs {
 		row := param.AsStore(doc)
-		id := row.String(primaryKey)
+		id := row.String(*primaryKey)
 		err = m.ZincDocSDK.UpdateDocument(index, id, doc)
 		if err != nil {
 			break

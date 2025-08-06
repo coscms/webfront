@@ -3,8 +3,8 @@ package search
 import "github.com/webx-top/echo"
 
 type Searcher interface {
-	Add(index string, primaryKey string, docs ...interface{}) error
-	Update(index string, primaryKey string, docs ...interface{}) error
+	Add(index string, primaryKey *string, docs ...interface{}) error
+	Update(index string, primaryKey *string, docs ...interface{}) error
 	Delete(index string, ids ...string) error
 	Flush() error
 	InitIndex(cfg *IndexConfig) error
@@ -15,11 +15,11 @@ var DefaultSearch = &NopSearch{}
 
 type NopSearch struct{}
 
-func (n *NopSearch) Add(index string, primaryKey string, docs ...interface{}) error {
+func (n *NopSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
 	return nil
 }
 
-func (m *NopSearch) Update(index string, primaryKey string, docs ...interface{}) error {
+func (m *NopSearch) Update(index string, primaryKey *string, docs ...interface{}) error {
 	return nil
 }
 

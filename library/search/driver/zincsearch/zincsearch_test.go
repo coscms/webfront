@@ -30,7 +30,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestAdd(t *testing.T) {
-	err := cli.Add(index, `id`, map[string]string{
+	primaryKey := `id`
+	err := cli.Add(index, &primaryKey, map[string]string{
 		"title": "钢铁侠美国队长复仇者联盟",
 		"id":    id,
 	})
