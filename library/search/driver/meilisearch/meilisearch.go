@@ -31,17 +31,9 @@ func (m *MeiliSearch) getIndex(index string) meilisearch.IndexManager {
 	return m.ServiceManager.Index(index)
 }
 
-func (m *MeiliSearch) Add(index string, primaryKey string, docs ...interface{}) error {
+func (m *MeiliSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
-	var (
-		t   *meilisearch.TaskInfo
-		err error
-	)
-	if len(primaryKey) > 0 {
-		t, err = indexM.AddDocuments(docs, primaryKey)
-	} else {
-		t, err = indexM.AddDocuments(docs)
-	}
+	t, err := indexM.AddDocuments(docs, primaryKey)
 	if err != nil {
 		return err
 	}
@@ -51,17 +43,9 @@ func (m *MeiliSearch) Add(index string, primaryKey string, docs ...interface{}) 
 	return err
 }
 
-func (m *MeiliSearch) Update(index string, primaryKey string, docs ...interface{}) error {
+func (m *MeiliSearch) Update(index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
-	var (
-		t   *meilisearch.TaskInfo
-		err error
-	)
-	if len(primaryKey) > 0 {
-		t, err = indexM.UpdateDocuments(docs, primaryKey)
-	} else {
-		t, err = indexM.UpdateDocuments(docs)
-	}
+	t, err := indexM.UpdateDocuments(docs, primaryKey)
 	if err != nil {
 		return err
 	}
@@ -131,14 +115,7 @@ func (m *MeiliSearch) Search(index string, keywords string, options *search.Sear
 		return 0, nil, err
 	}
 
-	rows := make([]echo.H, len(searchRes.Hits))
-	for i, v := range searchRes.Hits {
-		vm := echo.H(v.(map[string]interface{}))
-		m := echo.H{`Doc`: vm}
-		if vm.Has(`_formatted`) {
-			m.Set(`_formatted`, vm.GetStore(`_formatted`))
-		}
-		rows[i] = m
-	}
-	return searchRes.EstimatedTotalHits, rows, nil
+	var rows []echo.H
+	err = searchRes.Hits.Decode(&rows)
+	return searchRes.EstimatedTotalHits, rows, err
 }
