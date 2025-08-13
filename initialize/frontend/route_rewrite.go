@@ -47,6 +47,10 @@ func applyRouteRewrite(e *echo.Echo) error {
 	if err != nil {
 		return err
 	}
+
+	//cfg.Init()
+	e.Pre(middleware.UnrewriteWithConfig(cfg))
+
 	rewriteConfig.SetConfig(&cfg)
 	e.SetRewriter(rewriteConfig)
 	return err
@@ -64,7 +68,7 @@ func MakeRouteRewriter() (cfg middleware.RewriteConfig, err error) {
 	for _, v := range f.Objects() {
 		cfg.Rules[v.Route] = v.RewriteTo
 	}
-	cfg.Init()
+	//cfg.Init()
 	return
 }
 
