@@ -42,17 +42,28 @@ func (r *rewriteWithLock) Reverse(urlPath string) string {
 	return r.Config().Reverse(urlPath)
 }
 
+func (r *rewriteWithLock) UnrewriteMiddleware() echo.MiddlewareFuncd {
+	return func(next echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) (err error) {
+			if r.Config().Skipper(c) {
+				return next.Handle(c)
+			}
+
+			req := c.Request()
+			req.URL().SetPath(r.Config().Reverse(req.URL().Path()))
+			return next.Handle(c)
+		}
+	}
+}
+
 func applyRouteRewrite(e *echo.Echo) error {
 	cfg, err := MakeRouteRewriter()
 	if err != nil {
 		return err
 	}
-
-	//cfg.Init()
-	e.Pre(middleware.UnrewriteWithConfig(cfg))
-
 	rewriteConfig.SetConfig(&cfg)
 	e.SetRewriter(rewriteConfig)
+	e.Pre(rewriteConfig.UnrewriteMiddleware)
 	return err
 }
 
@@ -68,7 +79,7 @@ func MakeRouteRewriter() (cfg middleware.RewriteConfig, err error) {
 	for _, v := range f.Objects() {
 		cfg.Rules[v.Route] = v.RewriteTo
 	}
-	//cfg.Init()
+	cfg.Init()
 	return
 }
 
