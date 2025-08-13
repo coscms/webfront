@@ -4,7 +4,7 @@ go 1.24.5
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.33
+require github.com/coscms/webcore v0.9.37
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.31
 	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.16.13
+	github.com/webx-top/echo v1.16.14
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -102,7 +102,7 @@ require (
 	github.com/admpub/cron v0.1.1 // indirect
 	github.com/admpub/email v2.4.1+incompatible // indirect
 	github.com/admpub/fasthttp v0.0.7 // indirect
-	github.com/admpub/fsnotify v1.7.0 // indirect
+	github.com/admpub/fsnotify v1.7.1 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.1 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
@@ -215,7 +215,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.30 // indirect
+	github.com/mattn/go-sqlite3 v1.14.31 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/miekg/dns v1.1.68 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -279,26 +279,26 @@ require (
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	go.uber.org/mock v0.5.2 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
-	golang.org/x/image v0.29.0 // indirect
-	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
+	golang.org/x/image v0.30.0 // indirect
+	golang.org/x/mod v0.27.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	golang.org/x/tools v0.35.0 // indirect
+	golang.org/x/tools v0.36.0 // indirect
 	google.golang.org/api v0.245.0 // indirect
 	google.golang.org/genproto v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/grpc v1.74.2 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
+	google.golang.org/protobuf v1.36.7 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.66.6 // indirect
+	modernc.org/libc v1.66.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.38.2 // indirect
