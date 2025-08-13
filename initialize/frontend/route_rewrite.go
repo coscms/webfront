@@ -75,6 +75,7 @@ func MakeRouteRewriter() (cfg middleware.RewriteConfig, err error) {
 	if err != nil {
 		return
 	}
+	cfg.Skipper = echo.DefaultSkipper
 	cfg.Rules = map[string]string{}
 	for _, v := range f.Objects() {
 		cfg.Rules[v.Route] = v.RewriteTo
