@@ -40,6 +40,9 @@ func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool)
 		}
 		err := Make(http.MethodGet, reqURL, cacheKey)
 		return true, err
+	case `4`, `rm`:
+		err := Remove(cacheKey)
+		return false, err
 	}
 	return true, nil
 }
