@@ -11,7 +11,7 @@ import (
 
 func TestGenerate(t *testing.T) {
 	now := time.Now().UTC()
-	Registry.Add(`test`, `Test`, echo.KVxOptX[Sitemap, any](Sitemap{
+	cfg := Sitemap{
 		Do: func(add Adder) error {
 			return add(&smg.SitemapLoc{
 				Loc:        "news/2021-01-05/a-news-page",
@@ -20,8 +20,11 @@ func TestGenerate(t *testing.T) {
 				Priority:   1,
 			})
 		},
-	}))
+	}
+	Registry.Add(`test`, `Test`, echo.KVxOptX[Sitemap, any](cfg))
 
-	err := Generate(`https://www.webx.top`)
+	err := GenerateIndex(`https://www.webx.top`)
+	assert.NoError(t, err)
+	err = GenerateSingle(`https://www.webx.top`, cfg.Do)
 	assert.NoError(t, err)
 }

@@ -17,5 +17,6 @@ type Sitemap struct {
 
 func RegisterRoute(r echo.RouteRegister) {
 	r.File(`/sitemap.xml`, filepath.Join(echo.Wd(), `public`, `sitemap.xml`))
+	r.File(`/sitemap_index.xml`, filepath.Join(echo.Wd(), `public`, `sitemap_index.xml`))
 	r.Static(`/sitemaps`, filepath.Join(echo.Wd(), `public`, `sitemaps`))
 }
