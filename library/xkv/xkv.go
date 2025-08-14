@@ -40,19 +40,27 @@ var DefaultTTL int64 = 86400 * 7
 func GetValue(ctx echo.Context, key string, defaultValue ...string) (string, error) {
 	var value string
 	err := cache.XFunc(ctx, `nging.kv.key.`+key, &value, func() (err error) {
-		kvM := model.NewKv(ctx)
-		value, err = kvM.GetValue(key, defaultValue...)
+		value, err = GetValueNocache(ctx, key, defaultValue...)
 		return
 	}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)))
 	return value, err
 }
 
+func GetValueNocache(ctx echo.Context, key string, defaultValue ...string) (string, error) {
+	kvM := model.NewKv(ctx)
+	return kvM.GetValue(key, defaultValue...)
+}
+
 func GetTypeValues(ctx echo.Context, typ string, defaultValue ...string) ([]string, error) {
-	var value []string
-	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &value, func() (err error) {
-		kvM := model.NewKv(ctx)
-		value, err = kvM.GetTypeValues(typ, defaultValue...)
+	var values []string
+	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values, func() (err error) {
+		values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
 		return
 	}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)))
-	return value, err
+	return values, err
+}
+
+func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...string) ([]string, error) {
+	kvM := model.NewKv(ctx)
+	return kvM.GetTypeValues(typ, defaultValue...)
 }
