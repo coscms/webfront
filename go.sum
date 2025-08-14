@@ -268,6 +268,8 @@ github.com/admpub/service v0.0.8 h1:AmmNxXrsh4qQlppseeWccllSYZWgEM+dXfulX5UJfo0=
 github.com/admpub/service v0.0.8/go.mod h1:v6paMl5xamyS7yVJkUD1Gh+A3nVn1RxTcah/oxdf0Vc=
 github.com/admpub/sessions v0.3.0 h1:IlxkNCDZyg89sXJHl3q/nqpSk81hIz1Q1vVOiqhwi4w=
 github.com/admpub/sessions v0.3.0/go.mod h1:qZCCMxkYS5Uk12RmxvvIpXr7ZdgS2B59iX0XLoQYG0Q=
+github.com/admpub/sitemap-generator v0.0.0-20250814124852-43e227654102 h1:k1ZHmB93RlDGGQfo0VSt51QRcolIptyXcyvaFNhXljU=
+github.com/admpub/sitemap-generator v0.0.0-20250814124852-43e227654102/go.mod h1:P2eA5OCUxgnpuDaHHR7ihUZpHSOzP2agnrSrdVL0re0=
 github.com/admpub/sonyflake v0.0.1 h1:oKYRTf7gjbHHpDe9WQkueZuHsilLUVCpshDmWsh33Mc=
 github.com/admpub/sonyflake v0.0.1/go.mod h1:dWWC99nrhdpb3esJuB7NLWvACXcd1LouCGpYEuS0Pxc=
 github.com/admpub/tail v1.1.1 h1:cjdOErLhSOj6Fb/Pk3b2qiPprt2Uvq4Ax/NQz/RqMxQ=
@@ -611,6 +613,8 @@ github.com/golang/snappy v0.0.2/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEW
 github.com/golang/snappy v1.0.0 h1:Oy607GVXHs7RtbggtPBnr2RmDArIsAefDwvrdWvRhGs=
 github.com/golang/snappy v1.0.0/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golangci/lint-1 v0.0.0-20181222135242-d2cdd8c08219/go.mod h1:/X8TswGSh1pIozq4ZwCfxS0WA5JGXguxk94ar/4c87Y=
+github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a h1:l7A0loSszR5zHd/qK53ZIHMO8b3bBSmENnQ6eKnUT0A=
+github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
 github.com/gomodule/redigo v1.8.2/go.mod h1:P9dn9mFrCBvWhGE1wpxx6fgq7BAeLBk+UUUzlpkBYO0=
 github.com/gomodule/redigo v1.8.4/go.mod h1:P9dn9mFrCBvWhGE1wpxx6fgq7BAeLBk+UUUzlpkBYO0=
 github.com/gomodule/redigo v1.8.8/go.mod h1:7ArFNvsTjH8GMMzB4uy1snslv2BwmginuMs06a1uzZE=
@@ -688,6 +692,8 @@ github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe/go.mod h1:wJfORR
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/css v1.0.1 h1:ntNaBIghp6JmvWnxbZKANoLyuXTPZ4cAMlo6RyhlbO8=
 github.com/gorilla/css v1.0.1/go.mod h1:BvnYkspnSzMmwRK+b8/xgNPLiIuNZr6vbZBTPQ2A3b0=
+github.com/gorilla/feeds v1.2.0 h1:O6pBiXJ5JHhPvqy53NsjKOThq+dNFm8+DFrxBEdzSCc=
+github.com/gorilla/feeds v1.2.0/go.mod h1:WMib8uJP3BbY+X8Szd1rA5Pzhdfh+HCCAYT2z7Fza6Y=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=

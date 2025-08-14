@@ -56,3 +56,4 @@ nohup.out
 /dist/localtest/*/
 .env
 /vendor
+/library/sitemap/public

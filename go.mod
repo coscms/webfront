@@ -64,9 +64,12 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
+	github.com/admpub/sitemap-generator v0.0.0-20250814124852-43e227654102
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
+	github.com/gorilla/feeds v1.2.0
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.33.0
 	github.com/nging-plugins/dbmanager v1.8.7
