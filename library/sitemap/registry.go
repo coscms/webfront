@@ -37,8 +37,12 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
 	mw := func(r db.Result) db.Result {
 		return r.Select(`id`, `created`, `updated`, `image`).OrderBy(`id`)
 	}
+	articleLastID := ctx.Internal().Uint64(`articleLastID`)
+	if articleLastID > 0 {
+		cond.AddKV(`id`, db.Gt(articleLastID))
+	}
 	ls := pagination.NewOffsetLister(articleM, nil, mw, cond.And())
-	err := ls.ChunkList(func() error {
+	err := ls.ChunkList(func() (err error) {
 		list := articleM.Objects()
 		for _, row := range list {
 			link := sessdata.URLByName(`article.detail`, row.Id)
@@ -59,10 +63,16 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
 					ImageLoc: row.Image,
 				})
 			}
-			sm.Add(item)
+			err = sm.Add(item)
+			if err != nil {
+				return
+			}
+			articleLastID = row.Id
 		}
-		return nil
+		return
 	}, 100, 0)
+
+	ctx.Internal().Set(`articleLastID`, articleLastID)
 	return err
 }
 
