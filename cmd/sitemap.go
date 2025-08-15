@@ -16,6 +16,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webfront/library/sitemap"
+	"github.com/coscms/webfront/registry/route"
 )
 
 var sitemapCmd = &cobra.Command{
@@ -121,6 +122,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	}
 	subDir := u.Hostname()
 	eCtx := defaults.NewMockContext()
+	route.Apply()
 	switch sitemapCfg.Mode {
 	case `full`:
 
@@ -186,6 +188,6 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 
 func init() {
 	cmd.Add(sitemapCmd)
-	minifyCmd.Flags().StringVar(&sitemapCfg.Mode, `incr`, sitemapCfg.Mode, `模式。支持的值有: full(全量生成) / incr(增量生成) / clear(删除)`)
-	minifyCmd.Flags().BoolVar(&sitemapCfg.AllChild, `allChild`, sitemapCfg.AllChild, `是否同时生成所有子页面中的网址`)
+	sitemapCmd.Flags().StringVar(&sitemapCfg.Mode, `mode`, sitemapCfg.Mode, `模式。支持的值有: full(全量生成) / incr(增量生成) / clear(删除)`)
+	sitemapCmd.Flags().BoolVar(&sitemapCfg.AllChild, `allChild`, sitemapCfg.AllChild, `是否同时生成所有子页面中的网址`)
 }

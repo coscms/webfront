@@ -23,9 +23,10 @@ func TestGenerate(t *testing.T) {
 			})
 		},
 	}
+	Registry = echo.NewKVxData[Sitemap, any]()
 	Registry.Add(`test`, `Test`, echo.KVxOptX[Sitemap, any](cfg))
 
-	err := GenerateIndex(eCtx, `https://www.webx.top/`, `zh-CN`, false)
+	err := GenerateIndex(eCtx, `https://www.webx.top/`, `zh-CN`, true)
 	assert.NoError(t, err)
 	err = GenerateSingle(eCtx, `https://www.webx.top`, `zh-CN`, cfg.Do)
 	assert.NoError(t, err)
