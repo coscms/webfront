@@ -28,6 +28,10 @@ type RSS struct {
 	Do func(ctx echo.Context, feed *feeds.RssFeed) error
 }
 
+func T2s(t time.Time) string {
+	return t.Format(time.RFC1123Z)
+}
+
 func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 	source := ctx.Form(`source`)
 	articleM := modelArticle.NewArticle(ctx)
@@ -55,9 +59,9 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 			Description: row.Summary,
 		}
 		if row.Updated > 0 {
-			item.PubDate = time.Unix(int64(row.Updated), 0).Format(time.RFC1123Z)
+			item.PubDate = T2s(time.Unix(int64(row.Updated), 0))
 		} else {
-			item.PubDate = time.Unix(int64(row.Created), 0).Format(time.RFC1123Z)
+			item.PubDate = T2s(time.Unix(int64(row.Created), 0))
 		}
 		if idx == 0 {
 			feed.PubDate = item.PubDate
