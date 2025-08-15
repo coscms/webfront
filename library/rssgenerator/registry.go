@@ -50,7 +50,7 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 		}
 		item := &feeds.Item{
 			Id:          link,
-			Title:       com.Substr(row.Title, `...`, TitleMaxLength),
+			Title:       row.Title,
 			Link:        &feeds.Link{Href: link},
 			Description: row.Summary,
 			Author:      nil,

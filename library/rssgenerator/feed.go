@@ -9,8 +9,6 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
-const TitleMaxLength = 20
-
 func NewFeed(title, slogan, host, authorName, authorEmail string) *feeds.Feed {
 	now := time.Now()
 	feed := &feeds.Feed{
