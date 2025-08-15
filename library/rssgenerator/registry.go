@@ -1,6 +1,7 @@
 package rssgenerator
 
 import (
+	"strings"
 	"time"
 
 	"github.com/admpub/feeds"
@@ -35,10 +36,13 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 		cond.AddKV(`source_table`, source)
 	}
 	_, err := articleM.ListByOffset(&list, func(r db.Result) db.Result {
-		return r.Select(`-id`)
+		return r.OrderBy(`-id`)
 	}, 0, 20, cond.And())
 	for _, row := range list {
 		link := sessdata.URLByName(`article.detail`, row.Id)
+		if strings.HasPrefix(link, `/`) {
+			link = ctx.Site() + link[1:]
+		}
 		item := &feeds.Item{
 			Id:          link,
 			Title:       com.Substr(row.Title, `...`, TitleMaxLength),

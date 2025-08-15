@@ -2,13 +2,21 @@ package sitemap
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/admpub/sitemap-generator/smg"
-	"github.com/coscms/webcore/library/httpserver"
+	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory/pagination"
 	"github.com/webx-top/echo"
+
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webfront/middleware/sessdata"
+	modelArticle "github.com/coscms/webfront/model/official/article"
 )
 
-var Registry = echo.NewKVxData[Sitemap, any]()
+var Registry = echo.NewKVxData[Sitemap, any]().
+	Add(`article`, echo.T(`文章`), echo.KVxOptX[Sitemap, any](Sitemap{Do: articleSitemap}))
 
 func Register(k, v string, x Sitemap) {
 	Registry.Add(k, v, echo.KVxOptX[Sitemap, any](x))
@@ -16,6 +24,46 @@ func Register(k, v string, x Sitemap) {
 
 type Sitemap struct {
 	Do func(echo.Context, *smg.Sitemap) error
+}
+
+func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
+	source := ctx.Form(`source`)
+	articleM := modelArticle.NewArticle(ctx)
+	cond := db.NewCompounds()
+	cond.AddKV(`display`, common.BoolY)
+	if len(source) > 0 {
+		cond.AddKV(`source_table`, source)
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(`id`, `created`, `updated`, `image`).OrderBy(`id`)
+	}
+	ls := pagination.NewOffsetLister(articleM, nil, mw, cond.And())
+	err := ls.ChunkList(func() error {
+		list := articleM.Objects()
+		for _, row := range list {
+			link := sessdata.URLByName(`article.detail`, row.Id)
+			var lastMod time.Time
+			if row.Updated > 0 {
+				lastMod = time.Unix(int64(row.Updated), 0)
+			} else {
+				lastMod = time.Unix(int64(row.Created), 0)
+			}
+			item := &smg.SitemapLoc{
+				Loc:        link,
+				LastMod:    &lastMod,
+				ChangeFreq: smg.Weekly,
+				Priority:   PriorityDetail,
+			}
+			if len(row.Image) > 0 {
+				item.Images = append(item.Images, &smg.SitemapImage{
+					ImageLoc: row.Image,
+				})
+			}
+			sm.Add(item)
+		}
+		return nil
+	}, 100, 0)
+	return err
 }
 
 func RegisterRoute(r echo.RouteRegister) {
