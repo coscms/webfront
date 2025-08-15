@@ -168,7 +168,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		prepare = func(langCodes []string) error {
 			for _, v := range groupItems {
 				for _, _lang := range langCodes {
-					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang+`_`+subDir)
+					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang+`_`+subDir+`.txt`)
 					if err != nil && !os.IsNotExist(err) {
 						return err
 					}
@@ -191,7 +191,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 				if lastID <= 0 {
 					continue
 				}
-				err := filecache.WriteCache(`sitemap`, v.K+`_`+_lang+`_`+subDir, []byte(param.AsString(lastID)))
+				err := filecache.WriteCache(`sitemap`, v.K+`_`+_lang+`_`+subDir+`.txt`, []byte(param.AsString(lastID)))
 				if err != nil {
 					fmt.Println(err.Error())
 				}
