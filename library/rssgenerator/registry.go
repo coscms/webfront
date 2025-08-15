@@ -1,6 +1,8 @@
 package rssgenerator
 
 import (
+	"mime"
+	"path"
 	"strings"
 	"time"
 
@@ -71,6 +73,14 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 			item.Author = &feeds.Author{Name: row.Customer.Name, Email: ``}
 		} else if row.User != nil {
 			item.Author = &feeds.Author{Name: row.User.Username, Email: ``}
+		}
+		if len(row.Image) > 0 {
+			mtype := mime.TypeByExtension(path.Ext(row.Image))
+			row.Image = com.AbsURL(ctx.Site()+`rss`, row.Image)
+			item.Enclosure = &feeds.Enclosure{
+				Url:  row.Image,
+				Type: mtype,
+			}
 		}
 		feed.Add(item)
 	}
