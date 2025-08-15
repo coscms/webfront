@@ -77,11 +77,6 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 				item.Description = row.Content
 			}
 		}
-		if row.Customer != nil {
-			item.Author = row.Customer.Name
-		} else if row.User != nil {
-			item.Author = row.User.Username
-		}
 		if len(row.Image) > 0 {
 			mtype := mime.TypeByExtension(path.Ext(row.Image))
 			row.Image = com.AbsURL(ctx.Site()+`rss`, row.Image)
@@ -89,6 +84,11 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 				Url:  row.Image,
 				Type: mtype,
 			}
+		}
+		if row.Customer != nil {
+			item.Author = row.Customer.Name
+		} else if row.User != nil {
+			item.Author = row.User.Username
 		}
 		if row.Category != nil {
 			item.Category = row.Category.Name
