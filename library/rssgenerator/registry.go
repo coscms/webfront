@@ -9,6 +9,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webfront/middleware/sessdata"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 )
@@ -70,6 +71,6 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 }
 
 func RegisterRoute(r echo.RouteRegister) {
-	r.Get(`/rss`, Handle)
-	r.Get(`/rss/:group`, Handle)
+	r.Get(`/rss`, Handle).SetMetaKV(httpserver.PermGuestKV())
+	r.Get(`/rss/:group`, Handle).SetMetaKV(httpserver.PermGuestKV())
 }
