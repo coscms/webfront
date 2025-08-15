@@ -13,16 +13,16 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
-func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildPageItems bool, subDir ...string) error {
+func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateChildPageItems bool, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
 	var outputPath string
 	if len(subDir) > 0 {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], lang)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], langCode)
 	} else {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, langCode)
 	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
@@ -43,7 +43,7 @@ func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildP
 		if !generateChildPageItems {
 			continue
 		}
-		err = item.X.Do(ctx, sm)
+		err = item.X.Do(ctx, sm, langCode)
 		if err != nil {
 			return fmt.Errorf("unable to add sitemapLoc#%v: %v", item.K, err)
 		}
@@ -58,16 +58,16 @@ func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildP
 	return err
 }
 
-func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.Context, *smg.Sitemap) error, subDir ...string) error {
+func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(echo.Context, *smg.Sitemap, string) error, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
 	var outputPath string
 	if len(subDir) > 0 {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], lang)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], langCode)
 	} else {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, langCode)
 	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
@@ -80,7 +80,7 @@ func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.C
 	sm.SetOutputPath(outputPath)
 	sm.SetLastMod(&now)
 
-	err = f(ctx, sm)
+	err = f(ctx, sm, langCode)
 	if err != nil {
 		return fmt.Errorf("unable to add sitemapLoc: %v", err)
 	}
@@ -104,13 +104,13 @@ func RemoveAll(subDirs ...string) {
 	}
 }
 
-func RemoveLanguage(lang string, subDirs ...string) {
+func RemoveLanguage(langCode string, subDirs ...string) {
 	if len(subDirs) == 0 {
-		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, lang))
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, langCode))
 		return
 	}
 	for _, subDir := range subDirs {
-		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, subDir, lang))
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, subDir, langCode))
 	}
 }
 
@@ -125,7 +125,7 @@ func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPag
 	return
 }
 
-func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error, subDir ...string) (err error) {
+func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap, string) error, subDir ...string) (err error) {
 	for _, lang := range config.FromFile().Language.AllList {
 		lang = echo.NewLangCode(lang).Normalize()
 		err = GenerateSingle(ctx, rootURL, lang, f, subDir...)

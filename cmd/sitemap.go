@@ -11,15 +11,12 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/param"
-	"github.com/webx-top/echo/subdomains"
 
 	"github.com/coscms/webcore/cmd"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
-	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/coscms/webfront/library/sitemap"
-	"github.com/coscms/webfront/registry/route"
 )
 
 var sitemapCmd = &cobra.Command{
@@ -124,30 +121,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	subDir := u.Hostname()
-	eCtx := defaults.NewMockContext()
-
-	e := route.IRegister().Echo()
-	subdomains.Default.Default = httpserver.KindFrontend
-	subdomains.Default.Add(httpserver.KindFrontend+`@`+u.Host, e)
-	route.Apply()
-	frontend.SetRewriter(e)
-	e.Commit()
-
-	switch sitemapCfg.Mode {
-	case `full`:
-
-	case `incr`:
-		for _, v := range sitemap.Registry.Slice() {
-			b, err := filecache.ReadCache(`sitemap`, v.K)
-			if err != nil && !os.IsNotExist(err) {
-				return err
-			}
-			if len(b) > 0 {
-				lastID := param.AsUint64(string(b))
-				eCtx.Internal().Set(v.K+`LastID`, lastID)
-			}
-		}
-	case `clear`:
+	if sitemapCfg.Mode == `clear` {
 		if len(lang) == 0 {
 			sitemap.RemoveAll(subDir)
 			fmt.Println(`removing sitemap is done`)
@@ -165,25 +139,59 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	defer func() {
+	eCtx := defaults.NewMockContext()
+
+	frontend.TempInitRoute(u.Host)
+
+	var prepare func(langs []string) error
+	if sitemapCfg.Mode == `incr` {
+		prepare = func(langs []string) error {
+			for _, v := range sitemap.Registry.Slice() {
+				for _, _lang := range langs {
+					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang)
+					if err != nil && !os.IsNotExist(err) {
+						return err
+					}
+					if len(b) > 0 {
+						lastID := param.AsUint64(string(b))
+						eCtx.Internal().Set(_lang+`.`+v.K+`LastID`, lastID)
+					}
+				}
+			}
+			return nil
+		}
+	}
+	if prepare == nil {
+		prepare = func(langs []string) error { return nil }
+	}
+	save := func(langs []string) {
 		for _, v := range sitemap.Registry.Slice() {
-			lastID := eCtx.Internal().Uint64(v.K + `LastID`)
-			if lastID > 0 {
-				err := filecache.WriteCache(`sitemap`, v.K, []byte(param.AsString(lastID)))
+			for _, _lang := range langs {
+				lastID := eCtx.Internal().Uint64(_lang + `.` + v.K + `LastID`)
+				if lastID <= 0 {
+					continue
+				}
+				err := filecache.WriteCache(`sitemap`, v.K+`_`+_lang, []byte(param.AsString(lastID)))
 				if err != nil {
 					fmt.Println(err.Error())
 				}
 			}
 		}
-	}()
-	if len(lang) == 0 {
-		err = sitemap.GenerateIndexAllLanguage(eCtx, rootURL, sitemapCfg.AllChild, subDir)
-		fmt.Println(`sitemap generation is complete`)
-		return err
 	}
-	langs := param.Split(lang, `,`).Filter(normalizeLangCode).String()
-	err = validateLangCode(langs)
-	if err != nil {
+	var langs []string
+	if len(lang) == 0 {
+		langs = make([]string, len(config.FromFile().Language.AllList))
+		for index, lang := range config.FromFile().Language.AllList {
+			langs[index] = echo.NewLangCode(lang).Normalize()
+		}
+	} else {
+		langs = param.Split(lang, `,`).Filter(normalizeLangCode).String()
+		err = validateLangCode(langs)
+		if err != nil {
+			return err
+		}
+	}
+	if err = prepare(langs); err != nil {
 		return err
 	}
 	for _, _lang := range langs {
@@ -193,6 +201,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 	fmt.Println(`sitemap generation is complete`)
+	save(langs)
 	return err
 }
 

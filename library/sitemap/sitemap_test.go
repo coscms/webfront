@@ -14,7 +14,7 @@ func TestGenerate(t *testing.T) {
 	eCtx := defaults.NewMockContext()
 	now := time.Now().UTC()
 	cfg := Sitemap{
-		Do: func(ctx echo.Context, sm *smg.Sitemap) error {
+		Do: func(ctx echo.Context, sm *smg.Sitemap, langCode string) error {
 			return sm.Add(&smg.SitemapLoc{
 				Loc:        "news/2021-01-05/a-news-page",
 				LastMod:    &now,

@@ -23,10 +23,10 @@ func Register(k, v string, x Sitemap) {
 }
 
 type Sitemap struct {
-	Do func(echo.Context, *smg.Sitemap) error
+	Do func(ctx echo.Context, sm *smg.Sitemap, langCode string) error
 }
 
-func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
+func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string) error {
 	source := ctx.Form(`source`)
 	articleM := modelArticle.NewArticle(ctx)
 	cond := db.NewCompounds()
@@ -37,7 +37,8 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
 	mw := func(r db.Result) db.Result {
 		return r.Select(`id`, `created`, `updated`, `image`).OrderBy(`id`)
 	}
-	articleLastID := ctx.Internal().Uint64(`articleLastID`)
+	inkey := langCode + `.articleLastID`
+	articleLastID := ctx.Internal().Uint64(inkey)
 	if articleLastID > 0 {
 		cond.AddKV(`id`, db.Gt(articleLastID))
 	}
@@ -72,7 +73,7 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
 		return
 	}, 100, 0)
 
-	ctx.Internal().Set(`articleLastID`, articleLastID)
+	ctx.Internal().Set(inkey, articleLastID)
 	return err
 }
 

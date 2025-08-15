@@ -231,3 +231,12 @@ func URLFor(purl string) string {
 func Customer(c echo.Context) *dbschema.OfficialCustomer {
 	return xMW.Customer(c)
 }
+
+func TempInitRoute(host string) {
+	e := httpserver.Frontend.Router.Echo()
+	subdomains.Default.Default = httpserver.KindFrontend
+	subdomains.Default.Add(httpserver.KindFrontend+`@`+host, e)
+	httpserver.Frontend.Router.Apply()
+	SetRewriter(e)
+	e.Commit()
+}
