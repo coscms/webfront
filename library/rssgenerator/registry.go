@@ -38,6 +38,9 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 	_, err := articleM.ListByOffset(&list, func(r db.Result) db.Result {
 		return r.OrderBy(`-id`)
 	}, 0, 20, cond.And())
+	if err != nil {
+		return err
+	}
 	for _, row := range list {
 		link := sessdata.URLByName(`article.detail`, row.Id)
 		if strings.HasPrefix(link, `/`) {
