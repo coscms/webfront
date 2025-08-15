@@ -234,6 +234,7 @@ func Customer(c echo.Context) *dbschema.OfficialCustomer {
 
 func TempInitRoute(host string) {
 	e := httpserver.Frontend.Router.Echo()
+	e.SetDefaultExtension(RouteDefaultExtension)
 	subdomains.Default.Default = httpserver.KindFrontend
 	subdomains.Default.Add(httpserver.KindFrontend+`@`+host, e)
 	httpserver.Frontend.Router.Apply()
