@@ -11,10 +11,12 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/param"
+	"github.com/webx-top/echo/subdomains"
 
 	"github.com/coscms/webcore/cmd"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webfront/library/sitemap"
 	"github.com/coscms/webfront/registry/route"
 )
@@ -122,7 +124,11 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	}
 	subDir := u.Hostname()
 	eCtx := defaults.NewMockContext()
+
+	subdomains.Default.Default = httpserver.KindFrontend
+	subdomains.Default.Add(httpserver.KindFrontend+`@`+u.Host, route.IRegister().Echo())
 	route.Apply()
+
 	switch sitemapCfg.Mode {
 	case `full`:
 
