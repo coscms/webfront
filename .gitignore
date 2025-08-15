@@ -57,3 +57,4 @@ nohup.out
 .env
 /vendor
 /library/sitemap/public
+/public/sitemap

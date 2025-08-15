@@ -65,7 +65,7 @@ require (
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
-	github.com/admpub/sitemap-generator v0.0.0-20250814124852-43e227654102
+	github.com/admpub/sitemap-generator v0.0.0-20250815123445-c6bebe90982f
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.3.0

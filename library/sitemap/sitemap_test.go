@@ -15,6 +15,17 @@ func TestGenerate(t *testing.T) {
 	now := time.Now().UTC()
 	cfg := Sitemap{
 		Do: func(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirName string) error {
+			sm.Add(&smg.SitemapLoc{
+				Loc:        "https://www.coscms.com/news/2021-01-05/a-news-page",
+				LastMod:    &now,
+				ChangeFreq: smg.Weekly,
+				Priority:   1,
+				Images: []*smg.SitemapImage{
+					{ImageLoc: `https://www.coscms.com/test.jpg`},
+					{ImageLoc: `/test.jpg`},
+					{ImageLoc: `test.jpg`},
+				},
+			})
 			return sm.Add(&smg.SitemapLoc{
 				Loc:        "news/2021-01-05/a-news-page",
 				LastMod:    &now,
