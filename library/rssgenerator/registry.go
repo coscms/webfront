@@ -43,7 +43,7 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 	if err != nil {
 		return err
 	}
-	for _, row := range list {
+	for idx, row := range list {
 		link := sessdata.URLByName(`article.detail`, row.Id)
 		if strings.HasPrefix(link, `/`) {
 			link = ctx.Site() + link[1:]
@@ -58,6 +58,10 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 		}
 		if row.Updated > 0 {
 			item.Updated = time.Unix(int64(row.Updated), 0)
+		}
+		if idx == 0 {
+			feed.Created = item.Created
+			feed.Updated = item.Updated
 		}
 		if len(item.Description) == 0 {
 			switch row.Contype {
