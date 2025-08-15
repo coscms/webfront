@@ -9,9 +9,13 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/sitemap-generator/smg"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 )
 
-func GenerateIndex(rootURL string, generateChildPageItems bool) error {
+func GenerateIndex(ctx echo.Context, rootURL string, generateChildPageItems bool) error {
+	if ctx == nil {
+		ctx = defaults.NewMockContext()
+	}
 	now := time.Now().UTC()
 	outputPath := filepath.Join(echo.Wd(), `public`)
 	err := os.MkdirAll(outputPath, os.ModePerm)
@@ -33,7 +37,7 @@ func GenerateIndex(rootURL string, generateChildPageItems bool) error {
 		if !generateChildPageItems {
 			continue
 		}
-		err = item.X.Do(sm.Add)
+		err = item.X.Do(ctx, sm)
 		if err != nil {
 			return fmt.Errorf("unable to add sitemapLoc#%v: %v", item.K, err)
 		}
@@ -48,7 +52,10 @@ func GenerateIndex(rootURL string, generateChildPageItems bool) error {
 	return err
 }
 
-func GenerateSingle(rootURL string, f func(Adder) error) error {
+func GenerateSingle(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error) error {
+	if ctx == nil {
+		ctx = defaults.NewMockContext()
+	}
 	now := time.Now().UTC()
 	outputPath := filepath.Join(echo.Wd(), `public`)
 	err := os.MkdirAll(outputPath, os.ModePerm)
@@ -62,7 +69,7 @@ func GenerateSingle(rootURL string, f func(Adder) error) error {
 	sm.SetOutputPath(outputPath)
 	sm.SetLastMod(&now)
 
-	err = f(sm.Add)
+	err = f(ctx, sm)
 	if err != nil {
 		return fmt.Errorf("unable to add sitemapLoc: %v", err)
 	}

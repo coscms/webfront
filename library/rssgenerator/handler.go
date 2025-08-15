@@ -7,7 +7,23 @@ import (
 	"github.com/coscms/webcore/library/config"
 )
 
-func RSS(ctx echo.Context, f func(*feeds.Feed) error) error {
+func Handle(ctx echo.Context) error {
+	group := ctx.Param(`group`)
+	if len(group) == 0 {
+		group = ctx.Form(`group`)
+	}
+	if len(group) == 0 {
+		group = `article`
+	}
+	item := Registry.GetItem(group)
+	if item == nil {
+		return echo.ErrNotFound
+	}
+
+	return HandleWith(ctx, item.X.Do)
+}
+
+func HandleWith(ctx echo.Context, f func(echo.Context, *feeds.Feed) error) error {
 	cfg := config.Setting(`base`)
 	contact := config.Setting(`contact`)
 	feed := NewFeed(
@@ -30,7 +46,7 @@ func RSS(ctx echo.Context, f func(*feeds.Feed) error) error {
 		&feeds.Link{Rel: `self`, Href: ctx.FullRequestURI()},
 	}
 	feed.Copyright = `Copyright © ` + ctx.Domain()
-	if err := f(feed); err != nil {
+	if err := f(ctx, feed); err != nil {
 		return err
 	}
 

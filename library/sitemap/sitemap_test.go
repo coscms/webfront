@@ -7,13 +7,15 @@ import (
 	"github.com/admpub/sitemap-generator/smg"
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 )
 
 func TestGenerate(t *testing.T) {
+	eCtx := defaults.NewMockContext()
 	now := time.Now().UTC()
 	cfg := Sitemap{
-		Do: func(add Adder) error {
-			return add(&smg.SitemapLoc{
+		Do: func(ctx echo.Context, sm *smg.Sitemap) error {
+			return sm.Add(&smg.SitemapLoc{
 				Loc:        "news/2021-01-05/a-news-page",
 				LastMod:    &now,
 				ChangeFreq: smg.Weekly,
@@ -23,8 +25,8 @@ func TestGenerate(t *testing.T) {
 	}
 	Registry.Add(`test`, `Test`, echo.KVxOptX[Sitemap, any](cfg))
 
-	err := GenerateIndex(`https://www.webx.top`, false)
+	err := GenerateIndex(eCtx, `https://www.webx.top`, false)
 	assert.NoError(t, err)
-	err = GenerateSingle(`https://www.webx.top`, cfg.Do)
+	err = GenerateSingle(eCtx, `https://www.webx.top`, cfg.Do)
 	assert.NoError(t, err)
 }

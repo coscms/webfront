@@ -28,7 +28,7 @@ func NewFeed(title, slogan, host, authorName, authorEmail string) *feeds.Feed {
 			Title:       com.Substr(title,`...`,TitleMaxLength),
 			Link:        &feeds.Link{Href: link},
 			Description: MarkdownToHTML(``),
-			Author:      &feeds.Author{Name: authorName, Email: authorName},
+			Author:      &feeds.Author{Name: authorName, Email: authorEmail},
 			Created:     *news.CreatedAt,
 			Updated:     *news.UpdatedAt,
 		})

@@ -9,10 +9,12 @@ import (
 
 var Registry = echo.NewKVxData[Sitemap, any]()
 
-type Adder func(*smg.SitemapLoc) error
+func Register(k, v string, x Sitemap) {
+	Registry.Add(k, v, echo.KVxOptX[Sitemap, any](x))
+}
 
 type Sitemap struct {
-	Do func(add Adder) error
+	Do func(echo.Context, *smg.Sitemap) error
 }
 
 func RegisterRoute(r echo.RouteRegister) {
