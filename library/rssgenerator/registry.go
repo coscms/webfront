@@ -71,4 +71,5 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 
 func RegisterRoute(r echo.RouteRegister) {
 	r.Get(`/rss`, Handle)
+	r.Get(`/rss/:group`, Handle)
 }
