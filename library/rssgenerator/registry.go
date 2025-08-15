@@ -25,10 +25,10 @@ func Register(k, v string, x RSS) {
 }
 
 type RSS struct {
-	Do func(ctx echo.Context, feed *feeds.Feed) error
+	Do func(ctx echo.Context, feed *feeds.RssFeed) error
 }
 
-func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
+func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 	source := ctx.Form(`source`)
 	articleM := modelArticle.NewArticle(ctx)
 	list := []*modelArticle.ArticleWithOwner{}
@@ -48,20 +48,20 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 		if strings.HasPrefix(link, `/`) {
 			link = ctx.Site() + link[1:]
 		}
-		item := &feeds.Item{
-			Id:          link,
+		item := &feeds.RssItem{
+			Guid:        &feeds.RssGuid{Id: link},
 			Title:       row.Title,
-			Link:        &feeds.Link{Href: link},
+			Link:        link,
 			Description: row.Summary,
-			Author:      nil,
-			Created:     time.Unix(int64(row.Created), 0),
 		}
 		if row.Updated > 0 {
-			item.Updated = time.Unix(int64(row.Updated), 0)
+			item.PubDate = time.Unix(int64(row.Updated), 0).Format(time.RFC1123Z)
+		} else {
+			item.PubDate = time.Unix(int64(row.Created), 0).Format(time.RFC1123Z)
 		}
 		if idx == 0 {
-			feed.Created = item.Created
-			feed.Updated = item.Updated
+			feed.PubDate = item.PubDate
+			feed.LastBuildDate = item.PubDate
 		}
 		if len(item.Description) == 0 {
 			switch row.Contype {
@@ -74,19 +74,22 @@ func articleRSS(ctx echo.Context, feed *feeds.Feed) error {
 			}
 		}
 		if row.Customer != nil {
-			item.Author = &feeds.Author{Name: row.Customer.Name, Email: ``}
+			item.Author = row.Customer.Name
 		} else if row.User != nil {
-			item.Author = &feeds.Author{Name: row.User.Username, Email: ``}
+			item.Author = row.User.Username
 		}
 		if len(row.Image) > 0 {
 			mtype := mime.TypeByExtension(path.Ext(row.Image))
 			row.Image = com.AbsURL(ctx.Site()+`rss`, row.Image)
-			item.Enclosure = &feeds.Enclosure{
+			item.Enclosure = &feeds.RssEnclosure{
 				Url:  row.Image,
 				Type: mtype,
 			}
 		}
-		feed.Add(item)
+		if row.Category != nil {
+			item.Category = row.Category.Name
+		}
+		feed.Items = append(feed.Items, item)
 	}
 	return err
 }

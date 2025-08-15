@@ -156,8 +156,8 @@ github.com/admpub/fasthttp v0.0.7 h1:3wcunm1GdBfDjDhnpRVrOZBc8Wh3gL+EusuRgKnPSyE
 github.com/admpub/fasthttp v0.0.7/go.mod h1:Y9fpk2Pc56QLzo2yHqBbBfu6sroaoskrP8z6Aepk5NE=
 github.com/admpub/fasttemplate v0.0.2 h1:4bWzI22SlhloBTan+5sKPqk0DxKPcsV0suXBas3EhBk=
 github.com/admpub/fasttemplate v0.0.2/go.mod h1:6LKwJdGgyfuO6pQNJCAd/eZRCCQaCV7yLlJJdzslHaw=
-github.com/admpub/feeds v0.0.0-20250815022102-62f528415033 h1:jalyqYiq0GbaokZjNvnbF4O8ioeVeO35z38UCGNq2Sc=
-github.com/admpub/feeds v0.0.0-20250815022102-62f528415033/go.mod h1:akvPxA22TZPV9s9CLSy8vh3uyLeJUNuddUUxOgOGxQU=
+github.com/admpub/feeds v0.0.0-20250815085047-66c35b59a155 h1:6IUVp6hAN7OAsuJOiYzc7N3YmtKUpuhT4auqjWuNUes=
+github.com/admpub/feeds v0.0.0-20250815085047-66c35b59a155/go.mod h1:akvPxA22TZPV9s9CLSy8vh3uyLeJUNuddUUxOgOGxQU=
 github.com/admpub/fsnotify v1.5.0/go.mod h1:2YN7o9RdisXYVueAUsZxjx0Rbsiz6bu6B9XCgovJHY0=
 github.com/admpub/fsnotify v1.7.0/go.mod h1:D9ecq8Ksz5grAhvRRrbN7AdVXnwYx3OxM1+xfjru4+4=
 github.com/admpub/fsnotify v1.7.1 h1:U99cg3Ii3jN2ah/OwlfzD7JF1St6selQzPlGtJXtLDw=
@@ -694,8 +694,6 @@ github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe/go.mod h1:wJfORR
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/css v1.0.1 h1:ntNaBIghp6JmvWnxbZKANoLyuXTPZ4cAMlo6RyhlbO8=
 github.com/gorilla/css v1.0.1/go.mod h1:BvnYkspnSzMmwRK+b8/xgNPLiIuNZr6vbZBTPQ2A3b0=
-github.com/gorilla/feeds v1.2.0 h1:O6pBiXJ5JHhPvqy53NsjKOThq+dNFm8+DFrxBEdzSCc=
-github.com/gorilla/feeds v1.2.0/go.mod h1:WMib8uJP3BbY+X8Szd1rA5Pzhdfh+HCCAYT2z7Fza6Y=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=

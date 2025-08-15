@@ -34,6 +34,32 @@ func NewFeed(title, slogan, host, authorName, authorEmail string) *feeds.Feed {
 	return feed
 }
 
+func NewRssFeed(title, slogan, host, authorName string) *feeds.RssFeed {
+	now := time.Now()
+	feed := &feeds.RssFeed{
+		Link:          host,
+		Title:         title,
+		Description:   slogan,
+		LastBuildDate: now.Format(time.RFC1123Z),
+		Items:         []*feeds.RssItem{},
+	}
+	if len(authorName) > 0 {
+		feed.ManagingEditor = authorName
+	}
+	/*
+		feed.Items = append(feed.Items, &feeds.RssItem{
+			Guid:        &feeds.RssGuid{Id: link},
+			Title:       title,
+			Link:        link,
+			Description: MarkdownToHTML(``),
+			Author:      authorName,
+			Category:    ``,
+			PubDate:     *news.CreatedAt.Format(time.RFC1123Z),
+		})
+		//*/
+	return feed
+}
+
 func MarkdownToHTML(md string) string {
 	extensions := parser.NoIntraEmphasis | // 忽略单词内部的强调标记
 		parser.Tables | // 解析表格语法
