@@ -17,6 +17,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webfront/initialize/frontend"
 	"github.com/coscms/webfront/library/sitemap"
 	"github.com/coscms/webfront/registry/route"
 )
@@ -125,9 +126,12 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	subDir := u.Hostname()
 	eCtx := defaults.NewMockContext()
 
+	e := route.IRegister().Echo()
 	subdomains.Default.Default = httpserver.KindFrontend
-	subdomains.Default.Add(httpserver.KindFrontend+`@`+u.Host, route.IRegister().Echo())
+	subdomains.Default.Add(httpserver.KindFrontend+`@`+u.Host, e)
 	route.Apply()
+	frontend.SetRewriter(e)
+	e.Commit()
 
 	switch sitemapCfg.Mode {
 	case `full`:
