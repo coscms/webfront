@@ -4,7 +4,7 @@ go 1.24.5
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.9.40
+require github.com/coscms/webcore v0.9.41
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.3.31
 	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.16.17
+	github.com/webx-top/echo v1.16.19
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -218,7 +218,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.31 // indirect
+	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/miekg/dns v1.1.68 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -283,7 +283,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	go.uber.org/mock v0.5.2 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/image v0.30.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
