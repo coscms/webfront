@@ -23,7 +23,7 @@ func TestGenerate(t *testing.T) {
 	}
 	Registry.Add(`test`, `Test`, echo.KVxOptX[Sitemap, any](cfg))
 
-	err := GenerateIndex(`https://www.webx.top`)
+	err := GenerateIndex(`https://www.webx.top`, false)
 	assert.NoError(t, err)
 	err = GenerateSingle(`https://www.webx.top`, cfg.Do)
 	assert.NoError(t, err)

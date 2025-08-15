@@ -11,7 +11,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func GenerateIndex(rootURL string) error {
+func GenerateIndex(rootURL string, generateChildPageItems bool) error {
 	now := time.Now().UTC()
 	outputPath := filepath.Join(echo.Wd(), `public`)
 	err := os.MkdirAll(outputPath, os.ModePerm)
@@ -30,6 +30,9 @@ func GenerateIndex(rootURL string) error {
 		sm.SetName(item.K)
 		sm.SetLastMod(&now)
 		sm.SetOutputPath(outputPath + echo.FilePathSeparator + `sitemaps`)
+		if !generateChildPageItems {
+			continue
+		}
 		err = item.X.Do(sm.Add)
 		if err != nil {
 			return fmt.Errorf("unable to add sitemapLoc#%v: %v", item.K, err)
