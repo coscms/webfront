@@ -2,6 +2,7 @@ package sitemap
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/admpub/sitemap-generator/smg"
 	"github.com/webx-top/echo"
@@ -18,7 +19,31 @@ type Sitemap struct {
 }
 
 func RegisterRoute(r echo.RouteRegister) {
-	r.File(`/sitemap.xml`, filepath.Join(echo.Wd(), `public`, `sitemap.xml`))
-	r.File(`/sitemap_index.xml`, filepath.Join(echo.Wd(), `public`, `sitemap_index.xml`))
-	r.Static(`/sitemaps`, filepath.Join(echo.Wd(), `public`, `sitemaps`))
+	sitemapDir := filepath.Join(echo.Wd(), `public`, `sitemap`)
+	r.Get(`/sitemap.xml`, func(c echo.Context) error {
+		lang := c.Lang().Normalize()
+		return c.File(sitemapDir + echo.FilePathSeparator + lang + echo.FilePathSeparator + `sitemap.xml`)
+	})
+	r.Get(`/sitemap_index.xml`, func(c echo.Context) error {
+		lang := c.Lang().Normalize()
+		return c.File(sitemapDir + echo.FilePathSeparator + lang + echo.FilePathSeparator + `sitemap_index.xml`)
+	})
+	r.Get("/sitemaps/*", func(c echo.Context) error {
+		return static(c, sitemapDir)
+	})
+}
+
+func static(c echo.Context, sitemapDir string) error {
+	lang := c.Lang().Normalize()
+	root := sitemapDir + echo.FilePathSeparator + lang + echo.FilePathSeparator + `sitemaps`
+	var err error
+	root, err = filepath.Abs(root)
+	if err != nil {
+		return err
+	}
+	name := filepath.Join(root, c.Param("*"))
+	if !strings.HasPrefix(name, root) {
+		return echo.ErrNotFound
+	}
+	return c.File(name)
 }

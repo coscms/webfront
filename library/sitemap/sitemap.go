@@ -8,16 +8,17 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/sitemap-generator/smg"
+	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 )
 
-func GenerateIndex(ctx echo.Context, rootURL string, generateChildPageItems bool) error {
+func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildPageItems bool) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
-	outputPath := filepath.Join(echo.Wd(), `public`)
+	outputPath := filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
 		return err
@@ -52,12 +53,12 @@ func GenerateIndex(ctx echo.Context, rootURL string, generateChildPageItems bool
 	return err
 }
 
-func GenerateSingle(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error) error {
+func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.Context, *smg.Sitemap) error) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
-	outputPath := filepath.Join(echo.Wd(), `public`)
+	outputPath := filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
 		return err
@@ -84,11 +85,31 @@ func GenerateSingle(ctx echo.Context, rootURL string, f func(echo.Context, *smg.
 }
 
 func RemoveAll() {
-	for _, xmlFilePath := range []string{
-		filepath.Join(echo.Wd(), `public`, `sitemap.xml`),
-		filepath.Join(echo.Wd(), `public`, `sitemap_index.xml`),
-		filepath.Join(echo.Wd(), `public`, `sitemaps`),
-	} {
-		os.RemoveAll(xmlFilePath)
+	os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`))
+}
+
+func RemoveLanguage(lang string) {
+	os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, lang))
+}
+
+func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPageItems bool) (err error) {
+	for _, lang := range config.FromFile().Language.AllList {
+		lang = echo.NewLangCode(lang).Normalize()
+		err = GenerateIndex(ctx, rootURL, lang, generateChildPageItems)
+		if err != nil {
+			return
+		}
 	}
+	return
+}
+
+func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error) (err error) {
+	for _, lang := range config.FromFile().Language.AllList {
+		lang = echo.NewLangCode(lang).Normalize()
+		err = GenerateSingle(ctx, rootURL, lang, f)
+		if err != nil {
+			return
+		}
+	}
+	return
 }
