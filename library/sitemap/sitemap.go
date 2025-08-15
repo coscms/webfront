@@ -35,6 +35,10 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 	smi.SetOutputPath(outputPath)
 	smi.SetServerURI(`/sitemaps/`)
 
+	var subDirName string
+	if len(subDir) > 0 {
+		subDirName = subDir[0]
+	}
 	for _, item := range Registry.Slice() {
 		sm := smi.NewSitemap()
 		sm.SetName(item.K)
@@ -43,7 +47,7 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 		if !generateChildPageItems {
 			continue
 		}
-		err = item.X.Do(ctx, sm, langCode)
+		err = item.X.Do(ctx, sm, langCode, subDirName)
 		if err != nil {
 			return fmt.Errorf("unable to add sitemapLoc#%v: %v", item.K, err)
 		}
@@ -58,7 +62,7 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 	return err
 }
 
-func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(echo.Context, *smg.Sitemap, string) error, subDir ...string) error {
+func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(echo.Context, *smg.Sitemap, string, string) error, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
@@ -80,7 +84,11 @@ func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(ec
 	sm.SetOutputPath(outputPath)
 	sm.SetLastMod(&now)
 
-	err = f(ctx, sm, langCode)
+	var subDirName string
+	if len(subDir) > 0 {
+		subDirName = subDir[0]
+	}
+	err = f(ctx, sm, langCode, subDirName)
 	if err != nil {
 		return fmt.Errorf("unable to add sitemapLoc: %v", err)
 	}
@@ -125,7 +133,7 @@ func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPag
 	return
 }
 
-func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap, string) error, subDir ...string) (err error) {
+func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap, string, string) error, subDir ...string) (err error) {
 	for _, lang := range config.FromFile().Language.AllList {
 		lang = echo.NewLangCode(lang).Normalize()
 		err = GenerateSingle(ctx, rootURL, lang, f, subDir...)

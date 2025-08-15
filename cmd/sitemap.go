@@ -168,13 +168,13 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		prepare = func(langCodes []string) error {
 			for _, v := range groupItems {
 				for _, _lang := range langCodes {
-					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang)
+					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang+`_`+subDir)
 					if err != nil && !os.IsNotExist(err) {
 						return err
 					}
 					if len(b) > 0 {
 						lastID := param.AsUint64(string(b))
-						eCtx.Internal().Set(_lang+`.`+v.K+`LastID`, lastID)
+						eCtx.Internal().Set(subDir+`.`+_lang+`.`+v.K+`LastID`, lastID)
 					}
 				}
 			}
@@ -187,11 +187,11 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	save := func(langCodes []string) {
 		for _, v := range groupItems {
 			for _, _lang := range langCodes {
-				lastID := eCtx.Internal().Uint64(_lang + `.` + v.K + `LastID`)
+				lastID := eCtx.Internal().Uint64(subDir + `.` + _lang + `.` + v.K + `LastID`)
 				if lastID <= 0 {
 					continue
 				}
-				err := filecache.WriteCache(`sitemap`, v.K+`_`+_lang, []byte(param.AsString(lastID)))
+				err := filecache.WriteCache(`sitemap`, v.K+`_`+_lang+`_`+subDir, []byte(param.AsString(lastID)))
 				if err != nil {
 					fmt.Println(err.Error())
 				}
