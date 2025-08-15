@@ -100,13 +100,13 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			return clearAllSubdirLanguages(langs)
+			err = clearAllSubdirLanguages(langs)
+			fmt.Println(`removing sitemap is done`)
+			return err
 		}
 	}
 	if len(rootURL) == 0 {
 		return fmt.Errorf(`please specify the website root URL: %s sitemap <rootURL>`, os.Args[0])
-	}
-	if sitemapCfg.Mode == `clear` && rootURL == `all` {
 	}
 	u, err := url.Parse(rootURL)
 	if err != nil {
@@ -138,6 +138,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	case `clear`:
 		if len(lang) == 0 {
 			sitemap.RemoveAll(subDir)
+			fmt.Println(`removing sitemap is done`)
 			return nil
 		}
 		langs := param.Split(lang, `,`).Filter(normalizeLangCode).String()
@@ -148,6 +149,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 		for _, _lang := range langs {
 			sitemap.RemoveLanguage(_lang, subDir)
 		}
+		fmt.Println(`removing sitemap is done`)
 		return nil
 	}
 
@@ -164,6 +166,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 	}()
 	if len(lang) == 0 {
 		err = sitemap.GenerateIndexAllLanguage(eCtx, rootURL, sitemapCfg.AllChild, subDir)
+		fmt.Println(`sitemap generation is complete`)
 		return err
 	}
 	langs := param.Split(lang, `,`).Filter(normalizeLangCode).String()
@@ -177,6 +180,7 @@ func sitemapRunE(cmd *cobra.Command, args []string) error {
 			fmt.Println(err.Error())
 		}
 	}
+	fmt.Println(`sitemap generation is complete`)
 	return err
 }
 
