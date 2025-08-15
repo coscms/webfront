@@ -3,10 +3,10 @@ package rssgenerator
 import (
 	"time"
 
+	"github.com/admpub/feeds"
 	"github.com/coscms/webcore/library/common"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/gorilla/feeds"
 )
 
 const TitleMaxLength = 20
@@ -32,7 +32,7 @@ func NewFeed(title, slogan, host, authorName, authorEmail string) *feeds.Feed {
 			Created:     *news.CreatedAt,
 			Updated:     *news.UpdatedAt,
 		})
-	*/
+	//*/
 	return feed
 }
 
