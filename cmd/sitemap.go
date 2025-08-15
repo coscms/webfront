@@ -234,6 +234,6 @@ func init() {
 	for i, v := range slic {
 		groups[i] = v.K
 	}
-	sitemapCmd.Flags().StringVar(&sitemapCfg.Group, `group`, sitemapCfg.Group, `组。指定多个时用半角逗号“,”隔开, 支持的值有: `+strings.Join(groups, ` / `)+` 等`)
+	sitemapCmd.Flags().StringVar(&sitemapCfg.Group, `group`, sitemapCfg.Group, `组。指定多个时用半角逗号“,”隔开, 支持的值有: `+strings.Join(groups, ` / `)+` 等。不指定时代表所有组`)
 	sitemapCmd.Flags().BoolVar(&sitemapCfg.AllChild, `allChild`, sitemapCfg.AllChild, `是否同时生成所有子页面中的网址`)
 }
