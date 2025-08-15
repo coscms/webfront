@@ -9,9 +9,15 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func handleFile(c echo.Context, sitemapDir string, fileName string) error {
+func handleFile(c echo.Context, sitemapDir string, fileName string, getSubDirName func(echo.Context) string) error {
 	lang := c.Lang().Normalize()
 	root := sitemapDir + echo.FilePathSeparator
+	if getSubDirName != nil {
+		subDir := getSubDirName(c)
+		if len(subDir) > 0 {
+			root += subDir + echo.FilePathSeparator
+		}
+	}
 	file := root + lang + echo.FilePathSeparator + fileName
 	err := c.File(file)
 	if err == nil || err != echo.ErrNotFound {
@@ -25,9 +31,16 @@ func handleFile(c echo.Context, sitemapDir string, fileName string) error {
 	return err
 }
 
-func handleStatic(c echo.Context, sitemapDir string) error {
+func handleStatic(c echo.Context, sitemapDir string, getSubDirName func(echo.Context) string) error {
 	lang := c.Lang().Normalize()
-	root := sitemapDir + echo.FilePathSeparator + lang + echo.FilePathSeparator + `sitemaps`
+	root := sitemapDir + echo.FilePathSeparator
+	if getSubDirName != nil {
+		subDir := getSubDirName(c)
+		if len(subDir) > 0 {
+			root += subDir + echo.FilePathSeparator
+		}
+	}
+	root += lang + echo.FilePathSeparator + `sitemaps`
 	var err error
 	root, err = filepath.Abs(root)
 	if err != nil {

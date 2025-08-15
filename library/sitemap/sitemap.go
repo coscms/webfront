@@ -13,12 +13,17 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
-func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildPageItems bool) error {
+func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildPageItems bool, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
-	outputPath := filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+	var outputPath string
+	if len(subDir) > 0 {
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], lang)
+	} else {
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
 		return err
@@ -53,12 +58,17 @@ func GenerateIndex(ctx echo.Context, rootURL string, lang string, generateChildP
 	return err
 }
 
-func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.Context, *smg.Sitemap) error) error {
+func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.Context, *smg.Sitemap) error, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
-	outputPath := filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+	var outputPath string
+	if len(subDir) > 0 {
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], lang)
+	} else {
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, lang)
+	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
 		return err
@@ -84,18 +94,30 @@ func GenerateSingle(ctx echo.Context, rootURL string, lang string, f func(echo.C
 	return err
 }
 
-func RemoveAll() {
-	os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`))
+func RemoveAll(subDirs ...string) {
+	if len(subDirs) == 0 {
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`))
+		return
+	}
+	for _, subDir := range subDirs {
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, subDir))
+	}
 }
 
-func RemoveLanguage(lang string) {
-	os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, lang))
+func RemoveLanguage(lang string, subDirs ...string) {
+	if len(subDirs) == 0 {
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, lang))
+		return
+	}
+	for _, subDir := range subDirs {
+		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, subDir, lang))
+	}
 }
 
-func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPageItems bool) (err error) {
+func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPageItems bool, subDir ...string) (err error) {
 	for _, lang := range config.FromFile().Language.AllList {
 		lang = echo.NewLangCode(lang).Normalize()
-		err = GenerateIndex(ctx, rootURL, lang, generateChildPageItems)
+		err = GenerateIndex(ctx, rootURL, lang, generateChildPageItems, subDir...)
 		if err != nil {
 			return
 		}
@@ -103,10 +125,10 @@ func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPag
 	return
 }
 
-func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error) (err error) {
+func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap) error, subDir ...string) (err error) {
 	for _, lang := range config.FromFile().Language.AllList {
 		lang = echo.NewLangCode(lang).Normalize()
-		err = GenerateSingle(ctx, rootURL, lang, f)
+		err = GenerateSingle(ctx, rootURL, lang, f, subDir...)
 		if err != nil {
 			return
 		}

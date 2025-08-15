@@ -76,15 +76,15 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap) error {
 	return err
 }
 
-func RegisterRoute(r echo.RouteRegister) {
+func RegisterRoute(r echo.RouteRegister, getSubDirName func(echo.Context) string) {
 	sitemapDir := filepath.Join(echo.Wd(), `public`, `sitemap`)
 	r.Get(`/sitemap.xml`, func(c echo.Context) error {
-		return handleFile(c, sitemapDir, `sitemap.xml`)
+		return handleFile(c, sitemapDir, `sitemap.xml`, getSubDirName)
 	}).SetMetaKV(httpserver.PermGuestKV())
 	r.Get(`/sitemap_index.xml`, func(c echo.Context) error {
-		return handleFile(c, sitemapDir, `sitemap_index.xml`)
+		return handleFile(c, sitemapDir, `sitemap_index.xml`, getSubDirName)
 	}).SetMetaKV(httpserver.PermGuestKV())
 	r.Get("/sitemaps/*", func(c echo.Context) error {
-		return handleStatic(c, sitemapDir)
+		return handleStatic(c, sitemapDir, getSubDirName)
 	}).SetMetaKV(httpserver.PermGuestKV())
 }
