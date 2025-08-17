@@ -65,6 +65,26 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 	return err == nil, err
 }
 
+func IsCachedWithDomain(ctx echo.Context, domain, cacheKey string, urlWithQueryString ...bool) (bool, error) {
+	if defaults.IsMockContext(ctx) {
+		return false, nil
+	}
+	if ctx.Echo().Multilingual() {
+		cacheKey = ctx.Lang().Normalize() + `/` + cacheKey
+	}
+	if len(domain) > 0 {
+		cacheKey = domain + `/` + cacheKey
+	}
+	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
+		cached, err := controlCache(ctx, cacheKey, urlWithQueryString...)
+		if err != nil || !cached {
+			return cached, err
+		}
+	}
+	err := ETagCallback(ctx, cacheKey)
+	return err == nil, err
+}
+
 func getHash(c context.Context, cacheKey string) string {
 	var etag string
 	cache.Get(c, cacheKey+`.hash`, &etag)
