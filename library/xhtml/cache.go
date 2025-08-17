@@ -51,10 +51,7 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
-
-	if ctx.Echo().Multilingual() {
-		cacheKey = ctx.Lang().Normalize() + `/` + cacheKey
-	}
+	cacheKey = ctx.Lang().Normalize() + `/` + cacheKey
 	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
 		cached, err := controlCache(ctx, cacheKey, urlWithQueryString...)
 		if err != nil || !cached {
