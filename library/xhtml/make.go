@@ -5,14 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
 
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/coscms/webfront/library/xcommon"
 	"github.com/coscms/webfront/registry/route"
@@ -20,6 +18,7 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
+var DefaultSaveDir string = `html`
 var ErrGenerateHTML = errors.New(`failed to generate html`)
 var makerSingleflight = singleflight.Group{}
 
@@ -36,24 +35,6 @@ func BuildCacheKey(domain string, langCode string, cacheKey string) string {
 func Make(method string, path string, saveAs string, reqRewrite ...func(*http.Request)) error {
 	_, err, _ := makerSingleflight.Do(method+`_`+path, func() (interface{}, error) {
 		return nil, makeDo(``, method, path, saveAs, reqRewrite...)
-	})
-	return err
-}
-
-func MakeWithSiteURL(siteURL, method string, path string, saveAs string, reqRewrite ...func(*http.Request)) error {
-	u, err := url.Parse(siteURL)
-	if err != nil {
-		return err
-	}
-	langCode := config.FromFile().Language.Default
-	lcInPath := strings.SplitN(strings.TrimPrefix(path, `/`), `/`, 2)[0]
-	if langCode != lcInPath &&
-		com.InSlice(lcInPath, config.FromFile().Language.AllList) {
-		langCode = lcInPath
-	}
-	saveAs = BuildCacheKey(u.Hostname(), langCode, saveAs)
-	_, err, _ = makerSingleflight.Do(u.Hostname()+langCode+`_`+`_`+method+`_`+path, func() (interface{}, error) {
-		return nil, makeDo(siteURL, method, path, saveAs, reqRewrite...)
 	})
 	return err
 }
@@ -77,6 +58,9 @@ func makeDo(siteURL, method string, path string, saveAs string, reqRewrite ...fu
 		return err
 	}
 	body := rec.Body.String()
+	if len(DefaultSaveDir) > 0 {
+		saveAs = DefaultSaveDir + `/` + saveAs
+	}
 	err := cache.Put(context.Background(), saveAs, body+`<!-- Generated at `+time.Now().Format(time.DateTime)+` -->`, 0)
 	if err != nil {
 		log.Error(err)
@@ -90,6 +74,9 @@ func makeDo(siteURL, method string, path string, saveAs string, reqRewrite ...fu
 }
 
 func Remove(cacheKey string) error {
+	if len(DefaultSaveDir) > 0 {
+		cacheKey = DefaultSaveDir + `/` + cacheKey
+	}
 	cache.Delete(context.Background(), cacheKey+`.hash`)
 	return cache.Delete(context.Background(), cacheKey)
 }
