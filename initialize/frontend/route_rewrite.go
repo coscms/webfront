@@ -49,10 +49,10 @@ func (r *rewriteWithLock) UnrewriteMiddleware() echo.MiddlewareFuncd {
 				return next.Handle(c)
 			}
 
-			req := c.Request()
-			rew := r.Config().Reverse(req.URL().Path())
-			if rew != req.URL().Path() {
-				req.URL().SetPath(rew)
+			dp := c.DispatchPath()
+			rew := r.Config().Reverse(dp)
+			if rew != dp {
+				c.SetDispatchPath(rew)
 			}
 			return next.Handle(c)
 		}
