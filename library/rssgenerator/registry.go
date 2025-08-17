@@ -13,7 +13,6 @@ import (
 
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/httpserver"
-	"github.com/coscms/webfront/middleware/sessdata"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 )
 
@@ -48,7 +47,7 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 		return err
 	}
 	for idx, row := range list {
-		link := sessdata.URLByName(`article.detail`, row.Id)
+		link := ctx.URLByName(`article.detail`, row.Id)
 		if strings.HasPrefix(link, `/`) {
 			link = ctx.Site() + link[1:]
 		}

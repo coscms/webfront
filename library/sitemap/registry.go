@@ -11,7 +11,6 @@ import (
 
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/httpserver"
-	"github.com/coscms/webfront/middleware/sessdata"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 )
 
@@ -46,7 +45,7 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirNa
 	err := ls.ChunkList(func() (err error) {
 		list := articleM.Objects()
 		for _, row := range list {
-			link := sessdata.URLByName(`article.detail`, row.Id)
+			link := ctx.URLByName(`article.detail`, row.Id)
 			var lastMod time.Time
 			if row.Updated > 0 {
 				lastMod = time.Unix(int64(row.Updated), 0)
