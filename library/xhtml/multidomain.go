@@ -26,10 +26,11 @@ func IsCachedDomain(ctx echo.Context, cacheKey string, urlWithQueryString ...boo
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
-	cacheKey = ctx.Lang().Normalize() + `/` + cacheKey
+	langCode := ctx.Lang().Normalize()
+	cacheKey = langCode + `/` + cacheKey
 	cacheKey = ctx.Domain() + `/` + cacheKey
 	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
-		cached, err := controlCache(ctx, cacheKey, urlWithQueryString...)
+		cached, err := controlCache(ctx, langCode, cacheKey, urlWithQueryString...)
 		if err != nil || !cached {
 			return cached, err
 		}

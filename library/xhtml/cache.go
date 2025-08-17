@@ -12,7 +12,7 @@ import (
 	"github.com/coscms/webfront/middleware/sessdata"
 )
 
-func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bool, error) {
+func controlCache(ctx echo.Context, langCode string, cacheKey string, urlWithQueryString ...bool) (bool, error) {
 	nocacheStr := ctx.Form(`nocache`)
 	if len(nocacheStr) == 0 {
 		return true, nil
@@ -25,6 +25,9 @@ func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool)
 	case `3`, `mkall`:
 		isMakeAll := nocacheStr == `mkall`
 		reqURL := ctx.Request().URL().Path()
+		if !strings.HasPrefix(reqURL, `/`+langCode+`/`) {
+			reqURL = `/` + langCode + reqURL
+		}
 		if len(urlWithQueryString) > 0 && urlWithQueryString[0] {
 			if isMakeAll {
 				query := ctx.Request().URL().Query()
@@ -38,7 +41,7 @@ func controlCache(ctx echo.Context, cacheKey string, urlWithQueryString ...bool)
 		} else if isMakeAll {
 			reqURL += `?nocache=2`
 		}
-		err := Make(http.MethodGet, reqURL, cacheKey)
+		err := make(http.MethodGet, reqURL, cacheKey)
 		return true, err
 	case `4`, `rm`:
 		err := Remove(cacheKey)
@@ -51,9 +54,10 @@ func IsCached(ctx echo.Context, cacheKey string, urlWithQueryString ...bool) (bo
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
-	cacheKey = ctx.Lang().Normalize() + `/` + cacheKey
+	langCode := ctx.Lang().Normalize()
+	cacheKey = langCode + `/` + cacheKey
 	if customer := sessdata.Customer(ctx); customer != nil && customer.Uid > 0 {
-		cached, err := controlCache(ctx, cacheKey, urlWithQueryString...)
+		cached, err := controlCache(ctx, langCode, cacheKey, urlWithQueryString...)
 		if err != nil || !cached {
 			return cached, err
 		}
