@@ -33,7 +33,7 @@ import (
 
 func SessionInfo(h echo.Handler) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ppath := c.Request().URL().Path()
+		ppath := c.DispatchPath()
 		switch ppath {
 		case c.Echo().Prefix() + `/favicon.ico`:
 			return h.Handle(c)
@@ -198,22 +198,6 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 			return h.Handle(c)
 		}
 		return goToSignIn(c)
-	}
-}
-
-func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
-	return func(h echo.Handler) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			upath := c.Request().URL().Path()
-			for _, ignorePrefix := range ignorePrefixes {
-				if strings.HasPrefix(upath, ignorePrefix) {
-					return h.Handle(c)
-				}
-			}
-			cleanedPath := strings.TrimSuffix(upath, c.DefaultExtension())
-			c.Request().URL().SetPath(cleanedPath)
-			return h.Handle(c)
-		}
 	}
 }
 
