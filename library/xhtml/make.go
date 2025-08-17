@@ -33,7 +33,9 @@ func BuildCacheKey(domain string, langCode string, cacheKey string) string {
 }
 
 func Make(method string, path string, saveAs string, reqRewrite ...func(*http.Request)) error {
-	_, err, _ := makerSingleflight.Do(method+`_`+path, func() (interface{}, error) {
+	langCode := GetLangCodeByPath(path)
+	saveAs = BuildCacheKey(``, langCode, saveAs)
+	_, err, _ := makerSingleflight.Do(langCode+`_`+method+`_`+path, func() (interface{}, error) {
 		return nil, makeDo(``, method, path, saveAs, reqRewrite...)
 	})
 	return err

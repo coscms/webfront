@@ -3,11 +3,8 @@ package xhtml
 import (
 	"net/http"
 	"net/url"
-	"strings"
 
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/middleware/sessdata"
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 )
@@ -17,12 +14,7 @@ func MakeWithSiteURL(siteURL, method string, path string, saveAs string, reqRewr
 	if err != nil {
 		return err
 	}
-	langCode := config.FromFile().Language.Default
-	lcInPath := strings.SplitN(strings.TrimPrefix(path, `/`), `/`, 2)[0]
-	if langCode != lcInPath &&
-		com.InSlice(lcInPath, config.FromFile().Language.AllList) {
-		langCode = lcInPath
-	}
+	langCode := GetLangCodeByPath(path)
 	saveAs = BuildCacheKey(u.Hostname(), langCode, saveAs)
 	_, err, _ = makerSingleflight.Do(u.Hostname()+`_`+langCode+`_`+method+`_`+path, func() (interface{}, error) {
 		return nil, makeDo(siteURL, method, path, saveAs, reqRewrite...)
