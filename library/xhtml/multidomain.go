@@ -1,6 +1,7 @@
 package xhtml
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -9,9 +10,18 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
+var ErrNoSetValidateDomain = errors.New(`the ValidateDomain function has not been set`)
+
+var ValidateDomain = func(domain string) error {
+	return ErrNoSetValidateDomain
+}
+
 func MakeWithSiteURL(siteURL, method string, path string, saveAs string, reqRewrite ...func(*http.Request)) error {
 	u, err := url.Parse(siteURL)
 	if err != nil {
+		return err
+	}
+	if err = ValidateDomain(u.Hostname()); err != nil {
 		return err
 	}
 	langCode := GetLangCodeByPath(path)
@@ -26,6 +36,10 @@ func IsCachedDomain(ctx echo.Context, cacheKey string, urlWithQueryString ...boo
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
+	err := ValidateDomain(ctx.Domain())
+	if err != nil {
+		return false, err
+	}
 	langCode := ctx.Lang().Normalize()
 	cacheKey = langCode + `/` + cacheKey
 	cacheKey = ctx.Domain() + `/` + cacheKey
@@ -35,6 +49,6 @@ func IsCachedDomain(ctx echo.Context, cacheKey string, urlWithQueryString ...boo
 			return cached, err
 		}
 	}
-	err := ETagCallback(ctx, cacheKey)
+	err = ETagCallback(ctx, cacheKey)
 	return err == nil, err
 }
