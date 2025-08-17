@@ -38,7 +38,7 @@ func queryArticleCategory(c context.Context) interface{} {
 				Id:       category.Id,
 				ParentId: category.ParentId,
 				Title:    category.Name,
-				Url:      ctx.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
+				Url:      ctx.RelativeURL(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
 			},
 			Extra: echo.H{
 				`object`: category,
