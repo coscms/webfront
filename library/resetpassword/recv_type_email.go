@@ -23,7 +23,7 @@ func emailSend(c echo.Context, m *modelCustomer.Customer, account string) error 
 		return c.E(`您输入的E-mail地址与账号设置的不匹配，请输入账号中设置的E-mail地址`)
 	}
 	title := `[{siteName}]` + c.T(`找回密码`)
-	resetPasswordURL := GenResetPasswordURL(m.Name, `email`, account)
+	resetPasswordURL := GenResetPasswordURL(c, m.Name, `email`, account)
 	c.Request().Form().Set(`email`, account)
 	message := `亲爱的客户: {name}<br />您正在找回密码，本次验证码为：<div style="font-size:30px;background-color:black;color:white;width:200px;text-align:center;border-radius:50px;margin:5px auto;padding:5px">{code}</div>您可以输入此验证码，或者点击链接开始重置密码：<a href="` + resetPasswordURL + `" target="_blank">` + resetPasswordURL + `</a> ({lifeTime}分钟内有效)。<br /><br /> 来自：{siteURL}<br />时间：{now}`
 	return sendmsg.EmailSend(c, m, `forgot`, title, message)

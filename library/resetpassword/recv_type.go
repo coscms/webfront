@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/coscms/webcore/library/common"
-	xMW "github.com/coscms/webfront/middleware"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 	"github.com/webx-top/echo"
 )
@@ -96,9 +95,9 @@ func List() []*RecvType {
 	return rows
 }
 
-func GenResetPasswordURL(username string, typ string, account string) string {
+func GenResetPasswordURL(ctx echo.Context, username string, typ string, account string) string {
 	info := `name=` + url.QueryEscape(username) + `&type=` + url.QueryEscape(typ) + `&account=` + url.QueryEscape(account)
 	encrypted := common.Crypto().Encode(info)
-	resetPasswordURL := xMW.URLFor(`/forgot`) + `?vcode={code}&token=` + url.QueryEscape(encrypted)
+	resetPasswordURL := ctx.URLFor(`/forgot`) + `?vcode={code}&token=` + url.QueryEscape(encrypted)
 	return resetPasswordURL
 }

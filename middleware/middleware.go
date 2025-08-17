@@ -222,7 +222,7 @@ func goToSignIn(c echo.Context) error {
 		queryString = `?next=` + url.QueryEscape(next)
 	}
 	c.Data().SetError(c.NewError(stdCode.Unauthenticated, c.T(`请先登录`)))
-	return c.Redirect(URLFor(`/sign_in`) + queryString)
+	return c.Redirect(c.URLFor(`/sign_in`) + queryString)
 }
 
 var (

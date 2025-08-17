@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	modelNging "github.com/coscms/webcore/model"
-	"github.com/coscms/webfront/middleware/sessdata"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -53,7 +52,7 @@ func (a *Author) Get(c echo.Context) *Author {
 		a.Avatar = custM.Avatar
 		a.Gender = custM.Gender
 		if custM.Id > 0 {
-			a.HomeURL = sessdata.URLFor(`/u/` + fmt.Sprint(a.Id))
+			a.HomeURL = c.URLFor(`/u/` + fmt.Sprint(a.Id))
 		} else {
 			a.Name = c.T(`[已注销]`)
 		}

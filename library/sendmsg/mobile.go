@@ -18,7 +18,6 @@ import (
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	uploadChecker "github.com/coscms/webcore/registry/upload/checker"
-	xMW "github.com/coscms/webfront/middleware"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
@@ -131,7 +130,7 @@ func MobileSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, mes
 		return addErr
 	}
 	timestamp := time.Now().Unix()
-	smsConfig.CallbackURL = xMW.URLFor(`/verification/callback/` + smsProviderName + `/` + fmt.Sprint(vm.Verification.Id) + `/` + fmt.Sprint(timestamp) + `/` + uploadChecker.Token(smsProviderName, vm.Verification.Id, timestamp))
+	smsConfig.CallbackURL = ctx.URLFor(`/verification/callback/` + smsProviderName + `/` + fmt.Sprint(vm.Verification.Id) + `/` + fmt.Sprint(timestamp) + `/` + uploadChecker.Token(smsProviderName, vm.Verification.Id, timestamp))
 
 	err = provider.Send(smsConfig)
 	if err != nil {
