@@ -66,7 +66,7 @@ func Pre(middlewares ...interface{}) {
 }
 
 func PreUse(middlewares ...interface{}) {
-	routeRegister.Pre(middlewares...)
+	routeRegister.PreUse(middlewares...)
 }
 
 func PreToGroup(groupName string, middlewares ...interface{}) {
@@ -74,7 +74,7 @@ func PreToGroup(groupName string, middlewares ...interface{}) {
 }
 
 func PreUseToGroup(groupName string, middlewares ...interface{}) {
-	routeRegister.PreToGroup(groupName, middlewares...)
+	routeRegister.PreUseToGroup(groupName, middlewares...)
 }
 
 func Use(middlewares ...interface{}) {
