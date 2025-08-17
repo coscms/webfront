@@ -16,7 +16,7 @@ func MakeWithSiteURL(siteURL, method string, path string, saveAs string, reqRewr
 	}
 	langCode := GetLangCodeByPath(path)
 	saveAs = BuildCacheKey(u.Hostname(), langCode, saveAs)
-	_, err, _ = makerSingleflight.Do(u.Hostname()+`_`+langCode+`_`+method+`_`+path, func() (interface{}, error) {
+	_, err, _ = makerSingleflight.Do(u.Hostname()+`_`+method+`_`+path, func() (interface{}, error) {
 		return nil, makeDo(siteURL, method, path, saveAs, reqRewrite...)
 	})
 	return err
