@@ -61,7 +61,7 @@ func (r *rewriteWithLock) UnrewriteMiddleware() echo.MiddlewareFuncd {
 
 func applyRouteRewrite(e *echo.Echo) error {
 	err := SetRewriter(e)
-	e.Pre(rewriteConfig.UnrewriteMiddleware)
+	e.PreUse(rewriteConfig.UnrewriteMiddleware)
 	return err
 }
 
