@@ -11,7 +11,7 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
-var ErrNoSetValidateDomain = errors.New(`the ValidateDomain function has not been set`)
+var ErrNoSetValidateDomain = errors.New(`the DomainValidator function has not been set`)
 
 func validateDomain(domain string) error {
 	detected, err := httpserver.Frontend.ValidateDomain(domain)
