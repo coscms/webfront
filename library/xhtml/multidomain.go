@@ -14,7 +14,8 @@ import (
 var ErrNoSetValidateDomain = errors.New(`the DomainValidator function has not been set`)
 
 func validateDomain(domain string) error {
-	detected, err := httpserver.Frontend.ValidateDomain(domain)
+	ctx := defaults.NewMockContext()
+	detected, err := httpserver.Frontend.ValidateDomain(ctx, domain)
 	if err != nil || detected {
 		return err
 	}
