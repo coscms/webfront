@@ -34,7 +34,7 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 						return
 					}
 					if len(encodedClientID) == 0 {
-						encodedClientID = config.FromFile().Encode256(msg.ClientID + `|` + com.RandomAlphanumeric(16))
+						encodedClientID = config.FromFile().Encode256(msg.ClientID + `|f:` + com.Md5(customer.Name) + `|` + com.RandomAlphanumeric(16))
 					}
 					data <- sse.Event{
 						Event: notice.SSEventName,
