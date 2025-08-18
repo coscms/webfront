@@ -124,7 +124,7 @@ func MemoryNoticeSender(ctx echo.Context, customer *dbschema.OfficialCustomer) (
 			parts := strings.SplitN(plaintext, `|`, 4)
 			if len(parts) == 4 && parts[1] == `f:`+com.Md5(customer.Name) {
 				t, err := time.Parse(FMTDateTime, parts[2])
-				if err == nil && !t.IsZero() && time.Since(t) < time.Hour*24 {
+				if err == nil && !t.IsZero() && time.Since(t) < Day {
 					clientID = parts[0]
 				}
 			}

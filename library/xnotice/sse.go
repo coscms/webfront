@@ -13,6 +13,7 @@ import (
 )
 
 const FMTDateTime = `20060102150405`
+const Day = time.Hour * 24
 
 func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 	return func(ctx echo.Context) error {
