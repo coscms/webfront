@@ -3,6 +3,7 @@ package xnotice
 import (
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/admpub/log"
 	"github.com/admpub/websocket"
@@ -120,9 +121,12 @@ func MemoryNoticeSender(ctx echo.Context, customer *dbschema.OfficialCustomer) (
 	if lastEventID := ctx.Header(`Last-Event-Id`); len(lastEventID) > 0 {
 		plaintext := config.FromFile().Decode256(lastEventID)
 		if len(plaintext) > 0 {
-			parts := strings.SplitN(plaintext, `|`, 3)
-			if len(parts) == 3 && parts[1] == `f:`+com.Md5(customer.Name) {
-				clientID = parts[0]
+			parts := strings.SplitN(plaintext, `|`, 4)
+			if len(parts) == 4 && parts[1] == `f:`+com.Md5(customer.Name) {
+				t, err := time.Parse(FMTDateTime, parts[2])
+				if err == nil && !t.IsZero() && time.Since(t) < time.Hour*24 {
+					clientID = parts[0]
+				}
 			}
 		}
 	}

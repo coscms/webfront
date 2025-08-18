@@ -1,6 +1,8 @@
 package xnotice
 
 import (
+	"time"
+
 	"github.com/admpub/sse"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -9,6 +11,8 @@ import (
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/middleware/sessdata"
 )
+
+const FMTDateTime = `20060102150405`
 
 func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 	return func(ctx echo.Context) error {
@@ -34,7 +38,7 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 						return
 					}
 					if len(encodedClientID) == 0 {
-						encodedClientID = config.FromFile().Encode256(msg.ClientID + `|f:` + com.Md5(customer.Name) + `|` + com.RandomAlphanumeric(16))
+						encodedClientID = config.FromFile().Encode256(msg.ClientID + `|f:` + com.Md5(customer.Name) + `|` + time.Now().Format(FMTDateTime) + `|` + com.RandomAlphanumeric(6))
 					}
 					data <- sse.Event{
 						Event: notice.SSEventName,
