@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
@@ -12,7 +13,11 @@ import (
 
 var ErrNoSetValidateDomain = errors.New(`the ValidateDomain function has not been set`)
 
-var ValidateDomain = func(domain string) error {
+func validateDomain(domain string) error {
+	detected, err := httpserver.Frontend.ValidateDomain(domain)
+	if err != nil || detected {
+		return err
+	}
 	return ErrNoSetValidateDomain
 }
 
@@ -21,7 +26,7 @@ func MakeWithSiteURL(siteURL, method string, path string, saveAs string, reqRewr
 	if err != nil {
 		return err
 	}
-	if err = ValidateDomain(u.Hostname()); err != nil {
+	if err = validateDomain(u.Hostname()); err != nil {
 		return err
 	}
 	langCode := GetLangCodeByPath(path)
@@ -36,7 +41,7 @@ func IsCachedDomain(ctx echo.Context, cacheKey string, urlWithQueryString ...boo
 	if defaults.IsMockContext(ctx) {
 		return false, nil
 	}
-	err := ValidateDomain(ctx.Domain())
+	err := validateDomain(ctx.Domain())
 	if err != nil {
 		return false, err
 	}
