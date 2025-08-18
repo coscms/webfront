@@ -1,8 +1,8 @@
 package xnotice
 
 import (
-	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/admpub/log"
 	"github.com/admpub/websocket"
@@ -10,6 +10,7 @@ import (
 	"github.com/webx-top/echo/defaults"
 	ws "github.com/webx-top/echo/handler/websocket"
 
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -17,8 +18,8 @@ import (
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
-type NSender func(ctx context.Context, customer *dbschema.OfficialCustomer) (close func(), msg <-chan *notice.Message, err error)
-type NReceiver func(ctx context.Context, customer *dbschema.OfficialCustomer, message []byte) ([]byte, error)
+type NSender func(ctx echo.Context, customer *dbschema.OfficialCustomer) (close func(), msg <-chan *notice.Message, err error)
+type NReceiver func(ctx echo.Context, customer *dbschema.OfficialCustomer, message []byte) ([]byte, error)
 
 var (
 	DefaultSender   = MemoryNoticeSender
@@ -46,34 +47,32 @@ func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn,
 	return func(c *websocket.Conn, ctx echo.Context) error {
 		customer := sessdata.Customer(ctx)
 		//push(writer)
-		if msgGetter != nil {
-			close, ch, err := msgGetter(ctx, customer)
-			if err != nil {
-				return err
-			}
-			if close != nil {
-				defer close()
-			}
-			if ch == nil {
-				return nil
-			}
-			go func() {
-				for {
-					select {
-					case message, ok := <-ch:
-						if !ok || message == nil {
-							c.Close()
-							return
-						}
-						if send(c, message) != nil {
-							return
-						}
-					case <-ctx.Done():
+		close, ch, err := msgGetter(ctx, customer)
+		if err != nil {
+			return err
+		}
+		if close != nil {
+			defer close()
+		}
+		if ch == nil {
+			return nil
+		}
+		go func() {
+			for {
+				select {
+				case message, ok := <-ch:
+					if !ok || message == nil {
+						c.Close()
 						return
 					}
+					if send(c, message) != nil {
+						return
+					}
+				case <-ctx.Done():
+					return
 				}
-			}()
-		}
+			}
+		}()
 
 		//echo
 		execute := func(conn *websocket.Conn) error {
@@ -97,7 +96,7 @@ func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn,
 				}
 			}
 		}
-		err := execute(c)
+		err = execute(c)
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
 				ctx.Logger().Debug(err.Error())
@@ -115,12 +114,22 @@ func ResetClientCount() {
 	m.ResetClientCount(true)
 }
 
-func MemoryNoticeSender(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
+func MemoryNoticeSender(ctx echo.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
+	var clientID string
+	if lastEventID := ctx.Header(`Last-Event-Id`); len(lastEventID) > 0 {
+		plaintext := config.FromFile().Decode256(lastEventID)
+		if len(plaintext) > 0 {
+			clientID = strings.SplitN(plaintext, `|`, 2)[0]
+		}
+	}
+	if len(clientID) > 0 {
+		_close, msgChan := frontend.Notify.MakeMessageGetterWithClientID(customer.Name, clientID, `message`)
+		return _close, msgChan, nil
+	}
 	return frontend.Notify.MakeMessageGetter(customer.Name, `message`)
 }
 
-func OnlineStatusDBUpdater(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
-	c := ctx.(echo.Context)
+func OnlineStatusDBUpdater(c echo.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
 	sessionID := c.Session().ID()
 	if len(sessionID) > 0 || customer != nil {
 		onlineM := modelCustomer.NewOnline(c)
@@ -139,8 +148,7 @@ func OnlineStatusDBUpdater(ctx context.Context, customer *dbschema.OfficialCusto
 	return nil, nil, nil
 }
 
-func OnlineStatusQueueUpdater(ctx context.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
-	c := ctx.(echo.Context)
+func OnlineStatusQueueUpdater(c echo.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
 	sessionID := c.Session().ID()
 	if len(sessionID) > 0 || customer != nil {
 		err := SendOnlineStatusToQueue(sessionID, customer.Id, true)
@@ -169,6 +177,8 @@ func GetNSenderFromConfig(cfg echo.H) NSender {
 	return noticeNS
 }
 
-func RegisterRoute(r echo.RouteRegister, cfg echo.H) echo.IRouter {
-	return ws.New("/notice", MakeHandler(GetNSenderFromConfig(cfg), DefaultReceiver)).Wrapper(r)
+func RegisterRoute(r echo.RouteRegister, cfg echo.H) {
+	sender := GetNSenderFromConfig(cfg)
+	ws.New("/notice", MakeHandler(sender, DefaultReceiver)).Wrapper(r)
+	r.Get("/sse", MakeSSEHandler(sender))
 }

@@ -4,7 +4,7 @@ go 1.24.5
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.12.0
+require github.com/coscms/webcore v0.12.1-0.20250818131423-4b91498674b0
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -66,6 +66,7 @@ require (
 	github.com/admpub/go-zinc v0.0.8
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815123445-c6bebe90982f
+	github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.3.0
