@@ -126,8 +126,7 @@ func InitWebServer() {
 
 	// 前台服务设置
 	addMiddleware(e)
-	e.Get(`/favicon.ico`, faviconHandler).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true)
-	e.Pre(xMW.CheckSystem)
+	e.Get(`/favicon.ico`, faviconHandler).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true).SetMetaKV(`static`, true)
 	e.Use(xMW.SessionInfo)
 	if config.IsInstalled() {
 		routepage.Apply(e, frontend.GlobalFuncMap())
@@ -196,7 +195,10 @@ func addMiddleware(e *echo.Echo) {
 	e.Use(ngingMW.FuncMap())
 	e.Use(xMW.FuncMap())
 	e.Use(render.Auto())
+
 	// - verifier or guard -
+
+	e.Use(xMW.CheckSystem)
 
 	// RateLimiter
 	e.Use(xMW.RateLimiter())

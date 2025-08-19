@@ -17,7 +17,6 @@ import (
 	"github.com/coscms/webcore/library/license"
 	nav "github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/nerrors"
-	uploadLibrary "github.com/coscms/webcore/library/upload"
 	uploadClient "github.com/webx-top/client/upload"
 
 	"github.com/coscms/webfront/dbschema"
@@ -33,6 +32,11 @@ import (
 
 func CheckSystem(h echo.Handler) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		if c.Route().Bool(`static`) {
+			// 可以访问静态资源
+			return h.Handle(c)
+		}
+
 		//检查是否已安装
 		if !config.IsInstalled() {
 			c.Set(`notInstalled`, true)
@@ -46,14 +50,9 @@ func CheckSystem(h echo.Handler) echo.HandlerFunc {
 
 func SessionInfo(h echo.Handler) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ppath := c.DispatchPath()
-		switch ppath {
-		case c.Echo().Prefix() + `/favicon.ico`:
+		if c.Route().Bool(`static`) {
+			// 静态资源不需要会话信息
 			return h.Handle(c)
-		default:
-			if strings.HasPrefix(ppath, c.Echo().Prefix()+uploadLibrary.UploadURLPath) {
-				return h.Handle(c)
-			}
 		}
 
 		baseCfg := config.Setting(`base`)
