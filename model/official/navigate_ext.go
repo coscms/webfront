@@ -44,6 +44,7 @@ func queryArticleCategory(c context.Context) interface{} {
 			},
 			isActive: GenActiveDetector(`categoryId`, category.Id),
 		}
+		navExt.SetInsideURL(navExt.Url)
 		navExt.Init().SetContext(ctx)
 		if category.ParentId < 1 {
 			list = append(list, navExt)
@@ -138,6 +139,11 @@ func (f *NavigateExt) URL() string {
 		return f.insideURL
 	}
 	return f.Url
+}
+
+func (f *NavigateExt) SetInsideURL(insideURL string) *NavigateExt {
+	f.insideURL = insideURL
+	return f
 }
 
 func (f *NavigateExt) IsValidURL() bool {
