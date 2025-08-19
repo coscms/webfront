@@ -9,6 +9,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/cmd/bootconfig"
+	"github.com/coscms/webcore/library/clitranslator"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -210,6 +211,7 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 		return err
 	}
 	for _, _lang := range langCodes {
+		eCtx.SetTranslator(clitranslator.BuildTranslator(config.FromFile().Language, _lang))
 		err = GenerateIndex(eCtx, rootURL, _lang, sitemapCfg.AllChild, subDir)
 		if err != nil {
 			log.Error(err.Error())
