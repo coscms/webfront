@@ -9,7 +9,6 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/null"
 	"github.com/coscms/webfront/dbschema"
-	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -89,6 +88,7 @@ type NavigateExt struct {
 	identRegexp *regexp.Regexp
 	isInside    null.Bool // 是否是内部链接
 	isActive    func(echo.Context) bool
+	insideURL   string          // 内部链接的URL
 	Children    *[]*NavigateExt //`db:",relation=parent_id:id|eq(has_child,Y)"`
 	Extra       echo.H
 }
@@ -102,11 +102,7 @@ func (f *NavigateExt) initIdentRegexp() error {
 		return nil
 	}
 	var err error
-	if strings.HasPrefix(f.Ident, `regexp:`) {
-		expr := strings.TrimPrefix(f.Ident, `regexp:`)
-		if len(expr) == 0 {
-			return err
-		}
+	if expr, found := strings.CutPrefix(f.Ident, `regexp:`); found && len(expr) > 0 {
 		f.identRegexp, err, _ = navigateIdentRegexps.GetOrLoad(context.Background(), expr, loader)
 		if err != nil {
 			log.Error(expr+`: `, err)
@@ -134,8 +130,12 @@ func (f *NavigateExt) URL() string {
 	if len(f.Url) == 0 {
 		return ``
 	}
+	if len(f.insideURL) > 0 {
+		return f.insideURL
+	}
 	if f.IsInside() {
-		return sessdata.URLFor(f.Url)
+		f.insideURL = f.Context().RelativeURL(f.Url)
+		return f.insideURL
 	}
 	return f.Url
 }
@@ -151,9 +151,12 @@ func (f *NavigateExt) IsActive() bool {
 	if f.isActive != nil {
 		return f.isActive(f.Context())
 	}
-	currentPath := f.Context().Request().URL().Path()
-	if f.IsInside() && currentPath == f.Url {
-		return true
+	if f.IsInside() {
+		navURL := f.URL()
+		if navURL == f.Context().Request().URL().Path() ||
+			navURL == f.Context().DispatchPath() {
+			return true
+		}
 	}
 	if len(f.Ident) > 0 {
 		err := f.initIdentRegexp()
@@ -161,9 +164,9 @@ func (f *NavigateExt) IsActive() bool {
 			return false
 		}
 		if f.identRegexp != nil {
-			return f.identRegexp.MatchString(currentPath)
+			return f.identRegexp.MatchString(f.Context().DispatchPath())
 		}
-		return strings.HasSuffix(currentPath, f.Ident)
+		return strings.HasSuffix(f.Context().DispatchPath(), f.Ident)
 	}
 	return false
 }
