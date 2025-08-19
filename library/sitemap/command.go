@@ -12,6 +12,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webfront/initialize/frontend"
+	"github.com/coscms/webfront/registry/route"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
@@ -150,7 +151,7 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 		return errors.New(`No group found`)
 	}
 
-	eCtx := defaults.NewMockContext()
+	eCtx := defaults.NewMockContext(route.IRegister().Echo())
 
 	if !bootconfig.IsWeb() {
 		frontend.TempInitRoute(u.Host)
