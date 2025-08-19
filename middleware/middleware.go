@@ -31,6 +31,19 @@ import (
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
+func CheckSystem(h echo.Handler) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		//检查是否已安装
+		if !config.IsInstalled() {
+			c.Set(`notInstalled`, true)
+			c.Data().SetInfo(stdCode.SystemNotInstalled.String(), stdCode.SystemNotInstalled.Int())
+			return c.Render(`error/under-maintenance`, nil, http.StatusServiceUnavailable)
+		}
+
+		return h.Handle(c)
+	}
+}
+
 func SessionInfo(h echo.Handler) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ppath := c.DispatchPath()
@@ -41,13 +54,6 @@ func SessionInfo(h echo.Handler) echo.HandlerFunc {
 			if strings.HasPrefix(ppath, c.Echo().Prefix()+uploadLibrary.UploadURLPath) {
 				return h.Handle(c)
 			}
-		}
-
-		//检查是否已安装
-		if !config.IsInstalled() {
-			c.Set(`notInstalled`, true)
-			c.Data().SetInfo(stdCode.SystemNotInstalled.String(), stdCode.SystemNotInstalled.Int())
-			return c.Render(`error/under-maintenance`, nil, http.StatusServiceUnavailable)
 		}
 
 		baseCfg := config.Setting(`base`)

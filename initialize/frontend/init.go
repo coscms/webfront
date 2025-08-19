@@ -127,6 +127,7 @@ func InitWebServer() {
 	// 前台服务设置
 	addMiddleware(e)
 	e.Get(`/favicon.ico`, faviconHandler).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true)
+	e.Pre(xMW.CheckSystem)
 	e.Use(xMW.SessionInfo)
 	if config.IsInstalled() {
 		routepage.Apply(e, frontend.GlobalFuncMap())
