@@ -214,7 +214,7 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	}
 	lng := clitranslator.NewLanguage(config.FromFile().Language)
 	for _, _lang := range langCodes {
-		tr := lng.ToTranslator(_lang)
+		tr := lng.AcquireTranslator(_lang)
 		eCtx.SetTranslator(tr)
 		err = GenerateIndex(eCtx, rootURL, _lang, sitemapCfg.AllChild, subDir)
 		tr.Release()
