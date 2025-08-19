@@ -153,6 +153,8 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	}
 
 	eCtx := defaults.NewMockContext(route.IRegister().Echo())
+	eCtx.Request().SetHost(u.Host)
+	eCtx.Request().Header().Set(echo.HeaderXForwardedProto, u.Scheme)
 
 	if !bootconfig.IsWeb() {
 		frontend.TempInitRoute(u.Host)
