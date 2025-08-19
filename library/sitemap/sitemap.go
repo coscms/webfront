@@ -33,7 +33,11 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 	smi.SetSitemapIndexName(`sitemap_index`)
 	smi.SetHostname(rootURL)
 	smi.SetOutputPath(outputPath)
-	smi.SetServerURI(`/sitemaps/`)
+	serverURI := `/sitemaps/`
+	if len(langCode) > 0 && langCode != config.FromFile().Language.Default {
+		serverURI = `/` + langCode + serverURI
+	}
+	smi.SetServerURI(serverURI)
 
 	var subDirName string
 	if len(subDir) > 0 {
