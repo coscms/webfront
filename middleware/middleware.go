@@ -42,6 +42,12 @@ func SessionInfo(h echo.Handler) echo.HandlerFunc {
 				return h.Handle(c)
 			}
 		}
+
+		//检查是否已安装
+		if !config.IsInstalled() {
+			return c.Render(`error/under-maintenance`, nil, http.StatusServiceUnavailable)
+		}
+
 		baseCfg := config.Setting(`base`)
 		siteClose := baseCfg.Uint(`siteClose`)
 		if siteClose == xconst.SiteClose {
