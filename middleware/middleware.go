@@ -45,6 +45,7 @@ func SessionInfo(h echo.Handler) echo.HandlerFunc {
 
 		//检查是否已安装
 		if !config.IsInstalled() {
+			c.Set(`notInstalled`, true)
 			return c.Render(`error/under-maintenance`, nil, http.StatusServiceUnavailable)
 		}
 
