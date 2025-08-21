@@ -39,13 +39,16 @@ func genStyle(p Adverter) string {
 	if p == nil {
 		return ``
 	}
-	var styles []string
+	styles := make([]string, 0, 3)
 	if p.GetWidth() > 0 {
 		styles = append(styles, fmt.Sprintf(`width:%dpx`, p.GetWidth()))
+	} else {
+		styles = append(styles, `width:100%`)
 	}
 	if p.GetHeight() > 0 {
 		styles = append(styles, fmt.Sprintf(`height:%dpx`, p.GetHeight()))
 	}
+	styles = append(styles, `max-width:100%`)
 	style := strings.Join(styles, `;`)
 	if len(style) > 0 {
 		style = ` style="` + style + `"`
