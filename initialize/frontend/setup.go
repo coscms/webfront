@@ -37,7 +37,7 @@ func parseCmdArgs() map[string]string {
 func AutoBackendPrefix() {
 	if len(config.FromCLI().BackendDomain) == 0 &&
 		len(config.FromCLI().FrontendDomain) == 0 &&
-		len(os.Getenv(`NGING_BACKTEND_URL_PREFIX`)) == 0 &&
+		len(os.Getenv(`NGING_BACKEND_URL_PREFIX`)) == 0 &&
 		len(Prefix()) == 0 &&
 		len(parseCmdArgs()[`backend.domain`]) == 0 &&
 		len(parseCmdArgs()[`frontend.domain`]) == 0 {
