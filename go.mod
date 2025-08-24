@@ -4,7 +4,7 @@ go 1.24.5
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.12.9
+require github.com/coscms/webcore v0.12.10-0.20250824083603-a85484ecea4f
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -21,7 +21,7 @@ require (
 	github.com/admpub/godotenv v1.4.3
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ipfilter v1.0.6
-	github.com/admpub/license_gen v0.1.1
+	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5
 	github.com/admpub/null v8.0.5+incompatible
@@ -127,6 +127,7 @@ require (
 	github.com/admpub/ini v1.38.2 // indirect
 	github.com/admpub/ip2region/v2 v2.0.1 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
+	github.com/admpub/machineid v1.0.2 // indirect
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/map2struct v0.1.3 // indirect
