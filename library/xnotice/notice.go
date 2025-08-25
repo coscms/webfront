@@ -13,6 +13,7 @@ import (
 	ws "github.com/webx-top/echo/handler/websocket"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
@@ -187,6 +188,6 @@ func GetNSenderFromConfig(cfg echo.H) NSender {
 
 func RegisterRoute(r echo.RouteRegister, cfg echo.H) {
 	sender := GetNSenderFromConfig(cfg)
-	ws.New("/notice", MakeHandler(sender, DefaultReceiver)).Wrapper(r)
-	r.Get("/sse", MakeSSEHandler(sender))
+	ws.New("/notice", MakeHandler(sender, DefaultReceiver)).Wrapper(r).SetMetaKV(httpserver.PermPublicKV())
+	r.Get("/sse", MakeSSEHandler(sender)).SetMetaKV(httpserver.PermPublicKV())
 }
