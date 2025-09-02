@@ -9,7 +9,7 @@ func GetAndLock(m factory.Model, cond db.Compound, middlewares ...func(db.Result
 	ctx := m.Context()
 	cid := m.ConnID()
 	nmr := m.Namer()
-	p := m.NewParam()
+	p := m.NewParam().SetWrite()
 	if len(middlewares) > 0 {
 		p = p.SetMW(middlewares[0])
 	}

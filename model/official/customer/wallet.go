@@ -83,7 +83,7 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 		db.Cond{`asset_type`: flow.AssetType},
 	)
 	var exists bool
-	exists, err = f.Exists(nil, cond)
+	exists, err = f.Param(nil, cond).SetWrite().Exists()
 	if err != nil {
 		ctx.Rollback()
 		return err
