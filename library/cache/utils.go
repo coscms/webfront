@@ -16,6 +16,10 @@ func IsDbAccount(v string) bool {
 	return com.StrIsNumeric(v)
 }
 
+// ===============================
+// reloader
+// ===============================
+
 var _ extend.Reloader = (*ReloadableOptions)(nil)
 
 func NewReloadableOptions() *ReloadableOptions {
@@ -47,6 +51,10 @@ func (o *ReloadableOptions) Reload() error {
 func (o *ReloadableOptions) IsValid() bool {
 	return o != nil && o.Options != nil && len(o.Options.Adapter) > 0
 }
+
+// ===============================
+// list
+// ===============================
 
 type List[T any] struct {
 	list  []T
