@@ -3,8 +3,8 @@ package underattack
 import (
 	"regexp"
 	"strings"
-	"sync"
 
+	"github.com/admpub/once"
 	"github.com/coscms/webcore/library/ipfilter"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -16,14 +16,17 @@ func NewConfig() *Config {
 }
 
 type Config struct {
-	On          bool
-	IPWhitelist string
-	UAWhitelist string
-	HeaderName  string
-	HeaderValue string
-	filter      *ipfilter.IPFilter
-	regexp      *regexp.Regexp
-	sg          sync.Once
+	On                bool
+	IPWhitelist       string
+	UAWhitelist       string
+	HeaderName        string
+	HeaderValue       string
+	URIPathWhitelist  []string
+	URIQueryWhitelist []string
+	filter            *ipfilter.IPFilter
+	regexpUA          *regexp.Regexp
+	kvURIQuery        map[string][]string
+	once              once.Once
 }
 
 func (c *Config) FromStore(r echo.H) *Config {
@@ -32,6 +35,8 @@ func (c *Config) FromStore(r echo.H) *Config {
 	c.UAWhitelist = strings.TrimSpace(r.String(`UAWhitelist`))
 	c.HeaderName = strings.TrimSpace(r.String(`HeaderName`))
 	c.HeaderValue = strings.TrimSpace(r.String(`HeaderValue`))
+	c.URIPathWhitelist = com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIPathWhitelist`)))
+	c.URIQueryWhitelist = com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIQueryWhitelist`)))
 	return c
 }
 
@@ -64,9 +69,28 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 			}
 		}
 	}
-	c.sg.Do(c.initFilter)
-	if c.regexp != nil {
-		if c.regexp.MatchString(ctx.Request().UserAgent()) {
+	if len(c.URIPathWhitelist) > 0 {
+		if com.InSlice(ctx.Path(), c.URIPathWhitelist) {
+			return true
+		}
+		if ctx.Path() != ctx.DispatchPath() && com.InSlice(ctx.DispatchPath(), c.URIPathWhitelist) {
+			return true
+		}
+		return true
+	}
+	c.once.Do(c.initFilter)
+	if c.kvURIQuery != nil {
+		for key, values := range c.kvURIQuery {
+			inputs := ctx.FormValues(key)
+			for _, value := range values {
+				if com.InSlice(value, inputs) {
+					return true
+				}
+			}
+		}
+	}
+	if c.regexpUA != nil {
+		if c.regexpUA.MatchString(ctx.Request().UserAgent()) {
 			return true
 		}
 	}
@@ -77,6 +101,20 @@ func (c *Config) initFilter() {
 	c.filter = ipfilter.NewWithIP(``, c.IPWhitelist).SetDisallow(true)
 	if len(c.UAWhitelist) > 0 {
 		rows := com.TrimSpaceForRows(c.UAWhitelist)
-		c.regexp = regexp.MustCompile(strings.Join(rows, `|`))
+		c.regexpUA = regexp.MustCompile(strings.Join(rows, `|`))
+	}
+	c.kvURIQuery = map[string][]string{}
+	for _, row := range c.URIQueryWhitelist {
+		parts := strings.SplitN(row, `=`, 2)
+		for k, v := range parts {
+			parts[k] = strings.TrimSpace(v)
+		}
+		if len(parts[0]) == 0 {
+			continue
+		}
+		if _, ok := c.kvURIQuery[parts[0]]; !ok {
+			c.kvURIQuery[parts[0]] = []string{}
+		}
+		c.kvURIQuery[parts[0]] = append(c.kvURIQuery[parts[0]], parts[1])
 	}
 }
