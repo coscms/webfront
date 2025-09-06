@@ -57,41 +57,42 @@ func (o *ReloadableOptions) IsValid() bool {
 // ===============================
 
 type List[T any] struct {
-	list  []T
-	pgopt echo.H
+	List          []T
+	PagingOptions echo.H
 }
 
 func (c *List[T]) SetList(list []T) *List[T] {
-	c.list = list
+	c.List = list
 	return c
 }
 
-func (c *List[T]) SetPgOpt(options echo.H) *List[T] {
-	c.pgopt = options
+func (c *List[T]) SetOptions(options echo.H) *List[T] {
+	c.PagingOptions = options
 	return c
 }
 
 func (c *List[T]) Do(ctx echo.Context, cacheKey string, fn func() ([]T, error), opts ...x.GetOption) error {
-	err := XFunc(ctx, cacheKey, c, func() error {
+	//Delete(ctx, cacheKey)
+	err := XFunc(ctx, cacheKey, &c, func() error {
 		var err error
-		c.list, err = fn()
+		c.List, err = fn()
 		if err != nil {
 			return err
 		}
-		c.pgopt = ctx.Get(`pagination`).(*pagination.Pagination).Options()
+		c.PagingOptions = ctx.Get(`pagination`).(*pagination.Pagination).Options()
 		return err
 	}, opts...)
 	return err
 }
 
 func (c *List[T]) GetPaginator(ctx echo.Context) *pagination.Pagination {
-	return pagination.New(ctx).SetOptions(c.pgopt)
+	return pagination.New(ctx).SetOptions(c.PagingOptions)
 }
 
 func (c *List[T]) GetList() []T {
-	return c.list
+	return c.List
 }
 
-func (c *List[T]) GetPgOpt() echo.H {
-	return c.pgopt
+func (c *List[T]) GetOptions() echo.H {
+	return c.PagingOptions
 }
