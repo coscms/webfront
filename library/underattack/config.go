@@ -9,6 +9,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/param"
 )
 
 func NewConfig() *Config {
@@ -35,8 +36,8 @@ func (c *Config) FromStore(r echo.H) *Config {
 	c.UAWhitelist = strings.TrimSpace(r.String(`UAWhitelist`))
 	c.HeaderName = strings.TrimSpace(r.String(`HeaderName`))
 	c.HeaderValue = strings.TrimSpace(r.String(`HeaderValue`))
-	c.URIPathWhitelist = com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIPathWhitelist`)))
-	c.URIQueryWhitelist = com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIQueryWhitelist`)))
+	c.URIPathWhitelist = param.Unique(com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIPathWhitelist`))))
+	c.URIQueryWhitelist = param.Unique(com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIQueryWhitelist`))))
 	return c
 }
 
@@ -100,8 +101,10 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 func (c *Config) initFilter() {
 	c.filter = ipfilter.NewWithIP(``, c.IPWhitelist).SetDisallow(true)
 	if len(c.UAWhitelist) > 0 {
-		rows := com.TrimSpaceForRows(c.UAWhitelist)
-		c.regexpUA = regexp.MustCompile(strings.Join(rows, `|`))
+		rows := param.Unique(com.TrimSpaceForRows(c.UAWhitelist))
+		if len(rows) > 0 {
+			c.regexpUA = regexp.MustCompile(strings.Join(rows, `|`))
+		}
 	}
 	c.kvURIQuery = map[string][]string{}
 	for _, row := range c.URIQueryWhitelist {
