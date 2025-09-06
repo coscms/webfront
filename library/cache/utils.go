@@ -2,9 +2,12 @@ package cache
 
 import (
 	"github.com/admpub/cache"
+	"github.com/admpub/cache/x"
 	"github.com/admpub/color"
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
+	"github.com/webx-top/pagination"
 
 	"github.com/coscms/webcore/library/config/extend"
 )
@@ -43,4 +46,44 @@ func (o *ReloadableOptions) Reload() error {
 
 func (o *ReloadableOptions) IsValid() bool {
 	return o != nil && o.Options != nil && len(o.Options.Adapter) > 0
+}
+
+type List[T any] struct {
+	list  []T
+	pgopt echo.H
+}
+
+func (c *List[T]) SetList(list []T) *List[T] {
+	c.list = list
+	return c
+}
+
+func (c *List[T]) SetPgOpt(options echo.H) *List[T] {
+	c.pgopt = options
+	return c
+}
+
+func (c *List[T]) Do(ctx echo.Context, cacheKey string, fn func() ([]T, error), opts ...x.GetOption) error {
+	err := XFunc(ctx, cacheKey, c, func() error {
+		var err error
+		c.list, err = fn()
+		if err != nil {
+			return err
+		}
+		c.pgopt = ctx.Get(`pagination`).(*pagination.Pagination).Options()
+		return err
+	}, opts...)
+	return err
+}
+
+func (c *List[T]) GetPaginator(ctx echo.Context) *pagination.Pagination {
+	return pagination.New(ctx).SetOptions(c.pgopt)
+}
+
+func (c *List[T]) GetList() []T {
+	return c.list
+}
+
+func (c *List[T]) GetPgOpt() echo.H {
+	return c.pgopt
 }
