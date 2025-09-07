@@ -47,10 +47,9 @@ func (r Rule) Validate(ctx echo.Context) error {
 	return err
 }
 
+// IsAllowed 没有任何白名单规则时直接放行; 全部白名单规则匹配时直接放行
 func (r Rule) IsAllowed(ctx echo.Context) bool {
-	var dflt bool
 	if len(r.Headers) > 0 {
-		dflt = true
 		for k, v := range r.Headers {
 			if ctx.Header(k) != v {
 				return false
@@ -58,7 +57,6 @@ func (r Rule) IsAllowed(ctx echo.Context) bool {
 		}
 	}
 	if r.kvURIQuery != nil {
-		dflt = true
 		for key, values := range r.kvURIQuery {
 			inputs := ctx.FormValues(key)
 			for _, value := range values {
@@ -69,10 +67,9 @@ func (r Rule) IsAllowed(ctx echo.Context) bool {
 		}
 	}
 	if r.regexpUA != nil {
-		dflt = true
 		if !r.regexpUA.MatchString(ctx.Request().UserAgent()) {
 			return false
 		}
 	}
-	return dflt
+	return true
 }

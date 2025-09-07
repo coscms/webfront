@@ -98,13 +98,15 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 			} else if !strings.HasPrefix(dp, rule.Path) {
 				continue
 			}
-			if !rule.IsAllowed(ctx) {
+			if !rule.IsAllowed(ctx) { // 不匹配规则时，继续验证IP白名单
 				return c.filter.IsAllowed(ctx.RealIP())
 			}
 			return true
 		}
 	}
 
+	// 不匹配IP白名单时，不放行
+	// 没有设置IP白名单时，不放行
 	return c.filter.IsAllowed(ctx.RealIP())
 }
 
