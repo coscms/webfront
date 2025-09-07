@@ -1,7 +1,9 @@
 package underattack
 
 import (
+	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/admpub/once"
@@ -16,38 +18,32 @@ func NewConfig() *Config {
 	return &Config{}
 }
 
-type Config struct {
-	On                bool
-	IPWhitelist       string
-	UAWhitelist       string
-	HeaderName        string
-	HeaderValue       string
-	URIPathWhitelist  []string
-	URIQueryWhitelist []string
-	filter            *ipfilter.IPFilter
-	regexpUA          *regexp.Regexp
-	kvURIQuery        map[string][]string
-	once              once.Once
+type Rule struct {
+	Path        string
+	UAWhitelist string
+	Headers     map[string]string
+	QueryString string // a=b&b=c
+	regexpUA    *regexp.Regexp
+	kvURIQuery  map[string][]string
 }
 
-func (c *Config) FromStore(r echo.H) *Config {
-	c.On = r.Bool(`On`)
-	c.IPWhitelist = strings.TrimSpace(r.String(`IPWhitelist`))
-	c.UAWhitelist = strings.TrimSpace(r.String(`UAWhitelist`))
-	c.HeaderName = strings.TrimSpace(r.String(`HeaderName`))
-	c.HeaderValue = strings.TrimSpace(r.String(`HeaderValue`))
-	c.URIPathWhitelist = param.Unique(com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIPathWhitelist`))))
-	c.URIQueryWhitelist = param.Unique(com.TrimSpaceForRows(strings.TrimSpace(r.String(`URIQueryWhitelist`))))
-	return c
-}
-
-func (c *Config) Validate(ctx echo.Context) error {
-	err := ipfilter.ValidateRows(ctx, c.IPWhitelist)
-	if err != nil {
-		return err
+func (r *Rule) init() {
+	if len(r.UAWhitelist) > 0 {
+		rows := param.Unique(com.TrimSpaceForRows(r.UAWhitelist))
+		if len(rows) > 0 {
+			r.regexpUA = regexp.MustCompile(strings.Join(rows, `|`))
+		}
 	}
-	if len(c.UAWhitelist) > 0 {
-		rows := com.TrimSpaceForRows(c.UAWhitelist)
+	r.kvURIQuery = map[string][]string{}
+	if len(r.QueryString) > 0 {
+		r.kvURIQuery, _ = url.ParseQuery(r.QueryString)
+	}
+}
+
+func (r Rule) Validate(ctx echo.Context) error {
+	var err error
+	if len(r.UAWhitelist) > 0 {
+		rows := com.TrimSpaceForRows(r.UAWhitelist)
 		for _, row := range rows {
 			_, err = regexp.Compile(row)
 			if err != nil {
@@ -58,40 +54,128 @@ func (c *Config) Validate(ctx echo.Context) error {
 	return err
 }
 
-func (c *Config) IsAllowed(ctx echo.Context) bool {
-	if len(c.HeaderName) > 0 {
-		if len(c.HeaderValue) > 0 {
-			if ctx.Header(c.HeaderName) == c.HeaderValue {
-				return true
-			}
-		} else {
-			if len(ctx.Request().Header().Values(c.HeaderName)) > 0 {
-				return true
+func (r Rule) IsAllowed(ctx echo.Context) bool {
+	var dflt bool
+	if len(r.Headers) > 0 {
+		dflt = true
+		for k, v := range r.Headers {
+			if ctx.Header(k) != v {
+				return false
 			}
 		}
 	}
-	if len(c.URIPathWhitelist) > 0 {
-		if com.InSlice(ctx.Path(), c.URIPathWhitelist) {
-			return true
-		}
-		if ctx.Path() != ctx.DispatchPath() && com.InSlice(ctx.DispatchPath(), c.URIPathWhitelist) {
-			return true
-		}
-	}
-	c.once.Do(c.initFilter)
-	if c.kvURIQuery != nil {
-		for key, values := range c.kvURIQuery {
+	if r.kvURIQuery != nil {
+		dflt = true
+		for key, values := range r.kvURIQuery {
 			inputs := ctx.FormValues(key)
 			for _, value := range values {
-				if com.InSlice(value, inputs) {
-					return true
+				if !com.InSlice(value, inputs) {
+					return false
 				}
 			}
 		}
 	}
-	if c.regexpUA != nil {
-		if c.regexpUA.MatchString(ctx.Request().UserAgent()) {
-			return true
+	if r.regexpUA != nil {
+		dflt = true
+		if !r.regexpUA.MatchString(ctx.Request().UserAgent()) {
+			return false
+		}
+	}
+	return dflt
+}
+
+type Config struct {
+	On          bool
+	IPWhitelist string
+	Rules       []*Rule // Rules[0][Path]
+	filter      *ipfilter.IPFilter
+	once        once.Once
+}
+
+func (c *Config) FromStore(r echo.H) *Config {
+	c.On = r.Bool(`On`)
+	c.IPWhitelist = strings.TrimSpace(r.String(`IPWhitelist`))
+	m := r.GetStore(`Rules`)
+	pathList := getSliceString(m.Get(`Path`))
+	uaList := getSliceString(m.Get(`UAWhitelist`))
+	uaLength := len(uaList)
+	hdList := getSliceString(m.Get(`Headers`))
+	hdLength := len(hdList)
+	qsList := getSliceString(m.Get(`QueryString`))
+	qsLength := len(qsList)
+	for index, ppath := range pathList {
+		if uaLength > index && hdLength > index && qsLength > index {
+			ppath := strings.TrimSpace(ppath)
+			if len(ppath) == 0 {
+				continue
+			}
+			if !strings.HasPrefix(ppath, `/`) {
+				ppath = `/` + ppath
+			}
+			c.Rules = append(c.Rules, &Rule{
+				Path:        ppath,
+				UAWhitelist: strings.TrimSpace(uaList[index]),
+				Headers:     com.SplitKVRows(hdList[index]),
+				QueryString: strings.TrimSpace(qsList[index]),
+			})
+			continue
+		}
+		break
+	}
+	sort.Slice(c.Rules, func(i, j int) bool {
+		return len(c.Rules[i].Path) > len(c.Rules[j].Path)
+	})
+	return c
+}
+
+func getSliceString(v interface{}) []string {
+	value, ok := v.([]interface{})
+	if !ok {
+		return nil
+	}
+	var ss []string
+	for _, val := range value {
+		if ss, ok = val.([]string); ok {
+			return ss
+		}
+	}
+	return ss
+}
+
+func (c *Config) Validate(ctx echo.Context) error {
+	err := ipfilter.ValidateRows(ctx, c.IPWhitelist)
+	if err != nil {
+		return err
+	}
+	for _, rule := range c.Rules {
+		if err = rule.Validate(ctx); err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+func (c *Config) IsAllowed(ctx echo.Context) bool {
+	c.once.Do(c.initFilter)
+	if len(c.Rules) > 0 {
+		dp := ctx.DispatchPath()
+		ck := dp != ctx.Path()
+		var passed bool
+		for _, rule := range c.Rules {
+			if ck {
+				if !strings.HasPrefix(dp, rule.Path) && !strings.HasPrefix(ctx.Path(), rule.Path) {
+					continue
+				}
+			} else if !strings.HasPrefix(dp, rule.Path) {
+				continue
+			}
+			if !rule.IsAllowed(ctx) {
+				return false
+			}
+			passed = true
+		}
+		if passed {
+			return passed
 		}
 	}
 	return c.filter.IsAllowed(ctx.RealIP())
@@ -99,24 +183,7 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 
 func (c *Config) initFilter() {
 	c.filter = ipfilter.NewWithIP(``, c.IPWhitelist).SetDisallow(true)
-	if len(c.UAWhitelist) > 0 {
-		rows := param.Unique(com.TrimSpaceForRows(c.UAWhitelist))
-		if len(rows) > 0 {
-			c.regexpUA = regexp.MustCompile(strings.Join(rows, `|`))
-		}
-	}
-	c.kvURIQuery = map[string][]string{}
-	for _, row := range c.URIQueryWhitelist {
-		parts := strings.SplitN(row, `=`, 2)
-		for k, v := range parts {
-			parts[k] = strings.TrimSpace(v)
-		}
-		if len(parts[0]) == 0 {
-			continue
-		}
-		if _, ok := c.kvURIQuery[parts[0]]; !ok {
-			c.kvURIQuery[parts[0]] = []string{}
-		}
-		c.kvURIQuery[parts[0]] = append(c.kvURIQuery[parts[0]], parts[1])
+	for _, rule := range c.Rules {
+		rule.init()
 	}
 }
