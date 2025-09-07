@@ -77,7 +77,6 @@ func (c *Config) IsAllowed(ctx echo.Context) bool {
 		if ctx.Path() != ctx.DispatchPath() && com.InSlice(ctx.DispatchPath(), c.URIPathWhitelist) {
 			return true
 		}
-		return true
 	}
 	c.once.Do(c.initFilter)
 	if c.kvURIQuery != nil {
