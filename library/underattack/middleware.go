@@ -1,6 +1,7 @@
 package underattack
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
@@ -67,7 +68,7 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 			}
 			_, captchaType := captchabiz.GetCaptchaType()
 			c.Set(`captchaType`, captchaType)
-			return c.Render(`under_attack`, nil)
+			return c.Render(`under_attack`, nil, http.StatusForbidden) //http.StatusRequestTimeout
 		})
 	}
 }
