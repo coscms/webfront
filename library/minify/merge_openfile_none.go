@@ -13,6 +13,7 @@ import (
 )
 
 func openfile(asset string, file string) (http.File, error) {
+	file = filepath.Clean(file)
 	var afile string
 	if asset == `AssetsURL` {
 		afile = filepath.Join(bindataBackend.StaticOptions.Root, file)
