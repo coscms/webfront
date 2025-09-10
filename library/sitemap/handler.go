@@ -46,7 +46,9 @@ func handleStatic(c echo.Context, sitemapDir string, getSubDirName func(echo.Con
 	if err != nil {
 		return err
 	}
-	name := filepath.Join(root, c.Param("*"))
+	reqFile := c.Param("*")
+	reqFile = echo.CleanPath(reqFile)
+	name := filepath.Join(root, reqFile)
 	if !strings.HasPrefix(name, root) {
 		return echo.ErrNotFound
 	}
@@ -57,7 +59,7 @@ func handleStatic(c echo.Context, sitemapDir string, getSubDirName func(echo.Con
 	langDefault := config.FromFile().Language.Default
 	if lang != langDefault {
 		root = strings.TrimSuffix(root, lang+echo.FilePathSeparator+`sitemaps`) + langDefault + echo.FilePathSeparator + `sitemaps`
-		name = filepath.Join(root, c.Param("*"))
+		name = filepath.Join(root, reqFile)
 		err = c.File(name)
 	}
 	return err
