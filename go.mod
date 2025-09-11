@@ -1,10 +1,10 @@
 module github.com/coscms/webfront
 
-go 1.24.5
+go 1.25.1
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.12.10-0.20250911054150-744cdee2580b
+require github.com/coscms/webcore v0.12.10-0.20250911153605-cec2a90e5b03
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.0
 	github.com/webx-top/db v1.28.9
-	github.com/webx-top/echo v1.22.3-0.20250910195354-d6a202751f73
+	github.com/webx-top/echo v1.22.3
 	github.com/webx-top/echo-prometheus v1.1.2
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
