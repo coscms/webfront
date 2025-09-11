@@ -1,6 +1,8 @@
 package sitemap
 
 import (
+	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -9,6 +11,22 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 )
+
+func TestOSRoot(t *testing.T) {
+	testDir := `./testdata`
+	os.MkdirAll(testDir, os.ModePerm)
+	defer os.RemoveAll(testDir)
+	rootFS, err := os.OpenRoot(testDir)
+	assert.NoError(t, err)
+	for i := 0; i < 5; i++ {
+		content := strconv.Itoa(i)
+		rootFS.WriteFile(`test_`+content, []byte(content), os.ModePerm)
+		b, err := rootFS.ReadFile(`test_` + content)
+		assert.NoError(t, err)
+		assert.Equal(t, content, string(b))
+	}
+	defer rootFS.Close()
+}
 
 func TestGenerate(t *testing.T) {
 	eCtx := defaults.NewMockContext()
