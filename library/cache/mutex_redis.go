@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	redsyncClient   *redsync.Redsync
-	redsyncOnce     once.Once
-	maxLockDuration = 2 * time.Minute
+	redsyncClient *redsync.Redsync
+	redsyncOnce   once.Once
 )
 
 func resetRedsync() {
@@ -54,12 +53,14 @@ func RedisMutex(key string, options ...redsync.Option) *redsync.Mutex {
 	return RedsyncClient().NewMutex(key, options...)
 }
 
-type mutexRedis struct{}
+type mutexRedis struct {
+	maxLockDuration time.Duration
+}
 
-func (*mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
 	delay := 100 * time.Millisecond
 	m := RedisMutex(key,
-		redsync.WithExpiry(maxLockDuration),
+		redsync.WithExpiry(r.maxLockDuration),
 		redsync.WithTries(1000),
 		redsync.WithRetryDelayFunc(func(tries int) time.Duration {
 			return delay * time.Duration(tries)
@@ -84,9 +85,9 @@ func (*mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
 	return
 }
 
-func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 	m := RedisMutex(key,
-		redsync.WithExpiry(maxLockDuration),
+		redsync.WithExpiry(r.maxLockDuration),
 		redsync.WithTries(1),
 		redsync.WithRetryDelay(50*time.Millisecond),
 	)
@@ -99,7 +100,7 @@ func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 	}
 	done := make(chan struct{})
 	go func() {
-		ticker := time.NewTicker(maxLockDuration / 3)
+		ticker := time.NewTicker(r.maxLockDuration / 3)
 		defer ticker.Stop()
 		for {
 			select {
@@ -123,12 +124,14 @@ func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 }
 
 func (r *mutexRedis) TryLockWithTimeout(key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), maxLockDuration)
-	defer cancel()
-	return r.TryLockWithContext(key, ctx)
+	return r.tryLockWithContext(key, context.Background(), maxLockDuration)
 }
 
 func (r *mutexRedis) TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error) {
+	return r.tryLockWithContext(key, ctx, r.maxLockDuration)
+}
+
+func (r *mutexRedis) tryLockWithContext(key string, ctx context.Context, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
 	m := RedisMutex(key,
 		redsync.WithExpiry(maxLockDuration),
 		redsync.WithTries(1),
