@@ -97,9 +97,10 @@ func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 		}
 		return
 	}
-	ticker := time.NewTicker(maxLockDuration / 3)
 	done := make(chan struct{})
 	go func() {
+		ticker := time.NewTicker(maxLockDuration / 3)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-done:
@@ -112,7 +113,6 @@ func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 
 	unlock = func() error {
 		close(done)
-		ticker.Stop()
 		ok, err := m.Unlock()
 		if !ok || err != nil {
 			return fmt.Errorf("unlock unsuccessful: %w", err)
@@ -122,47 +122,13 @@ func (*mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 	return
 }
 
-func (*mutexRedis) TryLockWithTimeout(key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) TryLockWithTimeout(key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), maxLockDuration)
 	defer cancel()
-	m := RedisMutex(key,
-		redsync.WithExpiry(maxLockDuration),
-		redsync.WithTries(1),
-		redsync.WithRetryDelay(50*time.Millisecond),
-	)
-	err = m.LockContext(ctx)
-	if err != nil {
-		if err == redsync.ErrFailed {
-			err = ErrFailedToAcquireLock
-		}
-		return
-	}
-	ticker := time.NewTicker(maxLockDuration / 3)
-	done := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				m.Extend()
-			}
-		}
-	}()
-
-	unlock = func() error {
-		close(done)
-		ticker.Stop()
-		ok, err := m.Unlock()
-		if !ok || err != nil {
-			return fmt.Errorf("unlock unsuccessful: %w", err)
-		}
-		return nil
-	}
-	return
+	return r.TryLockWithContext(key, ctx)
 }
 
-func (*mutexRedis) TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error) {
 	m := RedisMutex(key,
 		redsync.WithExpiry(maxLockDuration),
 		redsync.WithTries(1),
@@ -175,22 +141,22 @@ func (*mutexRedis) TryLockWithContext(key string, ctx context.Context) (unlock U
 		}
 		return
 	}
-	ticker := time.NewTicker(maxLockDuration / 3)
 	done := make(chan struct{})
 	go func() {
+		ticker := time.NewTicker(maxLockDuration / 3)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-done:
 				return
 			case <-ticker.C:
-				m.Extend()
+				m.ExtendContext(ctx)
 			}
 		}
 	}()
 
 	unlock = func() error {
 		close(done)
-		ticker.Stop()
 		ok, err := m.Unlock()
 		if !ok || err != nil {
 			return fmt.Errorf("unlock unsuccessful: %w", err)
