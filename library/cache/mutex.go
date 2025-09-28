@@ -13,7 +13,7 @@ var (
 	defaultLockType int32 = int32(LockTypeMemory)
 	tryLockers            = map[LockType]TryLocker{
 		LockTypeMemory: &mutexMemory{},
-		LockTypeRedis:  &mutexRedis{maxLockDuration: 2 * time.Minute},
+		LockTypeRedis:  NewMutexRedis(2 * time.Minute),
 	}
 )
 

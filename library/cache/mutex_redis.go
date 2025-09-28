@@ -53,6 +53,15 @@ func RedisMutex(key string, options ...redsync.Option) *redsync.Mutex {
 	return RedsyncClient().NewMutex(key, options...)
 }
 
+func NewMutexRedis(maxLockDuration time.Duration) TryLocker {
+	if maxLockDuration <= 0 {
+		maxLockDuration = time.Minute
+	}
+	return &mutexRedis{
+		maxLockDuration: maxLockDuration,
+	}
+}
+
 type mutexRedis struct {
 	maxLockDuration time.Duration
 }
