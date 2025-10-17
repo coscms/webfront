@@ -4,7 +4,7 @@ go 1.25.1
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251017072501-c110091fb264
+require github.com/coscms/webcore v0.13.3-0.20251017075806-2eb73164dca0
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
