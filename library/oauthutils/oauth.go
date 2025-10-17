@@ -9,7 +9,6 @@ import (
 	"github.com/webx-top/echo/handler/oauth2"
 	"github.com/webx-top/echo/subdomains"
 
-	"github.com/coscms/oauth2s/client/goth/providers"
 	dbschemaNging "github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/httpserver"
@@ -100,10 +99,10 @@ func FindAccounts() ([]*oauth2.Account, error) {
 		value := cfg.ToAccount(row.Key)
 		var provider func(account *oauth2.Account) goth.Provider
 		if !isProduction {
-			provider = providers.Get(value.Name + `_dev`)
+			provider = oauth2.GetConstructor(value.Name + `_dev`)
 		}
 		if provider == nil {
-			provider = providers.Get(value.Name)
+			provider = oauth2.GetConstructor(value.Name)
 		}
 		value.SetConstructor(provider)
 		if value.On {

@@ -2,7 +2,6 @@ package oauthutils
 
 import (
 	"github.com/admpub/goth"
-	"github.com/coscms/oauth2s/client/goth/providers"
 	"github.com/webx-top/echo/handler/oauth2"
 
 	// - oauth2 provider
@@ -12,7 +11,7 @@ import (
 // RegisterProvider 注册Provider
 func RegisterProvider(c *oauth2.Config) {
 
-	providers.Register(`microsoft`, func(account *oauth2.Account) goth.Provider {
+	oauth2.Register(`microsoft`, func(account *oauth2.Account) goth.Provider {
 		if len(account.CallbackURL) == 0 {
 			account.CallbackURL = c.CallbackURL(account.Name)
 		}
@@ -22,7 +21,7 @@ func RegisterProvider(c *oauth2.Config) {
 	})
 
 	/*
-		providers.Register(`apple`, func(account *oauth2.Account) goth.Provider {
+		oauth2.Register(`apple`, func(account *oauth2.Account) goth.Provider {
 			if len(account.CallbackURL) == 0 {
 				account.CallbackURL = c.CallbackURL(account.Name)
 			}

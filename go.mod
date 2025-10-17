@@ -34,7 +34,7 @@ require (
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/coscms/forms v1.13.11
-	github.com/coscms/oauth2s v0.4.3
+	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/gosimple/slug v1.15.0
@@ -47,7 +47,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.0
 	github.com/webx-top/db v1.28.9
-	github.com/webx-top/echo v1.22.5
+	github.com/webx-top/echo v1.22.6
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
