@@ -1,10 +1,10 @@
 module github.com/coscms/webfront
 
-go 1.25.1
+go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251026074907-7a2f3313c9e3
+require github.com/coscms/webcore v0.13.3-0.20251105100044-80437087bd5a
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -46,7 +46,7 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.1
-	github.com/webx-top/db v1.28.9
+	github.com/webx-top/db v1.28.10
 	github.com/webx-top/echo v1.22.6
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
@@ -126,7 +126,7 @@ require (
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/ini v1.38.2 // indirect
-	github.com/admpub/ip2region/v2 v2.0.1 // indirect
+	github.com/admpub/ip2region/v3 v3.0.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/machineid v1.0.2 // indirect
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
@@ -175,7 +175,7 @@ require (
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fynelabs/selfupdate v0.2.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.26.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -282,7 +282,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/blake3 v0.2.4 // indirect
 	go.etcd.io/bbolt v1.4.3 // indirect
-	go.mongodb.org/mongo-driver v1.17.4 // indirect
+	go.mongodb.org/mongo-driver v1.17.6 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0 // indirect

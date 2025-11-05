@@ -364,14 +364,14 @@ func (f *ShortURL) GenVisitData(t time.Time) error {
 	if info.Province == `0` {
 		info.Province = ``
 	}
-	if info.Region == `0` {
-		info.Region = ``
+	if info.District == `0` {
+		info.District = ``
 	}
 	if info.Country == `0` {
 		info.Country = ``
 	}
 	f.Visit.Country = info.Country
-	f.Visit.Region = info.Region
+	f.Visit.Region = ``
 	f.Visit.Province = info.Province
 	f.Visit.City = info.City
 	f.Visit.Isp = info.ISP
