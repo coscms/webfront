@@ -5,7 +5,6 @@ import (
 
 	"github.com/admpub/ipfilter"
 	"github.com/admpub/log"
-	caddyPluginIPfilter "github.com/caddy-plugins/ipfilter"
 	"github.com/coscms/webcore/library/config"
 	cfgIPFilter "github.com/coscms/webfront/library/ipfilter"
 	"github.com/webx-top/com"
@@ -14,19 +13,12 @@ import (
 	mwIPFilter "github.com/webx-top/echo/middleware/ipfilter"
 )
 
+type ip2coutryISOCode func(net.IP) string
+
+var _ ip2coutryISOCode = ipfilter.NetIPToCountry
+
 func init() {
-	caddyPluginIPfilter.GetCountryCode = func(c caddyPluginIPfilter.IPFConfig, clientIP net.IP) (string, error) {
-		if c.DBHandler == nil {
-			return ipfilter.NetIPToCountry(clientIP), nil
-		}
-		// do the lookup.
-		var result caddyPluginIPfilter.OnlyCountry
-		err := c.DBHandler.Lookup(clientIP, &result)
-
-		// get only the ISOCode out of the lookup results.
-		return result.Country.ISOCode, err
-	}
-
+	echo.Set(`IP2CountyISOCode`, ipfilter.NetIPToCountry)
 }
 
 func getIPFilterConfig() (*cfgIPFilter.Options, bool) {
