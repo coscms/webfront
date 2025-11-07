@@ -37,7 +37,7 @@ func queryArticleCategory(c context.Context) interface{} {
 				Id:       category.Id,
 				ParentId: category.ParentId,
 				Title:    category.Name,
-				Url:      ctx.RelativeURL(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
+				Url:      ctx.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
 			},
 			Extra: echo.H{
 				`object`: category,
@@ -135,7 +135,7 @@ func (f *NavigateExt) URL() string {
 		return f.insideURL
 	}
 	if f.IsInside() {
-		f.insideURL = f.Context().RelativeURL(f.Url)
+		f.insideURL = f.Context().URLFor(f.Url)
 		return f.insideURL
 	}
 	return f.Url
@@ -158,7 +158,7 @@ func (f *NavigateExt) IsActive() bool {
 		return f.isActive(f.Context())
 	}
 	if f.IsInside() {
-		navURL := f.URL()
+		navURL := f.Url
 		if navURL == f.Context().Request().URL().Path() ||
 			navURL == f.Context().DispatchPath() {
 			return true
