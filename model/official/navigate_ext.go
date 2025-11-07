@@ -9,6 +9,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/null"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -37,7 +38,7 @@ func queryArticleCategory(c context.Context) interface{} {
 				Id:       category.Id,
 				ParentId: category.ParentId,
 				Title:    category.Name,
-				Url:      ctx.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
+				Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
 			},
 			Extra: echo.H{
 				`object`: category,
@@ -135,7 +136,7 @@ func (f *NavigateExt) URL() string {
 		return f.insideURL
 	}
 	if f.IsInside() {
-		f.insideURL = f.Context().URLFor(f.Url)
+		f.insideURL = sessdata.URLFor(f.Url)
 		return f.insideURL
 	}
 	return f.Url
