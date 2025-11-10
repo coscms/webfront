@@ -118,8 +118,8 @@ type OfficialCommonNavigate struct {
 	Target    string `db:"target" bson:"target" comment:"打开目标(_self/_blank/_parent/_top)" json:"target" xml:"target"`
 	Direction string `db:"direction" bson:"direction" comment:"非自定义链接的排列方向(X-横向;Y-纵向)" json:"direction" xml:"direction"`
 	Badge     string `db:"badge" bson:"badge" comment:"徽标文本" json:"badge" xml:"badge"`
-	Created   uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created   uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

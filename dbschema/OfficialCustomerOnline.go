@@ -105,7 +105,7 @@ type OfficialCustomerOnline struct {
 	CustomerId  uint64 `db:"customer_id,pk" bson:"customer_id" comment:"客户ID" json:"customer_id" xml:"customer_id"`
 	SessionId   string `db:"session_id,pk" bson:"session_id" comment:"session id" json:"session_id" xml:"session_id"`
 	ClientCount uint   `db:"client_count" bson:"client_count" comment:"客户端计数" json:"client_count" xml:"client_count"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"活跃时间" json:"updated" xml:"updated"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"活跃时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

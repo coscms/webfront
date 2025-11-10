@@ -109,7 +109,7 @@ type OfficialCommonRemark struct {
 	SourceTable string `db:"source_table" bson:"source_table" comment:"来源表" json:"source_table" xml:"source_table"`
 	SourceId    uint64 `db:"source_id" bson:"source_id" comment:"来源ID" json:"source_id" xml:"source_id"`
 	Content     string `db:"content" bson:"content" comment:"简短描述" json:"content" xml:"content"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

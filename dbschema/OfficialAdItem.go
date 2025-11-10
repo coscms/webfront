@@ -114,8 +114,8 @@ type OfficialAdItem struct {
 	Start       uint   `db:"start" bson:"start" comment:"生效起始时间" json:"start" xml:"start"`
 	End         uint   `db:"end" bson:"end" comment:"生效结束时间" json:"end" xml:"end"`
 	Sort        int    `db:"sort" bson:"sort" comment:"序号" json:"sort" xml:"sort"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

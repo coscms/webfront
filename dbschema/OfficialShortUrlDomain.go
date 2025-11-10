@@ -108,8 +108,8 @@ type OfficialShortUrlDomain struct {
 	Domain    string `db:"domain" bson:"domain" comment:"域名" json:"domain" xml:"domain"`
 	UrlCount  uint64 `db:"url_count" bson:"url_count" comment:"网址统计" json:"url_count" xml:"url_count"`
 	Disabled  string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

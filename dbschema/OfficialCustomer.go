@@ -119,8 +119,8 @@ type OfficialCustomer struct {
 	Disabled     string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
 	Gender       string `db:"gender" bson:"gender" comment:"性别(male-男;female-女;secret-保密)" json:"gender" xml:"gender"`
 	IdCardNo     string `db:"id_card_no" bson:"id_card_no" comment:"身份证号" json:"id_card_no" xml:"id_card_no"`
-	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated      uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated      uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Description  string `db:"description" bson:"description" comment:"说明" json:"description" xml:"description"`
 	Avatar       string `db:"avatar" bson:"avatar" comment:"头像" json:"avatar" xml:"avatar"`
 	Licenses     uint64 `db:"licenses" bson:"licenses" comment:"有效证书数量" json:"licenses" xml:"licenses"`

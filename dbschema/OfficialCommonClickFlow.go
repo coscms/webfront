@@ -108,7 +108,7 @@ type OfficialCommonClickFlow struct {
 	OwnerId    uint64 `db:"owner_id" bson:"owner_id" comment:"用户ID" json:"owner_id" xml:"owner_id"`
 	OwnerType  string `db:"owner_type" bson:"owner_type" comment:"用户类型(customer-前台客户;user-后台用户)" json:"owner_type" xml:"owner_type"`
 	Type       string `db:"type" bson:"type" comment:"类型(例如:like,hate)" json:"type" xml:"type"`
-	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

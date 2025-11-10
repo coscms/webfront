@@ -107,8 +107,8 @@ type OfficialCustomerWallet struct {
 	Balance     float64 `db:"balance" bson:"balance" comment:"余额" json:"balance" xml:"balance"`
 	Freeze      float64 `db:"freeze" bson:"freeze" comment:"冻结金额" json:"freeze" xml:"freeze"`
 	Accumulated float64 `db:"accumulated" bson:"accumulated" comment:"累计总金额" json:"accumulated" xml:"accumulated"`
-	Created     uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created     uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

@@ -110,7 +110,7 @@ type OfficialCustomerU2f struct {
 	Extra        string `db:"extra" bson:"extra" comment:"扩展设置" json:"extra" xml:"extra"`
 	Step         uint   `db:"step" bson:"step" comment:"第几步" json:"step" xml:"step"`
 	Precondition string `db:"precondition" bson:"precondition" comment:"除了密码登录外的其它前置条件(仅step=2时有效),用半角逗号分隔" json:"precondition" xml:"precondition"`
-	Created      uint   `db:"created" bson:"created" comment:"绑定时间" json:"created" xml:"created"`
+	Created      uint   `db:"created" bson:"created" comment:"绑定时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

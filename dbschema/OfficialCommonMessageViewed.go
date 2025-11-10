@@ -105,7 +105,7 @@ type OfficialCommonMessageViewed struct {
 	MessageId  uint64 `db:"message_id,pk" bson:"message_id" comment:"消息ID" json:"message_id" xml:"message_id"`
 	ViewerId   uint64 `db:"viewer_id,pk" bson:"viewer_id" comment:"浏览者ID" json:"viewer_id" xml:"viewer_id"`
 	ViewerType string `db:"viewer_type,pk" bson:"viewer_type" comment:"浏览者类型" json:"viewer_type" xml:"viewer_type"`
-	Created    uint   `db:"created" bson:"created" comment:"查看时间" json:"created" xml:"created"`
+	Created    uint   `db:"created" bson:"created" comment:"查看时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

@@ -109,8 +109,8 @@ type OfficialCustomerLevelRelation struct {
 	Expired         uint   `db:"expired" bson:"expired" comment:"过期时间(0为永不过期)" json:"expired" xml:"expired"`
 	AccumulatedDays uint   `db:"accumulated_days" bson:"accumulated_days" comment:"累计天数" json:"accumulated_days" xml:"accumulated_days"`
 	LastRenewalAt   uint   `db:"last_renewal_at" bson:"last_renewal_at" comment:"最近续费时间" json:"last_renewal_at" xml:"last_renewal_at"`
-	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated         uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated         uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

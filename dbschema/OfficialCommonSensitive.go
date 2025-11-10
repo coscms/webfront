@@ -106,8 +106,8 @@ type OfficialCommonSensitive struct {
 	Words    string `db:"words" bson:"words" comment:"敏感词" json:"words" xml:"words"`
 	Type     string `db:"type" bson:"type" comment:"类型(bad-敏感词;noise-噪音词)" json:"type" xml:"type"`
 	Disabled string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created  uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated  uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created  uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated  uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

@@ -115,8 +115,8 @@ type OfficialCommonCategory struct {
 	Template    string `db:"template" bson:"template" comment:"分类列表页模版" json:"template" xml:"template"`
 	Disabled    string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	ShowOnMenu  string `db:"show_on_menu" bson:"show_on_menu" comment:"是否(Y/N)显示在导航菜单上" json:"show_on_menu" xml:"show_on_menu"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Slugify     string `db:"slugify" bson:"slugify" comment:"SEO-friendly URLs with Slugify" json:"slugify" xml:"slugify"`
 }
 

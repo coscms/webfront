@@ -115,8 +115,8 @@ type OfficialCustomerGroupPackage struct {
 	Sold         uint    `db:"sold" bson:"sold" comment:"销量" json:"sold" xml:"sold"`
 	IconImage    string  `db:"icon_image" bson:"icon_image" comment:"图标图片" json:"icon_image" xml:"icon_image"`
 	IconClass    string  `db:"icon_class" bson:"icon_class" comment:"图标class" json:"icon_class" xml:"icon_class"`
-	Created      uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated      uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created      uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated      uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

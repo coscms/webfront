@@ -105,8 +105,8 @@ type OfficialCustomerRole struct {
 	Id          uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	Name        string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
 	Description string `db:"description" bson:"description" comment:"说明" json:"description" xml:"description"`
-	Created     uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created     uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Disabled    string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
 	IsDefault   string `db:"is_default" bson:"is_default" comment:"是否作为新用户注册时的默认角色" json:"is_default" xml:"is_default"`
 	ParentId    uint   `db:"parent_id" bson:"parent_id" comment:"父级ID" json:"parent_id" xml:"parent_id"`

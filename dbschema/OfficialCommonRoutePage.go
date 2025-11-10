@@ -113,8 +113,8 @@ type OfficialCommonRoutePage struct {
 	TemplateEnabled string `db:"template_enabled" bson:"template_enabled" comment:"是否使用模板" json:"template_enabled" xml:"template_enabled"`
 	TemplateFile    string `db:"template_file" bson:"template_file" comment:"模板文件(位于route_page文件夹)" json:"template_file" xml:"template_file"`
 	Disabled        string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated         uint   `db:"updated" bson:"updated" comment:"更改时间" json:"updated" xml:"updated"`
+	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated         uint   `db:"updated" bson:"updated" comment:"更改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

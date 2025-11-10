@@ -116,8 +116,8 @@ type OfficialCommonFriendlink struct {
 	VerifyResult    string `db:"verify_result" bson:"verify_result" comment:"验证结果(ok-成功;invalid-无效;none-未验证)" json:"verify_result" xml:"verify_result"`
 	Process         string `db:"process" bson:"process" comment:"处理结果(idle-待处理;success-成功;reject-拒绝)" json:"process" xml:"process"`
 	ProcessRemark   string `db:"process_remark" bson:"process_remark" comment:"处理备注" json:"process_remark" xml:"process_remark"`
-	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated         uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated         uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	ReturnTime      uint   `db:"return_time" bson:"return_time" comment:"回访时间" json:"return_time" xml:"return_time"`
 	ReturnCount     uint   `db:"return_count" bson:"return_count" comment:"回访次数" json:"return_count" xml:"return_count"`
 }

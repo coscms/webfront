@@ -115,8 +115,8 @@ type OfficialCustomerOauth struct {
 	AccessToken  string `db:"access_token" bson:"access_token" comment:"Access Token" json:"access_token" xml:"access_token"`
 	RefreshToken string `db:"refresh_token" bson:"refresh_token" comment:"Refresh Token" json:"refresh_token" xml:"refresh_token"`
 	Expired      uint   `db:"expired" bson:"expired" comment:"过期时间" json:"expired" xml:"expired"`
-	Created      uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated      uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created      uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated      uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

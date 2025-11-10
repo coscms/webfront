@@ -109,7 +109,7 @@ type OfficialCommonCollection struct {
 	CustomerId uint64 `db:"customer_id" bson:"customer_id" comment:"用户ID" json:"customer_id" xml:"customer_id"`
 	Views      uint   `db:"views" bson:"views" comment:"浏览次数" json:"views" xml:"views"`
 	Visited    uint   `db:"visited" bson:"visited" comment:"最近访问时间" json:"visited" xml:"visited"`
-	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

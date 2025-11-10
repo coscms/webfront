@@ -105,7 +105,7 @@ type OfficialCustomerInvitationUsed struct {
 	Id           uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	CustomerId   uint64 `db:"customer_id" bson:"customer_id" comment:"客户ID" json:"customer_id" xml:"customer_id"`
 	InvitationId uint   `db:"invitation_id" bson:"invitation_id" comment:"邀请码ID" json:"invitation_id" xml:"invitation_id"`
-	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	LevelId      uint   `db:"level_id" bson:"level_id" comment:"客户等级ID" json:"level_id" xml:"level_id"`
 	AgentLevelId uint   `db:"agent_level_id" bson:"agent_level_id" comment:"代理等级ID" json:"agent_level_id" xml:"agent_level_id"`
 	RoleIds      string `db:"role_ids" bson:"role_ids" comment:"注册为角色(多个用“,”分隔开)" json:"role_ids" xml:"role_ids"`

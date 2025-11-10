@@ -112,8 +112,8 @@ type OfficialCommonComplaint struct {
 	Content     string `db:"content" bson:"content" comment:"投诉内容" json:"content" xml:"content"`
 	Process     string `db:"process" bson:"process" comment:"处理状态(idle-空闲;reject-驳回;done-已处理;queue-等待处理中)" json:"process" xml:"process"`
 	Result      string `db:"result" bson:"result" comment:"处理结果说明" json:"result" xml:"result"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

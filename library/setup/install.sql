@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 9.0.1, for macos12.7 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.6, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: nging
 -- ------------------------------------------------------
--- Server version	9.0.1
+-- Server version	8.4.6
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -27,7 +27,7 @@ CREATE TABLE `official_ad_item` (
   `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '广告名称',
   `publisher_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '广告商ID',
   `position_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '广告位ID',
-  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '广告内容',
+  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`广告内容',
   `contype` enum('text','image','video','audio') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'image' COMMENT '内容类型',
   `mode` enum('CPA','CPM','CPC','CPS','CPT') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'CPS' COMMENT '广告模式',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '广告链接',
@@ -99,7 +99,7 @@ CREATE TABLE `official_ad_settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `advert_id` bigint unsigned NOT NULL COMMENT '广告ID',
   `type` enum('area','age','time','client','gendar') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'area' COMMENT '设置类型(area-地区;age-年龄;time-时段;client-客户端类型;gendar-性别)',
-  `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '值',
+  `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`值',
   `v_start` int unsigned NOT NULL DEFAULT '0' COMMENT '起始值',
   `v_end` int unsigned NOT NULL DEFAULT '0' COMMENT '结束值',
   `t_start` int unsigned NOT NULL DEFAULT '0' COMMENT '起始时间',
@@ -147,9 +147,9 @@ DROP TABLE IF EXISTS `official_common_area`;
 CREATE TABLE `official_common_area` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `pid` int unsigned NOT NULL DEFAULT '0' COMMENT '父id',
-  `short` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '简称',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
-  `merged` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '全称',
+  `short` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`简称',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`名称',
+  `merged` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`全称',
   `level` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '层级(1,2,3-省,市,区县)',
   `pinyin` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '拼音',
   `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '长途区号',
@@ -176,7 +176,7 @@ DROP TABLE IF EXISTS `official_common_area_group`;
 CREATE TABLE `official_common_area_group` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `country_abbr` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '国家缩写',
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '组名称',
+  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`组名称',
   `abbr` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '组缩写',
   `area_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '根地区ID',
   `sort` int NOT NULL DEFAULT '0' COMMENT '排序编号',
@@ -203,12 +203,12 @@ CREATE TABLE `official_common_article` (
   `source_table` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '来源表(不含official_前缀)',
   `owner_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '新闻发布者',
   `owner_type` enum('user','customer') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer' COMMENT '所有者类型(customer-前台客户;user-后台用户)',
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '新闻标题',
-  `keywords` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '关键词',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`新闻标题',
+  `keywords` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`关键词',
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '缩略图',
   `image_original` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '原始图',
-  `summary` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '摘要',
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
+  `summary` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`摘要',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`内容',
   `contype` enum('text','html','markdown') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'markdown' COMMENT '内容类型',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
@@ -221,7 +221,7 @@ CREATE TABLE `official_common_article` (
   `likes` bigint unsigned NOT NULL DEFAULT '0' COMMENT '好评数量',
   `hates` bigint unsigned NOT NULL DEFAULT '0' COMMENT '差评数量',
   `views` bigint unsigned NOT NULL DEFAULT '0' COMMENT '浏览次数',
-  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
+  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`标签',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '价格',
   `slugify` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'SEO-friendly URLs with Slugify',
   PRIMARY KEY (`id`),
@@ -252,9 +252,9 @@ CREATE TABLE `official_common_category` (
   `parent_id` int unsigned NOT NULL DEFAULT '0' COMMENT '上级分类ID',
   `has_child` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否有子分类',
   `level` int unsigned NOT NULL DEFAULT '0' COMMENT '层级',
-  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
-  `keywords` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分类页面关键词',
-  `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分类说明',
+  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`分类名称',
+  `keywords` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`分类页面关键词',
+  `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`分类说明',
   `cover` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分类封面图',
   `type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'article' COMMENT '类型',
   `sort` int NOT NULL DEFAULT '5000' COMMENT '排序编号(从小到大)',
@@ -421,9 +421,9 @@ CREATE TABLE `official_common_group` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `parent_id` int unsigned NOT NULL DEFAULT '0' COMMENT '上级ID',
   `uid` int unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '组名',
+  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`组名',
   `type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer' COMMENT '类型(customer-客户组;cert-证书组;order-订单组;product-产品组;attr-产品属性组;openapp-开放平台应用;api-外部接口组)',
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '说明',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`说明',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `common_group_type` (`type`)
@@ -498,16 +498,16 @@ CREATE TABLE `official_common_navigate` (
   `parent_id` int unsigned NOT NULL DEFAULT '0' COMMENT '上级ID',
   `has_child` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否有子菜单',
   `level` int unsigned NOT NULL DEFAULT '0' COMMENT '层级',
-  `title` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '菜单标题',
+  `title` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`菜单标题',
   `cover` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '图片封面',
   `url` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '网址',
   `ident` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标识',
-  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`备注',
   `sort` int NOT NULL DEFAULT '5000' COMMENT '排序',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
   `target` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '打开目标(_self/_blank/_parent/_top)',
   `direction` enum('X','Y') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Y' COMMENT '非自定义链接的排列方向(X-横向;Y-纵向)',
-  `badge` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '徽标文本',
+  `badge` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`徽标文本',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -543,10 +543,10 @@ DROP TABLE IF EXISTS `official_common_route_page`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_common_route_page` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '页面名称',
+  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`页面名称',
   `route` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '路由网址',
   `method` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'GET' COMMENT '路由方法(GET/POST/PUT...)',
-  `page_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '页面内容',
+  `page_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`页面内容',
   `page_vars` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '页面变量(JSON)',
   `page_type` enum('html','json','text','xml','redirect') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'html' COMMENT '页面类型',
   `page_id` int unsigned NOT NULL DEFAULT '0' COMMENT '页面ID(可选,0为不关联)',
@@ -604,7 +604,7 @@ DROP TABLE IF EXISTS `official_common_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_common_tags` (
-  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '标签名',
+  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`标签名',
   `num` bigint unsigned NOT NULL DEFAULT '0' COMMENT '数量',
   `group` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分组标识',
   `display` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Y' COMMENT '是否显示',
@@ -1030,6 +1030,38 @@ CREATE TABLE `official_customer_wallet_flow` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `official_i18n_resource`
+--
+
+DROP TABLE IF EXISTS `official_i18n_resource`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `official_i18n_resource` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '表名.字段名',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `i18n_resource_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='多语言key资源';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `official_i18n_translation`
+--
+
+DROP TABLE IF EXISTS `official_i18n_translation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `official_i18n_translation` (
+  `resource_id` int unsigned NOT NULL COMMENT '资源ID',
+  `row_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '数据行ID',
+  `lang` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'en' COMMENT '语种',
+  `text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文本',
+  PRIMARY KEY (`lang`,`row_id`,`resource_id`),
+  FULLTEXT KEY `i18n_translation_text` (`text`) /*!50100 WITH PARSER `ngram` */ 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='多语言译文';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `official_page`
 --
 
@@ -1189,4 +1221,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-15 21:01:13
+-- Dump completed on 2025-11-10 10:51:27

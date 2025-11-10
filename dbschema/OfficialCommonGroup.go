@@ -108,7 +108,7 @@ type OfficialCommonGroup struct {
 	Name        string `db:"name" bson:"name" comment:"组名" json:"name" xml:"name"`
 	Type        string `db:"type" bson:"type" comment:"类型(customer-客户组;cert-证书组;order-订单组;product-产品组;attr-产品属性组;openapp-开放平台应用;api-外部接口组)" json:"type" xml:"type"`
 	Description string `db:"description" bson:"description" comment:"说明" json:"description" xml:"description"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

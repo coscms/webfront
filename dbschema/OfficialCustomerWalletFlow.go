@@ -116,7 +116,7 @@ type OfficialCustomerWalletFlow struct {
 	TradeNo        string  `db:"trade_no" bson:"trade_no" comment:"交易号(来自哪个交易)" json:"trade_no" xml:"trade_no"`
 	Status         string  `db:"status" bson:"status" comment:"状态(pending-待确认;confirmed-已确认;canceled-已取消)" json:"status" xml:"status"`
 	Description    string  `db:"description" bson:"description" comment:"简短描述" json:"description" xml:"description"`
-	Created        uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created        uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

@@ -116,8 +116,8 @@ type OfficialCommonComment struct {
 	OwnerType       string `db:"owner_type" bson:"owner_type" comment:"评论者类型(customer-前台客户;user-后台用户)" json:"owner_type" xml:"owner_type"`
 	Content         string `db:"content" bson:"content" comment:"评论内容" json:"content" xml:"content"`
 	Contype         string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
-	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated         uint   `db:"updated" bson:"updated" comment:"编辑时间" json:"updated" xml:"updated"`
+	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated         uint   `db:"updated" bson:"updated" comment:"编辑时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Display         string `db:"display" bson:"display" comment:"显示" json:"display" xml:"display"`
 	Level           uint   `db:"level" bson:"level" comment:"层数" json:"level" xml:"level"`
 	Path            string `db:"path" bson:"path" comment:"路径" json:"path" xml:"path"`

@@ -109,7 +109,7 @@ type OfficialCustomerPrepaidCard struct {
 	SalePrice  float64 `db:"sale_price" bson:"sale_price" comment:"售价" json:"sale_price" xml:"sale_price"`
 	Number     string  `db:"number" bson:"number" comment:"卡号" json:"number" xml:"number"`
 	Password   string  `db:"password" bson:"password" comment:"卡密" json:"password" xml:"password"`
-	Created    uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created    uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Start      uint    `db:"start" bson:"start" comment:"有效时间" json:"start" xml:"start"`
 	End        uint    `db:"end" bson:"end" comment:"失效时间" json:"end" xml:"end"`
 	Used       uint    `db:"used" bson:"used" comment:"使用时间" json:"used" xml:"used"`

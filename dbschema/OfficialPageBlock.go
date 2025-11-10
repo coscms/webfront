@@ -109,8 +109,8 @@ type OfficialPageBlock struct {
 	ItemConfigs string `db:"item_configs" bson:"item_configs" comment:"项目配置" json:"item_configs" xml:"item_configs"`
 	Template    string `db:"template" bson:"template" comment:"模版文件" json:"template" xml:"template"`
 	Disabled    string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

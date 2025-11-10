@@ -112,8 +112,8 @@ type OfficialShortUrl struct {
 	Visited   uint   `db:"visited" bson:"visited" comment:"最近访问时间" json:"visited" xml:"visited"`
 	Visits    uint64 `db:"visits" bson:"visits" comment:"访问次数" json:"visits" xml:"visits"`
 	Available string `db:"available" bson:"available" comment:"是否有效" json:"available" xml:"available"`
-	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated   uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Expired   uint   `db:"expired" bson:"expired" comment:"过期时间(0为不限制)" json:"expired" xml:"expired"`
 	Password  string `db:"password" bson:"password" comment:"访问密码md5(空代表无需密码)" json:"password" xml:"password"`
 }

@@ -104,7 +104,7 @@ type OfficialCustomerFollowing struct {
 
 	CustomerA uint64 `db:"customer_a,pk" bson:"customer_a" comment:"关注人ID" json:"customer_a" xml:"customer_a"`
 	CustomerB uint64 `db:"customer_b,pk" bson:"customer_b" comment:"被关注人ID" json:"customer_b" xml:"customer_b"`
-	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created   uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Mutual    string `db:"mutual" bson:"mutual" comment:"是否相互关注" json:"mutual" xml:"mutual"`
 }
 

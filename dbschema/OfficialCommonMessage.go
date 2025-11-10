@@ -115,7 +115,7 @@ type OfficialCommonMessage struct {
 	Contype         string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
 	Encrypted       string `db:"encrypted" bson:"encrypted" comment:"是否为加密消息" json:"encrypted" xml:"encrypted"`
 	Password        string `db:"password" bson:"password" comment:"密码" json:"password" xml:"password"`
-	Created         uint   `db:"created" bson:"created" comment:"发送时间" json:"created" xml:"created"`
+	Created         uint   `db:"created" bson:"created" comment:"发送时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Url             string `db:"url" bson:"url" comment:"网址" json:"url" xml:"url"`
 	RootId          uint64 `db:"root_id" bson:"root_id" comment:"根ID" json:"root_id" xml:"root_id"`
 	ReplyId         uint64 `db:"reply_id" bson:"reply_id" comment:"回复ID" json:"reply_id" xml:"reply_id"`

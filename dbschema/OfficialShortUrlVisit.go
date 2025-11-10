@@ -122,7 +122,7 @@ type OfficialShortUrlVisit struct {
 	OsVersion      string `db:"os_version" bson:"os_version" comment:"操作系统版本" json:"os_version" xml:"os_version"`
 	Browser        string `db:"browser" bson:"browser" comment:"浏览器" json:"browser" xml:"browser"`
 	BrowserVersion string `db:"browser_version" bson:"browser_version" comment:"浏览器版本" json:"browser_version" xml:"browser_version"`
-	Created        int    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created        int    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

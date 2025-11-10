@@ -106,7 +106,7 @@ type OfficialCustomerInvitation struct {
 	OwnerId      uint64 `db:"owner_id" bson:"owner_id" comment:"创建者ID" json:"owner_id" xml:"owner_id"`
 	OwnerType    string `db:"owner_type" bson:"owner_type" comment:"创建者类型" json:"owner_type" xml:"owner_type"`
 	Code         string `db:"code" bson:"code" comment:"邀请码" json:"code" xml:"code"`
-	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created      uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Start        uint   `db:"start" bson:"start" comment:"有效时间" json:"start" xml:"start"`
 	End          uint   `db:"end" bson:"end" comment:"失效时间" json:"end" xml:"end"`
 	Disabled     string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`

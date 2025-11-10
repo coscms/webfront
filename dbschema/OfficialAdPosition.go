@@ -111,8 +111,8 @@ type OfficialAdPosition struct {
 	Contype  string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
 	Url      string `db:"url" bson:"url" comment:"广告链接" json:"url" xml:"url"`
 	Disabled string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created  uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated  uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created  uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated  uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

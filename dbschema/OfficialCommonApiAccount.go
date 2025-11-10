@@ -115,8 +115,8 @@ type OfficialCommonApiAccount struct {
 	Encryption string `db:"encryption" bson:"encryption" comment:"加密方式" json:"encryption" xml:"encryption"`
 	Extra      string `db:"extra" bson:"extra" comment:"扩展数据(JSON格式)" json:"extra" xml:"extra"`
 	Disabled   string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
-	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated    uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated    uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

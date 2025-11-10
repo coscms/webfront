@@ -108,8 +108,8 @@ type OfficialCustomerDevice struct {
 	Scense     string `db:"scense" bson:"scense" comment:"场景标识" json:"scense" xml:"scense"`
 	Platform   string `db:"platform" bson:"platform" comment:"系统平台" json:"platform" xml:"platform"`
 	DeviceNo   string `db:"device_no" bson:"device_no" comment:"设备编号" json:"device_no" xml:"device_no"`
-	Created    uint   `db:"created" bson:"created" comment:"登录时间" json:"created" xml:"created"`
-	Updated    uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created    uint   `db:"created" bson:"created" comment:"登录时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated    uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Expired    uint   `db:"expired" bson:"expired" comment:"过期时间" json:"expired" xml:"expired"`
 }
 

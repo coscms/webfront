@@ -107,8 +107,8 @@ type OfficialAdPublisher struct {
 	OwnerType string  `db:"owner_type" bson:"owner_type" comment:"所有者类型(customer-前台客户;user-后台用户)" json:"owner_type" xml:"owner_type"`
 	Deposit   float64 `db:"deposit" bson:"deposit" comment:"押金" json:"deposit" xml:"deposit"`
 	Disabled  string  `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created   uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated   uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created   uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated   uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function

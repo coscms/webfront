@@ -115,8 +115,8 @@ type OfficialCustomerLevel struct {
 	IntegralAmountType string  `db:"integral_amount_type" bson:"integral_amount_type" comment:"资产金额类型(balance-余额;accumulated-累积额)" json:"integral_amount_type" xml:"integral_amount_type"`
 	IntegralMin        float64 `db:"integral_min" bson:"integral_min" comment:"最小积分" json:"integral_min" xml:"integral_min"`
 	IntegralMax        float64 `db:"integral_max" bson:"integral_max" comment:"最大积分" json:"integral_max" xml:"integral_max"`
-	Created            uint    `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated            uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created            uint    `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated            uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Score              int     `db:"score" bson:"score" comment:"分值(分值越大等级越高)" json:"score" xml:"score"`
 	Disabled           string  `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	Extra              string  `db:"extra" bson:"extra" comment:"扩展配置(JSON)" json:"extra" xml:"extra"`

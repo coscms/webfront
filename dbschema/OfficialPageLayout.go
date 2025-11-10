@@ -108,8 +108,8 @@ type OfficialPageLayout struct {
 	Configs  string `db:"configs" bson:"configs" comment:"区块在布局中的配置" json:"configs" xml:"configs"`
 	Sort     int    `db:"sort" bson:"sort" comment:"排序" json:"sort" xml:"sort"`
 	Disabled string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
-	Created  uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created"`
-	Updated  uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created  uint   `db:"created" bson:"created" comment:"添加时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated  uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function
