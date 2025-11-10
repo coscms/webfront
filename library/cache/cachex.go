@@ -38,9 +38,7 @@ func AdminRefreshable(ctx echo.Context, customer *dbschema.OfficialCustomer, ttl
 			return ttl
 		}
 	}
-
-	nocache := ctx.Formx(`nocache`).Bool()
-	return TTLIf(nocache, Fresh, ttl)
+	return JoinOptions(ttl, NocacheOption(ctx))
 }
 
 func GetTTLByNumber(ttl int64, b x.GetOption) x.GetOption {
@@ -105,19 +103,31 @@ func AddTTL(a x.GetOption, ttl int64) x.GetOption {
 }
 
 func GenOptions(ctx echo.Context, cacheSeconds int64) []x.GetOption {
+	opts := []x.GetOption{TTL(cacheSeconds), NocacheOption(ctx)}
+	return opts
+}
+
+func NocacheOption(ctx echo.Context) x.GetOption {
 	nocache := ctx.Formx(`nocache`).Int()
-	opts := []x.GetOption{TTL(cacheSeconds)}
 	switch nocache {
 	case 1:
-		opts = append(opts, DisableCacheUsage(true)) // 禁用缓存
+		return Disabled // 禁用缓存
 	case 2:
-		opts = append(opts, UseFreshData(true)) // 强制缓存新数据
+		return Fresh // 强制缓存新数据
 	case 3:
-		opts = append(opts, UseFreshData(true))
+		return Fresh
 	case 4:
-		opts = append(opts, RemoveData(true))
+		return REMOVE
 	}
-	return opts
+	return Noop
+}
+
+func JoinOptions(opts ...x.GetOption) x.GetOption {
+	return func(o *x.Options) {
+		for _, opt := range opts {
+			opt(o)
+		}
+	}
 }
 
 func xNewFromPool(query x.Querier, ttlSeconds int64, args ...string) *x.Cachex {
