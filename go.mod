@@ -9,7 +9,7 @@ require github.com/coscms/webcore v0.13.3-0.20251110042526-b077cf655047
 require (
 	github.com/RichardKnop/machinery v1.10.8
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
-	github.com/admpub/cache v0.8.0
+	github.com/admpub/cache v0.8.1
 	github.com/admpub/color v1.8.1
 	github.com/admpub/copier v0.1.1
 	github.com/admpub/decimal v1.3.2
@@ -54,7 +54,7 @@ require (
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yanyiwu/gojieba v1.4.6
 	golang.org/x/oauth2 v0.32.0
-	golang.org/x/sync v0.17.0
+	golang.org/x/sync v0.18.0
 	gopkg.in/redis.v5 v5.2.9
 )
 
@@ -287,7 +287,7 @@ require (
 	golang.org/x/image v0.32.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect

@@ -14,6 +14,7 @@ type QueryFunc = x.QueryFunc
 const (
 	CacheDisabled int64 = -1 // 禁用缓存
 	CacheFresh    int64 = -2 // 强制缓存新数据
+	CacheRemove   int64 = -4 // 强制删除数据
 )
 
 var (
@@ -21,8 +22,10 @@ var (
 	Query             = x.Query
 	DisableCacheUsage = x.DisableCacheUsage
 	UseFreshData      = x.UseFreshData
+	RemoveData        = x.RemoveData
 	Disabled          = DisableCacheUsage(true) // 禁用缓存
 	Fresh             = UseFreshData(true)      // 强制缓存新数据
+	REMOVE            = RemoveData(true)        // 强制缓存新数据
 	Noop              = func(o *x.Options) {}
 )
 
@@ -55,6 +58,13 @@ func GetTTLByNumber(ttl int64, b x.GetOption) x.GetOption {
 				b(o)
 			}
 			Fresh(o)
+		}
+	case CacheRemove:
+		return func(o *x.Options) {
+			if b != nil {
+				b(o)
+			}
+			REMOVE(o)
 		}
 	default:
 		if b != nil {
@@ -104,6 +114,8 @@ func GenOptions(ctx echo.Context, cacheSeconds int64) []x.GetOption {
 		opts = append(opts, UseFreshData(true)) // 强制缓存新数据
 	case 3:
 		opts = append(opts, UseFreshData(true))
+	case 4:
+		opts = append(opts, RemoveData(true))
 	}
 	return opts
 }
