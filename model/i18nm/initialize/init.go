@@ -1,4 +1,4 @@
-package initliaze
+package initialize
 
 import (
 	"github.com/admpub/log"
