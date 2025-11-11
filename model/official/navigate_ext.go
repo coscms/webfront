@@ -10,6 +10,7 @@ import (
 	"github.com/admpub/null"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/middleware/sessdata"
+	"github.com/coscms/webfront/model/i18nm"
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -32,6 +33,7 @@ func queryArticleCategory(c context.Context) interface{} {
 		children = map[uint][]*NavigateExt{}
 		ext      = ctx.DefaultExtension()
 	)
+	i18nm.GetModelsTranslations(ctx, categories)
 	for _, category := range categories {
 		navExt := &NavigateExt{
 			OfficialCommonNavigate: &dbschema.OfficialCommonNavigate{

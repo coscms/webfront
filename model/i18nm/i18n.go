@@ -3,6 +3,7 @@ package i18nm
 import (
 	"strings"
 
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -55,6 +56,9 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T) []T {
 	if len(models) == 0 {
 		return models
 	}
+	if config.FromFile().Language.Default == ctx.Lang().Normalize() {
+		return models
+	}
 	ids := make([]uint64, len(models))
 	idk := map[uint64]int{}
 	for index, row := range models {
@@ -81,6 +85,9 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T) []T {
 		index := idk[id]
 		rowI := map[string]interface{}{}
 		for field, text := range row {
+			if len(text) == 0 {
+				continue
+			}
 			rowI[field] = text
 		}
 		models[index].FromRow(rowI)
