@@ -5,6 +5,7 @@ import (
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
 
@@ -33,6 +34,10 @@ func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]ma
 		m[v.RowId][rKeys[v.ResourceId]] = v.Text
 	}
 	return m
+}
+
+func GetModelTranslations(mdl factory.Model, ids []uint64) map[uint64]map[string]string {
+	return GetTranslations(mdl.Context(), mdl.Short_(), ids)
 }
 
 func Initialize(ctx echo.Context) error {
