@@ -52,7 +52,7 @@ func GetModelTranslations(mdl factory.Model, ids []uint64) map[uint64]map[string
 // For each model, it extracts the ID, fetches translations using GetModelTranslations,
 // and updates the model fields with the translated values.
 // If the input slice is empty or any model lacks an ID field, it returns the original slice unchanged.
-func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T) []T {
+func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableName ...string) []T {
 	if len(models) == 0 {
 		return models
 	}
@@ -80,7 +80,11 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T) []T {
 	if ctx == nil {
 		ctx = models[0].Context()
 	}
-	translations := GetTranslations(ctx, models[0].Short_(), ids)
+	table := models[0].Short_()
+	if len(tableName) > 0 && len(tableName[0]) > 0 {
+		table = tableName[0]
+	}
+	translations := GetTranslations(ctx, table, ids)
 	for id, row := range translations {
 		index := idk[id]
 		rowI := map[string]interface{}{}
