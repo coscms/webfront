@@ -121,34 +121,3 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableN
 	}
 	return models
 }
-
-// Initialize scans all database fields marked as multilingual and ensures they have corresponding
-// entries in the i18n resource table. It creates new i18n resource records for any multilingual
-// fields that don't already exist in the resource table. Returns any error encountered during
-// the process.
-func Initialize(ctx echo.Context) error {
-	rM := dbschema.NewOfficialI18nResource(ctx)
-	var exists bool
-	var err error
-	for table, fieldInfo := range dbschema.DBI.Fields {
-		for field, info := range fieldInfo {
-			if !info.Multilingual {
-				continue
-			}
-			exists, err = rM.Exists(nil, `code`, table+`.`+field)
-			if err != nil {
-				return err
-			}
-			if exists {
-				continue
-			}
-			rM.Code = table + `.` + field
-			_, err = rM.Insert()
-			if err != nil {
-				return err
-			}
-			rM.Reset()
-		}
-	}
-	return err
-}
