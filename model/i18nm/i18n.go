@@ -1,19 +1,42 @@
 package i18nm
 
 import (
+	"maps"
 	"strings"
 
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/cache"
+	"github.com/coscms/webfront/middleware/sessdata"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
 
+// SetTranstationsTTL sets the TTL (Time To Live) for translations in the given echo context.
+// The ttl parameter specifies the duration in seconds that translations should be cached.
+func SetTranstationsTTL(ctx echo.Context, ttl int64) {
+	ctx.Internal().Set(`translationsTTL`, ttl)
+}
+
 // GetTranslations retrieves translations for the specified table and row IDs.
 // It returns a map where keys are row IDs and values are maps of field names to translated texts.
 // The translations are filtered by the current request language and the specified table prefix.
 func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
+	if ttl, ok := ctx.Internal().Get(`translationsTTL`).(int64); ok {
+		m := map[uint64]map[string]string{}
+		cache.XFunc(ctx, `translations.`+table+`.`+com.JoinNumbers(ids, `_`), &m, func() error {
+			r := getTranslations(ctx, table, ids)
+			maps.Copy(m, r)
+			return nil
+		}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(ttl)))
+		return m
+	}
+	return getTranslations(ctx, table, ids)
+}
+
+func getTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	rM.ListByOffset(nil, nil, 0, -1, `code`, db.Like(table+`.%`))
