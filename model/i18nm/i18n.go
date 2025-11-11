@@ -9,6 +9,9 @@ import (
 	"github.com/webx-top/echo"
 )
 
+// GetTranslations retrieves translations for the specified table and row IDs.
+// It returns a map where keys are row IDs and values are maps of field names to translated texts.
+// The translations are filtered by the current request language and the specified table prefix.
 func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
 	rM := dbschema.NewOfficialI18nResource(ctx)
@@ -36,15 +39,63 @@ func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]ma
 	return m
 }
 
+// GetModelTranslations retrieves translations for multiple model instances by their IDs.
+// It returns a map where each key is a model ID and the value is another map of language translations.
+// The translations are fetched using the model's context and table name.
 func GetModelTranslations(mdl factory.Model, ids []uint64) map[uint64]map[string]string {
 	return GetTranslations(mdl.Context(), mdl.Short_(), ids)
 }
 
+// GetModelsTranslations retrieves translations for a slice of models and applies them to each model.
+// It takes a slice of models as input and returns the same slice with translations applied.
+// For each model, it extracts the ID, fetches translations using GetModelTranslations,
+// and updates the model fields with the translated values.
+// If the input slice is empty or any model lacks an ID field, it returns the original slice unchanged.
+func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T) []T {
+	if len(models) == 0 {
+		return models
+	}
+	ids := make([]uint64, len(models))
+	idk := map[uint64]int{}
+	for index, row := range models {
+		var id uint64
+		switch v := row.GetField(`Id`).(type) {
+		case uint64:
+			id = v
+		case uint:
+			id = uint64(v)
+		default:
+			return models
+		}
+		ids[index] = id
+		idk[id] = index
+	}
+	if len(ids) == 0 {
+		return models
+	}
+	if ctx == nil {
+		ctx = models[0].Context()
+	}
+	translations := GetTranslations(ctx, models[0].Short_(), ids)
+	for id, row := range translations {
+		index := idk[id]
+		rowI := map[string]interface{}{}
+		for field, text := range row {
+			rowI[field] = text
+		}
+		models[index].FromRow(rowI)
+	}
+	return models
+}
+
+// Initialize scans all database fields marked as multilingual and ensures they have corresponding
+// entries in the i18n resource table. It creates new i18n resource records for any multilingual
+// fields that don't already exist in the resource table. Returns any error encountered during
+// the process.
 func Initialize(ctx echo.Context) error {
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	var exists bool
 	var err error
-
 	for table, fieldInfo := range dbschema.DBI.Fields {
 		for field, info := range fieldInfo {
 			if !info.Multilingual {
