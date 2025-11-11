@@ -27,6 +27,7 @@ import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/mwutils"
 	"github.com/coscms/webfront/library/xcommon"
+	"github.com/coscms/webfront/model/i18nm"
 	"github.com/coscms/webfront/model/official"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
@@ -69,6 +70,7 @@ func NavigateList(ctx echo.Context, m *dbschema.OfficialCommonNavigate, navType 
 			db.Cond{`type`: navType},
 		))
 		childrenMapping = map[uint][]*official.NavigateExt{}
+		i18nm.GetModelsTranslations(ctx, nav)
 		for _, _nav := range nav {
 			_nav.Init().SetContext(ctx)
 			if _, ok := childrenMapping[_nav.ParentId]; !ok {
