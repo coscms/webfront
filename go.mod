@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251110042526-b077cf655047
+require github.com/coscms/webcore v0.13.3-0.20251113040332-dc4945fbf1a6
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -53,7 +53,7 @@ require (
 	github.com/webx-top/pagination v0.3.2
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yanyiwu/gojieba v1.4.6
-	golang.org/x/oauth2 v0.32.0
+	golang.org/x/oauth2 v0.33.0
 	golang.org/x/sync v0.18.0
 	gopkg.in/redis.v5 v5.2.9
 )
@@ -252,8 +252,8 @@ require (
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tklauser/go-sysconf v0.3.15 // indirect
-	github.com/tklauser/numcpus v0.10.0 // indirect
+	github.com/tklauser/go-sysconf v0.3.16 // indirect
+	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/webx-top/captcha v0.1.0 // indirect
@@ -282,15 +282,15 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
-	golang.org/x/crypto v0.43.0 // indirect
+	golang.org/x/crypto v0.44.0 // indirect
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
-	golang.org/x/image v0.32.0 // indirect
-	golang.org/x/mod v0.29.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
+	golang.org/x/image v0.33.0 // indirect
+	golang.org/x/mod v0.30.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/tools v0.39.0 // indirect
 	google.golang.org/api v0.255.0 // indirect
 	google.golang.org/genproto v0.0.0-20251103181224-f26f9409b101 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251103181224-f26f9409b101 // indirect
