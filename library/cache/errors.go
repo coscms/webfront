@@ -9,3 +9,7 @@ import (
 func IsNotExist(err error) bool {
 	return errors.Is(err, cache.ErrNotFound) || errors.Is(err, cache.ErrExpired)
 }
+
+func IsExpired(err error) bool {
+	return errors.Is(err, cache.ErrExpired)
+}
