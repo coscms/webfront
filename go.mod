@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251113040332-dc4945fbf1a6
+require github.com/coscms/webcore v0.13.3-0.20251115030953-97c0d45b2c3f
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -123,7 +123,7 @@ require (
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/ini v1.38.2 // indirect
-	github.com/admpub/ip2region/v3 v3.0.3 // indirect
+	github.com/admpub/ip2region/v3 v3.0.4 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/machineid v1.0.2 // indirect
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
