@@ -1,6 +1,8 @@
 package i18nm
 
 import (
+	"strings"
+
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
@@ -25,9 +27,9 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	var err error
 	table := mdl.Short_()
-	fnpre := `Language`
+	namePrefix := `Language`
 	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
-		fnpre = formNamePrefix[0]
+		namePrefix = formNamePrefix[0]
 	}
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
@@ -49,7 +51,7 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 		formName := com.CamelCase(field)
 		formName2 := com.UpperCaseFirst(formName)
 		for _, langCode := range config.FromFile().Language.AllList {
-			translate := ctx.FormAny(fnpre+`[`+langCode+`][`+formName+`]`, fnpre+`[`+langCode+`][`+formName2+`]`)
+			translate := ctx.FormAny(namePrefix+`[`+langCode+`][`+formName+`]`, namePrefix+`[`+langCode+`][`+formName2+`]`)
 			cond := db.And(
 				db.Cond{`lang`: langCode},
 				db.Cond{`row_id`: id},
@@ -80,6 +82,42 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 			}
 			rM.Reset()
 		}
+	}
+	return err
+}
+
+// SetModelTranslationsToForm sets translation texts from a model to form fields.
+// It retrieves translations for the given model ID and populates the form with language-specific values.
+// The form field names are prefixed with the given prefix (default "Language") in the format: prefix[lang][field].
+// Returns any error encountered during the operation.
+func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...string) error {
+	ctx := mdl.Context()
+	table := mdl.Short_()
+	namePrefix := `Language`
+	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
+		namePrefix = formNamePrefix[0]
+	}
+	rM := dbschema.NewOfficialI18nResource(ctx)
+	_, err := rM.ListByOffset(nil, nil, 0, -1, `code`, db.Like(table+`.%`))
+	if err != nil {
+		return err
+	}
+	rows := rM.Objects()
+	rIDs := make([]uint, len(rows))
+	rKeys := map[uint]string{}
+	for i, v := range rows {
+		rIDs[i] = v.Id
+		rKeys[v.Id] = com.CamelCase(strings.SplitN(v.Code, `.`, 2)[1])
+	}
+	tM := dbschema.NewOfficialI18nTranslation(ctx)
+	_, err = tM.ListByOffset(nil, nil, 0, -1, db.And(
+		db.Cond{`row_id`: id},
+		db.Cond{`resource_id`: db.In(rIDs)},
+	))
+	tRows := tM.Objects()
+	for _, v := range tRows {
+		field := rKeys[v.ResourceId]
+		ctx.Request().Form().Set(namePrefix+`[`+v.Lang+`][`+field+`]`, v.Text)
 	}
 	return err
 }
