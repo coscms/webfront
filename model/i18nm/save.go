@@ -50,7 +50,11 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 		tM.Reset()
 		formName := com.CamelCase(field)
 		formName2 := com.UpperCaseFirst(formName)
+		defaultLang := ctx.Lang().Normalize()
 		for _, langCode := range config.FromFile().Language.AllList {
+			if defaultLang == langCode {
+				continue
+			}
 			translate := ctx.FormAny(namePrefix+`[`+langCode+`][`+formName+`]`, namePrefix+`[`+langCode+`][`+formName2+`]`)
 			cond := db.And(
 				db.Cond{`lang`: langCode},
