@@ -124,8 +124,11 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 		ctx.Request().Form().Set(namePrefix+`[`+v.Lang+`][`+field+`]`, v.Text)
 	}
 	langDefault := config.FromFile().Language.Default
-	for _, field := range rKeys {
-		ctx.Request().Form().Set(namePrefix+`[`+langDefault+`][`+field+`]`, com.String(mdl.GetField(field)))
+	for _, info := range dbschema.DBI.Fields[table] {
+		if !info.Multilingual {
+			continue
+		}
+		ctx.Request().Form().Set(namePrefix+`[`+langDefault+`][`+com.LowerCaseFirst(info.GoName)+`]`, com.String(mdl.GetField(info.GoName)))
 	}
 	return err
 }
