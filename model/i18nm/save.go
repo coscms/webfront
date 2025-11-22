@@ -123,6 +123,10 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 		field := rKeys[v.ResourceId]
 		ctx.Request().Form().Set(namePrefix+`[`+v.Lang+`][`+field+`]`, v.Text)
 	}
+	langDefault := config.FromFile().Language.Default
+	for _, field := range rKeys {
+		ctx.Request().Form().Set(namePrefix+`[`+langDefault+`][`+field+`]`, com.String(mdl.GetField(field)))
+	}
 	return err
 }
 

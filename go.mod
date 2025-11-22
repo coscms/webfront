@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251121102622-98fdfe6fcd71
+require github.com/coscms/webcore v0.13.3-0.20251122131633-881bab2a4f38
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -18,7 +18,7 @@ require (
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/go-hashids v2.0.1+incompatible
 	github.com/admpub/go-shortid v0.0.0-20140827050853-24d054c393fe
-	github.com/admpub/godotenv v1.4.3
+	github.com/admpub/godotenv v1.4.4
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ipfilter v1.0.6
 	github.com/admpub/license_gen v0.1.2
@@ -32,7 +32,7 @@ require (
 	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/sensitive v0.0.1
 	github.com/admpub/useragent v0.0.2
-	github.com/coscms/forms v1.13.12
+	github.com/coscms/forms v1.13.15
 	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
@@ -46,7 +46,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.1
 	github.com/webx-top/db v1.28.12
-	github.com/webx-top/echo v1.22.8
+	github.com/webx-top/echo v1.22.9
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
