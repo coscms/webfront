@@ -47,7 +47,10 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 		}
 	}
 	ctx.Internal().Set(`i18n_translation_resource_table`, table)
-	defer ctx.Internal().Delete(`i18n_translation_resource_table`)
+	defer func() {
+		ctx.Internal().Delete(`i18n_translation_resource_table`)
+		ctx.Internal().Delete(`i18n_translation_resource_field`)
+	}()
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
 			continue
@@ -183,8 +186,10 @@ func DeleteModelTranslations(mdl factory.Model, id uint64) error {
 	}
 	rows := rM.Objects()
 	rIDs := make([]uint, len(rows))
+	rCodes := map[uint]string{}
 	for i, v := range rows {
 		rIDs[i] = v.Id
+		rCodes[v.Id] = v.Code
 	}
 	if len(rIDs) == 0 {
 		return nil
@@ -193,6 +198,12 @@ func DeleteModelTranslations(mdl factory.Model, id uint64) error {
 		db.Cond{`row_id`: id},
 		db.Cond{`resource_id`: db.In(rIDs)},
 	)
+	ctx.Internal().Set(`i18n_translation_resource_table`, table)
+	ctx.Internal().Set(`i18n_translation_resource_codes`, rCodes)
+	defer func() {
+		ctx.Internal().Delete(`i18n_translation_resource_table`)
+		ctx.Internal().Delete(`i18n_translation_resource_codes`)
+	}()
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	return tM.Delete(nil, cond)
 }

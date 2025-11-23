@@ -2,13 +2,42 @@ package i18n
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
+	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webfront/dbschema"
 )
+
+func getResourceTableAndField(ctx echo.Context, resourceId uint) (string, string) {
+	resourceTable := ctx.Internal().String(`i18n_translation_resource_table`)
+	resourceField := ctx.Internal().String(`i18n_translation_resource_field`)
+	if len(resourceTable) > 0 && len(resourceField) == 0 {
+		if rCodes, ok := ctx.Internal().Get(`i18n_translation_resource_codes`).(map[uint]string); ok {
+			if code, ok := rCodes[resourceId]; ok {
+				parts := strings.SplitN(code, `.`, 2)
+				if len(parts) == 2 {
+					resourceField = parts[1]
+				}
+			}
+			return resourceTable, resourceField
+		}
+	}
+	if len(resourceTable) == 0 || len(resourceField) == 0 {
+		rM := dbschema.NewOfficialI18nResource(ctx)
+		if err := rM.Get(nil, `id`, resourceId); err == nil {
+			parts := strings.SplitN(rM.Code, `.`, 2)
+			if len(parts) == 2 {
+				resourceTable = parts[0]
+				resourceField = parts[1]
+			}
+		}
+	}
+	return resourceTable, resourceField
+}
 
 func init() {
 	// - official_i18n_translation
@@ -21,10 +50,9 @@ func init() {
 			db.Cond{`row_id`: fm.RowId},
 			db.Cond{`resource_id`: fm.ResourceId},
 		))
-		resourceTable := fm.Context().Internal().String(`i18n_translation_resource_table`)
-		resourceField := fm.Context().Internal().String(`i18n_translation_resource_field`)
-		if len(resourceTable) > 0 && len(resourceField) > 0 {
-			if pMap, ok := listener.UpdaterInfos[``]; ok {
+		if pMap, ok := listener.UpdaterInfos[``]; ok {
+			resourceTable, resourceField := getResourceTableAndField(fm.Context(), fm.ResourceId)
+			if len(resourceTable) > 0 && len(resourceField) > 0 {
 				if updaterInfo, ok := pMap[resourceTable]; ok && updaterInfo != nil {
 					if up, ok := updaterInfo[resourceField]; ok {
 						property.SetEmbedded(up.Embedded)
