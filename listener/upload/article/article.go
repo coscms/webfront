@@ -36,7 +36,7 @@ func init() {
 		return
 	}, true).SetTable(`official_common_article`, `content`).ListenDefault()
 
-	dbschema.DBI.On(`deleting`, func(m factory.Model, _ ...string) error {
+	dbschema.DBI.On(factory.EventDeleting, func(m factory.Model, _ ...string) error {
 		fm := m.(*dbschema.OfficialCommonArticle)
 		var err error
 		if len(fm.Tags) > 0 {

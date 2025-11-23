@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
@@ -31,6 +32,22 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
 		namePrefix = formNamePrefix[0]
 	}
+	var hasUpload func(field string) bool
+	if pMap, ok := listener.UpdaterInfos[``]; ok {
+		if updaterInfo, ok := pMap[table]; ok && updaterInfo != nil {
+			hasUpload = func(field string) bool {
+				_, ok := updaterInfo[field]
+				return ok
+			}
+		}
+	}
+	if hasUpload == nil {
+		hasUpload = func(field string) bool {
+			return false
+		}
+	}
+	ctx.Internal().Set(`i18n_translation_resource_table`, table)
+	defer ctx.Internal().Delete(`i18n_translation_resource_table`)
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
 			continue
@@ -46,6 +63,7 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 				return err
 			}
 		}
+		ctx.Internal().Set(`i18n_translation_resource_field`, field)
 		resourceID := rM.Id
 		tM.Reset()
 		formName := com.CamelCase(field)
@@ -62,7 +80,11 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 				db.Cond{`resource_id`: resourceID},
 			)
 			if len(translate) == 0 {
-				err = tM.Delete(nil, cond)
+				if hasUpload(field) {
+					err = tM.Delete(nil, cond)
+				} else {
+					err = tM.EventOFF().Delete(nil, cond)
+				}
 				if err != nil {
 					return err
 				}
@@ -77,9 +99,17 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 				tM.ResourceId = resourceID
 				tM.RowId = id
 				tM.Text = translate
-				_, err = tM.Insert()
+				if hasUpload(field) {
+					_, err = tM.Insert()
+				} else {
+					_, err = tM.EventOFF().Insert()
+				}
 			} else if translate != tM.Text {
-				err = tM.UpdateField(nil, `text`, translate, cond)
+				if hasUpload(field) {
+					err = tM.UpdateField(nil, `text`, translate, cond)
+				} else {
+					err = tM.EventOFF().UpdateField(nil, `text`, translate, cond)
+				}
 			}
 			if err != nil {
 				return err
