@@ -163,6 +163,40 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 	return err
 }
 
+// DeleteModelTranslations deletes all translations associated with a specific model instance.
+// It removes both the resource entries and their corresponding translations from the database.
+// Parameters:
+//
+//	mdl - the model instance containing context and table information
+//	id  - the ID of the model instance whose translations should be deleted
+//
+// Returns:
+//
+//	error - any error encountered during the deletion process
+func DeleteModelTranslations(mdl factory.Model, id uint64) error {
+	ctx := mdl.Context()
+	table := mdl.Short_()
+	rM := dbschema.NewOfficialI18nResource(ctx)
+	_, err := rM.ListByOffset(nil, nil, 0, -1, `code`, db.Like(table+`.%`))
+	if err != nil {
+		return err
+	}
+	rows := rM.Objects()
+	rIDs := make([]uint, len(rows))
+	for i, v := range rows {
+		rIDs[i] = v.Id
+	}
+	if len(rIDs) == 0 {
+		return nil
+	}
+	cond := db.And(
+		db.Cond{`row_id`: id},
+		db.Cond{`resource_id`: db.In(rIDs)},
+	)
+	tM := dbschema.NewOfficialI18nTranslation(ctx)
+	return tM.Delete(nil, cond)
+}
+
 // Initialize scans all database fields marked as multilingual and ensures they have corresponding
 // entries in the i18n resource table. It creates new i18n resource records for any multilingual
 // fields that don't already exist in the resource table. Returns any error encountered during
