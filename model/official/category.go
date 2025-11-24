@@ -262,16 +262,30 @@ func (f *Category) setDefaults() {
 	}
 }
 
+func (f *Category) check() error {
+	var err error
+	f.setDefaults()
+	if len(f.Name) == 0 {
+		err = f.Context().NewError(code.InvalidParameter, `分类名称不能为空`).SetZone(`name`)
+		return err
+	}
+	if f.Id > 0 {
+		err = f.ExistsOther(f.Name, f.Id)
+	} else {
+		err = f.Exists(f.Name)
+	}
+	return err
+}
+
 func (f *Category) Add() (pk interface{}, err error) {
+	err = f.check()
+	if err != nil {
+		return
+	}
 	f.Context().Begin()
 	defer func() {
 		f.Context().End(err == nil)
 	}()
-	f.setDefaults()
-	err = f.Exists(f.Name)
-	if err != nil {
-		return
-	}
 	if f.ParentId > 0 {
 		parent := dbschema.NewOfficialCommonCategory(f.Context())
 		err = parent.Get(nil, `id`, f.ParentId)
@@ -301,14 +315,14 @@ func (f *Category) Add() (pk interface{}, err error) {
 }
 
 func (f *Category) Edit(mw func(db.Result) db.Result, args ...interface{}) (err error) {
+	err = f.check()
+	if err != nil {
+		return
+	}
 	f.Context().Begin()
 	defer func() {
 		f.Context().End(err == nil)
 	}()
-	f.setDefaults()
-	if err = f.ExistsOther(f.Name, f.Id); err != nil {
-		return err
-	}
 	oldData := dbschema.NewOfficialCommonCategory(f.Context())
 	err = oldData.Get(nil, args...)
 	if err != nil {

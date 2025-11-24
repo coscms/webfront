@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webfront/dbschema"
 )
@@ -120,6 +121,11 @@ func (f *Navigate) ParentIds(parentID uint) []uint {
 
 func (f *Navigate) check() error {
 	var err error
+	f.Title = strings.TrimSpace(f.Title)
+	if len(f.Title) == 0 {
+		err = f.Context().NewError(code.InvalidParameter, `菜单标题不能为空`).SetZone(`title`)
+		return err
+	}
 	if strings.HasPrefix(f.Ident, `regexp:`) {
 		expr := strings.TrimPrefix(f.Ident, `regexp:`)
 		_, err = regexp.Compile(expr)
