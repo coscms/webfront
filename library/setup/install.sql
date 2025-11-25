@@ -221,7 +221,7 @@ CREATE TABLE `official_common_article` (
   `likes` bigint unsigned NOT NULL DEFAULT '0' COMMENT '好评数量',
   `hates` bigint unsigned NOT NULL DEFAULT '0' COMMENT '差评数量',
   `views` bigint unsigned NOT NULL DEFAULT '0' COMMENT '浏览次数',
-  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`标签',
+  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '价格',
   `slugify` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'SEO-friendly URLs with Slugify',
   PRIMARY KEY (`id`),
@@ -604,11 +604,13 @@ DROP TABLE IF EXISTS `official_common_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_common_tags` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`标签名',
   `num` bigint unsigned NOT NULL DEFAULT '0' COMMENT '数量',
   `group` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分组标识',
   `display` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Y' COMMENT '是否显示',
-  PRIMARY KEY (`name`,`group`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `common_tags_uniq` (`name`,`group`),
   KEY `common_tags_group` (`group`,`display`,`num` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='标签库';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1221,4 +1223,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-10 10:51:27
+-- Dump completed on 2025-11-25  2:55:23

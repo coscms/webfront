@@ -100,9 +100,10 @@ type OfficialCommonTags struct {
 	base    factory.Base
 	objects []*OfficialCommonTags
 
-	Name    string `db:"name,pk" bson:"name" comment:"标签名" json:"name" xml:"name"`
+	Id      uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Name    string `db:"name" bson:"name" comment:"标签名" json:"name" xml:"name"`
 	Num     uint64 `db:"num" bson:"num" comment:"数量" json:"num" xml:"num"`
-	Group   string `db:"group,pk" bson:"group" comment:"分组标识" json:"group" xml:"group"`
+	Group   string `db:"group" bson:"group" comment:"分组标识" json:"group" xml:"group"`
 	Display string `db:"display" bson:"display" comment:"是否显示" json:"display" xml:"display"`
 }
 
@@ -326,7 +327,7 @@ func (a *OfficialCommonTags) ListByOffset(recv interface{}, mw func(db.Result) d
 }
 
 func (a *OfficialCommonTags) Insert() (pk interface{}, err error) {
-
+	a.Id = 0
 	if len(a.Display) == 0 {
 		a.Display = "Y"
 	}
@@ -337,7 +338,13 @@ func (a *OfficialCommonTags) Insert() (pk interface{}, err error) {
 		}
 	}
 	pk, err = a.Param(nil).SetSend(a).Insert()
-
+	if err == nil && pk != nil {
+		if v, y := pk.(uint64); y {
+			a.Id = v
+		} else if v, y := pk.(int64); y {
+			a.Id = uint64(v)
+		}
+	}
 	if err == nil && a.base.Eventable() {
 		err = DBI.Fire("created", a, nil)
 	}
@@ -511,6 +518,7 @@ func (a *OfficialCommonTags) Upsert(mw func(db.Result) db.Result, args ...interf
 		}
 		return DBI.Fire("updating", a, mw, args...)
 	}, func() error {
+		a.Id = 0
 		if len(a.Display) == 0 {
 			a.Display = "Y"
 		}
@@ -519,7 +527,13 @@ func (a *OfficialCommonTags) Upsert(mw func(db.Result) db.Result, args ...interf
 		}
 		return DBI.Fire("creating", a, nil)
 	})
-
+	if err == nil && pk != nil {
+		if v, y := pk.(uint64); y {
+			a.Id = v
+		} else if v, y := pk.(int64); y {
+			a.Id = uint64(v)
+		}
+	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
 			err = DBI.Fire("updated", a, mw, args...)
@@ -568,6 +582,7 @@ func (a *OfficialCommonTags) Exists(mw func(db.Result) db.Result, args ...interf
 }
 
 func (a *OfficialCommonTags) Reset() *OfficialCommonTags {
+	a.Id = 0
 	a.Name = ``
 	a.Num = 0
 	a.Group = ``
@@ -578,6 +593,7 @@ func (a *OfficialCommonTags) Reset() *OfficialCommonTags {
 func (a *OfficialCommonTags) AsMap(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
+		r["Id"] = a.Id
 		r["Name"] = a.Name
 		r["Num"] = a.Num
 		r["Group"] = a.Group
@@ -586,6 +602,8 @@ func (a *OfficialCommonTags) AsMap(onlyFields ...string) param.Store {
 	}
 	for _, field := range onlyFields {
 		switch field {
+		case "Id":
+			r["Id"] = a.Id
 		case "Name":
 			r["Name"] = a.Name
 		case "Num":
@@ -605,6 +623,8 @@ func (a *OfficialCommonTags) FromRow(row map[string]interface{}) {
 			continue
 		}
 		switch key {
+		case "id":
+			a.Id = param.AsUint64(value)
 		case "name":
 			a.Name = param.AsString(value)
 		case "num":
@@ -619,6 +639,8 @@ func (a *OfficialCommonTags) FromRow(row map[string]interface{}) {
 
 func (a *OfficialCommonTags) GetField(field string) interface{} {
 	switch field {
+	case "Id":
+		return a.Id
 	case "Name":
 		return a.Name
 	case "Num":
@@ -634,6 +656,7 @@ func (a *OfficialCommonTags) GetField(field string) interface{} {
 
 func (a *OfficialCommonTags) GetAllFieldNames() []string {
 	return []string{
+		"Id",
 		"Name",
 		"Num",
 		"Group",
@@ -643,6 +666,8 @@ func (a *OfficialCommonTags) GetAllFieldNames() []string {
 
 func (a *OfficialCommonTags) HasField(field string) bool {
 	switch field {
+	case "Id":
+		return true
 	case "Name":
 		return true
 	case "Num":
@@ -676,6 +701,8 @@ func (a *OfficialCommonTags) Set(key interface{}, value ...interface{}) {
 			vv = value[0]
 		}
 		switch kk {
+		case "Id":
+			a.Id = param.AsUint64(vv)
 		case "Name":
 			a.Name = param.AsString(vv)
 		case "Num":
@@ -691,6 +718,7 @@ func (a *OfficialCommonTags) Set(key interface{}, value ...interface{}) {
 func (a *OfficialCommonTags) AsRow(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
+		r["id"] = a.Id
 		r["name"] = a.Name
 		r["num"] = a.Num
 		r["group"] = a.Group
@@ -699,6 +727,8 @@ func (a *OfficialCommonTags) AsRow(onlyFields ...string) param.Store {
 	}
 	for _, field := range onlyFields {
 		switch field {
+		case "id":
+			r["id"] = a.Id
 		case "name":
 			r["name"] = a.Name
 		case "num":
