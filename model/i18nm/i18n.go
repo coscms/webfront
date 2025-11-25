@@ -14,6 +14,10 @@ import (
 	"github.com/webx-top/echo"
 )
 
+func isMultilingual(){
+ return len(config.FromFile().Language.AllList) > 1
+}
+
 // SetTranstationsTTL sets the TTL (Time To Live) for translations in the given echo context.
 // The ttl parameter specifies the duration in seconds that translations should be cached.
 func SetTranstationsTTL(ctx echo.Context, ttl int64) {
@@ -24,6 +28,9 @@ func SetTranstationsTTL(ctx echo.Context, ttl int64) {
 // It returns a map where keys are row IDs and values are maps of field names to translated texts.
 // The translations are filtered by the current request language and the specified table prefix.
 func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
+ if !isMultilingual() {
+  return map[uint64]map[string]string{}
+ }
 	if ttl, ok := ctx.Internal().Get(`translationsTTL`).(int64); ok {
 		m := map[uint64]map[string]string{}
 		cache.XFunc(ctx, `translations.`+table+`.`+com.JoinNumbers(ids, `_`), &m, func() error {
@@ -78,7 +85,10 @@ func GetModelTranslations(mdl factory.Model, ids []uint64) map[uint64]map[string
 func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableName ...string) []T {
 	if len(models) == 0 {
 		return models
-	}
+	} 
+ if !isMultilingual() {
+  return models
+ }
 	if config.FromFile().Language.Default == ctx.Lang().Normalize() {
 		return models
 	}
