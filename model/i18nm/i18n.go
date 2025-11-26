@@ -70,11 +70,43 @@ func getTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]ma
 	return m
 }
 
-// GetModelTranslations retrieves translations for multiple model instances by their IDs.
+// GetModelTranslationsByIDs retrieves translations for multiple model instances by their IDs.
 // It returns a map where each key is a model ID and the value is another map of language translations.
 // The translations are fetched using the model's context and table name.
-func GetModelTranslations(mdl factory.Model, ids []uint64) map[uint64]map[string]string {
+func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64) map[uint64]map[string]string {
 	return GetTranslations(mdl.Context(), mdl.Short_(), ids)
+}
+
+// GetModelTranslations retrieves translations for a model instance by its ID.
+// It returns translations as a map where each key is a field name and the value is the translated text.
+// If the model lacks an ID field, it does nothing.
+// If the context is nil, it uses the model's context.
+// It fetches translations using the model's context and table name.
+// If translations are found, it applies them to the model instance using the FromRow method.
+func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
+	var id uint64
+	switch v := mdl.GetField(`Id`).(type) {
+	case uint64:
+		id = v
+	case uint:
+		id = uint64(v)
+	default:
+		return
+	}
+	if ctx == nil {
+		ctx = mdl.Context()
+	}
+	translations := GetTranslations(ctx, mdl.Short_(), []uint64{id})
+	if len(translations) > 0 && len(translations[id]) > 0 {
+		rowI := map[string]interface{}{}
+		for field, text := range translations[id] {
+			if len(text) == 0 {
+				continue
+			}
+			rowI[field] = text
+		}
+		mdl.FromRow(rowI)
+	}
 }
 
 // GetModelsTranslations retrieves translations for a slice of models and applies them to each model.
