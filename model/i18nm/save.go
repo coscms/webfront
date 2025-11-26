@@ -23,7 +23,7 @@ import (
 // Returns:
 //   - error: Any error encountered during the save process
 func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...string) error {
-	if !isMultilingual() {
+	if !IsMultilingual() {
 		return nil
 	}
 	ctx := mdl.Context()
@@ -131,7 +131,7 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 // The form field names are prefixed with the given prefix (default "Language") in the format: prefix[lang][field].
 // Returns any error encountered during the operation.
 func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...string) error {
-	if !isMultilingual() {
+	if !IsMultilingual() {
 		return nil
 	}
 	ctx := mdl.Context()
@@ -183,7 +183,7 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 //
 //	error - any error encountered during the deletion process
 func DeleteModelTranslations(mdl factory.Model, id uint64) error {
-	if !isMultilingual() {
+	if !IsMultilingual() {
 		return nil
 	}
 	ctx := mdl.Context()

@@ -31,13 +31,13 @@ type CommentConfig struct {
 var (
 	//CommentAllowUsers all-所有人;buyer-当前商品买家;author-当前文章作者;admin-管理员;allAgent-所有代理;curAgent-当前产品代理;none-无人;designated-指定人员
 	CommentAllowUsers = []echo.KV{
-		{K: `all`, V: `所有人`},
-		{K: `buyer`, V: `当前商品买家`},
-		{K: `author`, V: `当前文章作者`},
-		{K: `curAgent`, V: `当前产品代理商`},
-		{K: `allAgent`, V: `所有代理商`},
-		{K: `admin`, V: `管理员`},
-		{K: `none`, V: `无`},
+		{K: `all`, V: echo.T(`所有人`)},
+		{K: `buyer`, V: echo.T(`当前商品买家`)},
+		{K: `author`, V: echo.T(`当前文章作者`)},
+		{K: `curAgent`, V: echo.T(`当前产品代理商`)},
+		{K: `allAgent`, V: echo.T(`所有代理商`)},
+		{K: `admin`, V: echo.T(`管理员`)},
+		{K: `none`, V: echo.T(`无`)},
 		//{K: `designated`, V: `指定人员`},
 	}
 	//CommentAllowTypes 允许的类型标识
@@ -49,11 +49,11 @@ var (
 			AfterDelete: commentArticleAfterDelete,
 			WithTarget:  commentArticleWithTarget,
 			Ident:       `article`,
-			Label:       `文章`,
+			Label:       echo.T(`文章`),
 		},
 		`other`: {
 			Ident: `other`,
-			Label: `其它`,
+			Label: echo.T(`其它`),
 		},
 	}
 )

@@ -55,10 +55,10 @@ var poolContentHideParams = sync.Pool{
 var ContentHideDetector = echo.NewKVData()
 
 func init() {
-	ContentHideDetectorRegister(`signIn`, `登录后才能查看`, func(params *ContentHideParams) bool {
+	ContentHideDetectorRegister(`signIn`, echo.T(`登录后才能查看`), func(params *ContentHideParams) bool {
 		return params.Customer == nil // 返回true表示需要隐藏内容，否则显示内容
-	}, `此处内容需要登录后方可阅读`)
-	ContentHideDetectorRegister(`level`, `只有特定等级的用户才能查看(多个等级ID用半角逗号“,”分隔，例如“[hide:level:1,2]隐藏内容[/hide]”)`, func(params *ContentHideParams) bool {
+	}, echo.T(`此处内容需要登录后方可阅读`))
+	ContentHideDetectorRegister(`level`, echo.T(`只有特定等级的用户才能查看(多个等级ID用半角逗号“,”分隔，例如“[hide:level:1,2]隐藏内容[/hide]”)`), func(params *ContentHideParams) bool {
 		if params.Customer == nil {
 			return true // 返回true表示需要隐藏内容，否则显示内容
 		}
@@ -73,8 +73,8 @@ func init() {
 		}
 		has, _ := levelM.HasLevel(params.Customer.Id, levelIDs...)
 		return !has
-	}, `此处内容仅供会员查看`, messageFuncOnHideForLevel)
-	ContentHideDetectorRegister(`group`, `只有特定用户组才能查看(多个组ID用半角逗号“,”分隔，例如“[hide:group:1,2]隐藏内容[/hide]”)`, func(params *ContentHideParams) bool {
+	}, echo.T(`此处内容仅供会员查看`), messageFuncOnHideForLevel)
+	ContentHideDetectorRegister(`group`, echo.T(`只有特定用户组才能查看(多个组ID用半角逗号“,”分隔，例如“[hide:group:1,2]隐藏内容[/hide]”)`), func(params *ContentHideParams) bool {
 		if params.Customer == nil {
 			return true // 返回true表示需要隐藏内容，否则显示内容
 		}
@@ -87,7 +87,7 @@ func init() {
 		groupIDStrings := param.StringSlice(strings.Split(params.Args[0], `,`)).Filter()
 		return !com.InSlice(param.AsString(params.Customer.GroupId), groupIDStrings)
 	}, ``, messageFuncOnHideForGroup)
-	ContentHideDetectorRegister(`role`, `只有特定角色才能查看(多个角色ID用半角逗号“,”分隔，例如“[hide:role:1,2]隐藏内容[/hide]”)`, func(params *ContentHideParams) bool {
+	ContentHideDetectorRegister(`role`, echo.T(`只有特定角色才能查看(多个角色ID用半角逗号“,”分隔，例如“[hide:role:1,2]隐藏内容[/hide]”)`), func(params *ContentHideParams) bool {
 		if params.Customer == nil {
 			return true // 返回true表示需要隐藏内容，否则显示内容
 		}
@@ -106,7 +106,7 @@ func init() {
 		}
 		return true
 	}, ``, messageFuncOnHideForRole)
-	ContentHideDetectorRegister(`owner`, `作者才能查看`, func(params *ContentHideParams) bool {
+	ContentHideDetectorRegister(`owner`, echo.T(`作者才能查看`), func(params *ContentHideParams) bool {
 		if params.Customer == nil {
 			return true
 		}
@@ -117,8 +117,8 @@ func init() {
 			return true
 		}
 		return uint64(params.Customer.Uid) != params.Article.OwnerId
-	}, `此处内容只有本文作者才能查看`)
-	ContentHideDetectorRegister(`paid`, `需要付款后才能查看(需设置售价)`, func(params *ContentHideParams) bool {
+	}, echo.T(`此处内容只有本文作者才能查看`))
+	ContentHideDetectorRegister(`paid`, echo.T(`需要付款后才能查看(需设置售价)`), func(params *ContentHideParams) bool {
 		if params.Article.Price <= 0 {
 			return false
 		}

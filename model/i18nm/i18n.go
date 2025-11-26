@@ -14,7 +14,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func isMultilingual() bool {
+func IsMultilingual() bool {
 	return len(config.FromFile().Language.AllList) > 1
 }
 
@@ -27,26 +27,35 @@ func SetTranstationsTTL(ctx echo.Context, ttl int64) {
 // GetTranslations retrieves translations for the specified table and row IDs.
 // It returns a map where keys are row IDs and values are maps of field names to translated texts.
 // The translations are filtered by the current request language and the specified table prefix.
-func GetTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
-	if !isMultilingual() {
+func GetTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
+	if !IsMultilingual() {
 		return map[uint64]map[string]string{}
 	}
 	if ttl, ok := ctx.Internal().Get(`translationsTTL`).(int64); ok {
 		m := map[uint64]map[string]string{}
 		cache.XFunc(ctx, `translations.`+table+`.`+com.JoinNumbers(ids, `_`), &m, func() error {
-			r := getTranslations(ctx, table, ids)
+			r := getTranslations(ctx, table, ids, columns...)
 			maps.Copy(m, r)
 			return nil
 		}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(ttl)))
 		return m
 	}
-	return getTranslations(ctx, table, ids)
+	return getTranslations(ctx, table, ids, columns...)
 }
 
-func getTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]map[string]string {
+func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
 	rM := dbschema.NewOfficialI18nResource(ctx)
-	rM.ListByOffset(nil, nil, 0, -1, `code`, db.Like(table+`.%`))
+	var condVal interface{}
+	if len(columns) > 0 {
+		for i, v := range columns {
+			columns[i] = table + `.` + v
+		}
+		condVal = db.In(columns)
+	} else {
+		condVal = db.Like(table + `.%`)
+	}
+	rM.ListByOffset(nil, nil, 0, -1, `code`, condVal)
 	rows := rM.Objects()
 	rIDs := make([]uint, len(rows))
 	rKeys := map[uint]string{}
@@ -73,8 +82,8 @@ func getTranslations(ctx echo.Context, table string, ids []uint64) map[uint64]ma
 // GetModelTranslationsByIDs retrieves translations for multiple model instances by their IDs.
 // It returns a map where each key is a model ID and the value is another map of language translations.
 // The translations are fetched using the model's context and table name.
-func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64) map[uint64]map[string]string {
-	return GetTranslations(mdl.Context(), mdl.Short_(), ids)
+func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64, columns ...string) map[uint64]map[string]string {
+	return GetTranslations(mdl.Context(), mdl.Short_(), ids, columns...)
 }
 
 // GetModelTranslations retrieves translations for a model instance by its ID.
@@ -83,8 +92,8 @@ func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64) map[uint64]map[s
 // If the context is nil, it uses the model's context.
 // It fetches translations using the model's context and table name.
 // If translations are found, it applies them to the model instance using the FromRow method.
-func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
-	if !isMultilingual() {
+func GetModelTranslations(ctx echo.Context, mdl factory.Model, columns ...string) {
+	if !IsMultilingual() {
 		return
 	}
 	var id uint64
@@ -102,7 +111,7 @@ func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
 	if ctx == nil {
 		ctx = mdl.Context()
 	}
-	translations := GetTranslations(ctx, mdl.Short_(), []uint64{id})
+	translations := GetTranslations(ctx, mdl.Short_(), []uint64{id}, columns...)
 	if len(translations) > 0 && len(translations[id]) > 0 {
 		rowI := map[string]interface{}{}
 		for field, text := range translations[id] {
@@ -120,11 +129,11 @@ func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
 // For each model, it extracts the ID, fetches translations using GetModelTranslations,
 // and updates the model fields with the translated values.
 // If the input slice is empty or any model lacks an ID field, it returns the original slice unchanged.
-func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableName ...string) []T {
+func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, columns ...string) []T {
 	if len(models) == 0 {
 		return models
 	}
-	if !isMultilingual() {
+	if !IsMultilingual() {
 		return models
 	}
 	if config.FromFile().Language.Default == ctx.Lang().Normalize() {
@@ -155,10 +164,7 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableN
 		ctx = models[0].Context()
 	}
 	table := models[0].Short_()
-	if len(tableName) > 0 && len(tableName[0]) > 0 {
-		table = tableName[0]
-	}
-	translations := GetTranslations(ctx, table, ids)
+	translations := GetTranslations(ctx, table, ids, columns...)
 	for id, row := range translations {
 		index := idk[id]
 		rowI := map[string]interface{}{}

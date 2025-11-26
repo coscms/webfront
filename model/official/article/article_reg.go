@@ -13,7 +13,7 @@ import (
 const GroupName = `article`
 
 func init() {
-	official.AddTagGroup(GroupName, `文章`)
+	official.AddTagGroup(GroupName, echo.T(`文章`))
 	official.AddClickFlowTarget(GroupName, official.ClickFlowTargetFunc(func(c echo.Context, id interface{}) (func(typ string, isCancel ...bool) error, func() official.ClickFlowTargetInfo, error) {
 		articleM := NewArticle(c)
 		err := articleM.Get(nil, `id`, id)
@@ -28,7 +28,7 @@ func init() {
 			return articleM.UpdateField(nil, field, db.Raw(field+official.MakeOperator(isCancel...)+`1`), db.Cond{`id`: id})
 		}, nil, nil
 	}))
-	official.AddCollectionTarget(GroupName, `文章`, official.CollectionTargetDoFunc(func(c echo.Context, id interface{}) (func(isCancel ...bool) error, func() official.CollectionTargetInfo, error) {
+	official.AddCollectionTarget(GroupName, echo.T(`文章`), official.CollectionTargetDoFunc(func(c echo.Context, id interface{}) (func(isCancel ...bool) error, func() official.CollectionTargetInfo, error) {
 		articleM := NewArticle(c)
 		err := articleM.Get(nil, `id`, id)
 		if err != nil {
