@@ -84,6 +84,9 @@ func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64) map[uint64]map[s
 // It fetches translations using the model's context and table name.
 // If translations are found, it applies them to the model instance using the FromRow method.
 func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
+	if !isMultilingual() {
+		return
+	}
 	var id uint64
 	switch v := mdl.GetField(`Id`).(type) {
 	case uint64:
@@ -91,6 +94,9 @@ func GetModelTranslations(ctx echo.Context, mdl factory.Model) {
 	case uint:
 		id = uint64(v)
 	default:
+		return
+	}
+	if id == 0 {
 		return
 	}
 	if ctx == nil {
@@ -134,6 +140,9 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, tableN
 		case uint:
 			id = uint64(v)
 		default:
+			return models
+		}
+		if id == 0 {
 			return models
 		}
 		ids[index] = id
