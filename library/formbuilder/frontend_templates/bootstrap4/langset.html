@@ -14,7 +14,7 @@
 
 			<div class="tab-content">
       		{{- range $k,$v := .langs }}
-				<div class="tab-pane hide{{if eq $k 0}} active{{end}}" id="langset_{{$langset.name}}_{{$v.ID}}">
+				<div class="tab-pane{{if eq $k 0}} active{{end}}" id="langset_{{$langset.name}}_{{$v.ID}}">
 					{{- range $k, $g := $v.Groups }}
 					{{- if gt (len $g.Elements) 0}}
 					<div class="form-group row{{if $g.HasError}} has-error{{end}}">
