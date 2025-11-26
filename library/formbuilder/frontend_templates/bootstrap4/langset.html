@@ -1,5 +1,5 @@
 {{- $langset := . }}
-	<div class="wd-100p{{if and $langset.params $langset.params.class}} {{$langset.params.class}}{{end}}"{{if $langset.params}}{{range $k,$v := $langset.params}}{{if ne $k `class`}} {{$k}}="{{$v}}"{{end}}{{end}}{{end}}{{range $langset.tags}} {{.}}{{end}}>
+	<div class="wd-100p{{if and $langset.params ($langset.params.Exists `class`)}} {{$langset.params.Get `class`}}{{end}}"{{if $langset.params}}{{range $k,$v := $langset.params}}{{if ne $k `class`}} {{$k}}="{{$v}}"{{end}}{{end}}{{end}}{{range $langset.tags}} {{.}}{{end}}>
 		<div class="col-md-12 tabbable langset">
   			<ul class="nav nav-tabs">
       		{{- range $k,$v := .langs }}

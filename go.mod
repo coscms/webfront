@@ -32,7 +32,7 @@ require (
 	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/sensitive v0.0.1
 	github.com/admpub/useragent v0.0.2
-	github.com/coscms/forms v1.15.2
+	github.com/coscms/forms v1.15.3
 	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/sms v0.0.7
 	github.com/googollee/go-socket.io v1.7.0
