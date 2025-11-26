@@ -35,7 +35,7 @@ func (f *Article) ListByTag(recv interface{}, mw func(db.Result) db.Result, page
 	return f.OfficialCommonArticle.List(recv, mw, page, size, f.TagCond(tag))
 }
 
-func (f *Article) GetCategories(rows ...*dbschema.OfficialCommonArticle) ([]dbschema.OfficialCommonCategory, error) {
+func (f *Article) GetCategories(rows ...*dbschema.OfficialCommonArticle) ([]*dbschema.OfficialCommonCategory, error) {
 	row := f.OfficialCommonArticle
 	if len(rows) > 0 {
 		row = rows[0]

@@ -192,8 +192,8 @@ func (f *Category) ListIndent(categoryList []*dbschema.OfficialCommonCategory) [
 	return categoryList
 }
 
-func (f *Category) Parents(parentID uint, onlyID ...bool) ([]dbschema.OfficialCommonCategory, error) {
-	categories := []dbschema.OfficialCommonCategory{}
+func (f *Category) Parents(parentID uint, onlyID ...bool) ([]*dbschema.OfficialCommonCategory, error) {
+	categories := []*dbschema.OfficialCommonCategory{}
 	r := map[uint]bool{}
 	var _mw func(db.Result) db.Result
 	if len(onlyID) > 0 && onlyID[0] {
@@ -209,14 +209,15 @@ func (f *Category) Parents(parentID uint, onlyID ...bool) ([]dbschema.OfficialCo
 			}
 			return categories, err
 		}
-		categories = append(categories, *f.OfficialCommonCategory)
+		cloned := *f.OfficialCommonCategory
+		categories = append(categories, &cloned)
 		r[parentID] = true
 		parentID = f.ParentId
 	}
 	return categories, nil
 }
 
-func (f *Category) Positions(id uint) ([]dbschema.OfficialCommonCategory, error) {
+func (f *Category) Positions(id uint) ([]*dbschema.OfficialCommonCategory, error) {
 	parents, err := f.Parents(id)
 	if err != nil {
 		return parents, err
@@ -224,7 +225,7 @@ func (f *Category) Positions(id uint) ([]dbschema.OfficialCommonCategory, error)
 	if len(parents) == 0 {
 		return parents, nil
 	}
-	positions := make([]dbschema.OfficialCommonCategory, len(parents))
+	positions := make([]*dbschema.OfficialCommonCategory, len(parents))
 	var index int
 	for end := len(parents) - 1; end >= 0; end-- {
 		positions[index] = parents[end]
