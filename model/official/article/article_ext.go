@@ -20,10 +20,11 @@ type ArticleWithOwner struct {
 	Category *Category             `db:"-,relation=id:category_id|gtZero,columns=id&name" json:",omitempty"`
 }
 
-func MultilingualCategoryForArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
+func MultilingualArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
 	if !i18nm.IsMultilingual() {
 		return
 	}
+	i18nm.GetModelsTranslations(ctx, list)
 	cateIDs := map[uint][]int{}
 	categories := []*Category{}
 	for i, a := range list {
