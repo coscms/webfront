@@ -36,3 +36,15 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 	param.AddJoin(`INNER`, tM.Short_(), `TR`, table+`.id = TR.row_id`).AddArgs(cond.And())
 	return err
 }
+
+// SearchModel searches for records in the specified model using the given keyword and parameters.
+// It delegates the actual search operation to the Search function with the model's short name.
+// ctx: Echo context for the request
+// mdl: The model to search in
+// keyword: The search term
+// param: Additional search parameters
+// columns: Optional columns to search in
+// Returns an error if the search fails
+func SearchModel(ctx echo.Context, mdl factory.Model, keyword string, param *factory.Param, columns ...string) error {
+	return Search(ctx, mdl.Short_(), keyword, param, columns...)
+}
