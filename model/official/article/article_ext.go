@@ -1,10 +1,13 @@
 package article
 
 import (
+	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webfront/dbschema"
 	modelAuthor "github.com/coscms/webfront/model/author"
+	"github.com/coscms/webfront/model/i18nm"
 	"github.com/coscms/webfront/model/official"
 )
 
@@ -17,13 +20,68 @@ type ArticleWithOwner struct {
 	Category *Category             `db:"-,relation=id:category_id|gtZero,columns=id&name" json:",omitempty"`
 }
 
+func MultilingualCategoryForArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
+	if !i18nm.IsMultilingual() {
+		return
+	}
+	cateIDs := map[uint][]int{}
+	categories := []*Category{}
+	for i, a := range list {
+		if a.Category != nil {
+			if _, ok := cateIDs[a.Category.Id]; !ok {
+				cateIDs[a.Category.Id] = []int{}
+				categories = append(categories, a.Category)
+			}
+			cateIDs[a.Category.Id] = append(cateIDs[a.Category.Id], i)
+		}
+	}
+	if len(categories) == 0 {
+		return
+	}
+	i18nm.GetModelsTranslations(ctx, categories, `name`)
+	for _, v := range categories {
+		for _, i := range cateIDs[v.Id] {
+			list[i].Category.Name = v.Name
+		}
+	}
+}
+
 type Category struct {
 	Id   uint   `db:"id"`
 	Name string `db:"name"`
 }
 
+func (c *Category) Short_() string {
+	return `official_common_category`
+}
+
 func (c *Category) Name_() string {
 	return dbschema.WithPrefix(`official_common_category`)
+}
+
+func (a *Category) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	default:
+		return nil
+	}
+}
+
+func (a *Category) FromRow(row map[string]interface{}) {
+	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
+		switch key {
+		case "id":
+			a.Id = param.AsUint(value)
+		case "name":
+			a.Name = param.AsString(value)
+		}
+	}
 }
 
 type ArticleAndSourceInfo struct {
