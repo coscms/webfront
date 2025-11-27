@@ -33,7 +33,7 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 	cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
 	cond.From(mysql.SearchField(`~TR.text`, keyword))
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
-	param.AddJoin(`INNER`, tM.Short_(), `TR`, table+`.id = TR.row_id`).AddArgs(cond.And())
+	param.AddJoin(`INNER`, tM.Short_(), `TR`, dbschema.WithPrefix(table)+`.id = TR.row_id`).AddArgs(cond.And())
 	return err
 }
 
