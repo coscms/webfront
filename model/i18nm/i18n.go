@@ -43,11 +43,17 @@ func GetTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 	return getTranslations(ctx, table, ids, columns...)
 }
 
-func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
-	m := map[uint64]map[string]string{}
-	if len(ids) == 0 {
-		return m
-	}
+// getResources retrieves i18n resources from the specified table with optional column filtering.
+// It returns a slice of OfficialI18nResource objects and any error encountered during the operation.
+// Parameters:
+//   - ctx: echo context for database operations
+//   - table: name of the table to query
+//   - columns: optional list of columns to filter (if empty, matches all columns with LIKE pattern)
+//
+// Returns:
+//   - []*dbschema.OfficialI18nResource: slice of retrieved resources
+//   - error: any error that occurred during the query
+func getResources(ctx echo.Context, table string, columns ...string) ([]*dbschema.OfficialI18nResource, error) {
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	var condVal interface{}
 	if len(columns) > 0 {
@@ -58,9 +64,20 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 	} else {
 		condVal = db.Like(table + `.%`)
 	}
-	rM.ListByOffset(nil, nil, 0, -1, `code`, condVal)
-	rows := rM.Objects()
-	if len(rows) == 0 {
+	_, err := rM.ListByOffset(nil, nil, 0, -1, `code`, condVal)
+	if err != nil {
+		return nil, err
+	}
+	return rM.Objects(), err
+}
+
+func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
+	m := map[uint64]map[string]string{}
+	if len(ids) == 0 {
+		return m
+	}
+	rows, err := getResources(ctx, table, columns...)
+	if err != nil || len(rows) == 0 {
 		return m
 	}
 	rIDs := make([]uint, len(rows))

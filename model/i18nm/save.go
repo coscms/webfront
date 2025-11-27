@@ -198,14 +198,14 @@ func DeleteModelTranslations(mdl factory.Model, id uint64) error {
 		return err
 	}
 	rows := rM.Objects()
+	if len(rows) == 0 {
+		return nil
+	}
 	rIDs := make([]uint, len(rows))
 	rCodes := map[uint]string{}
 	for i, v := range rows {
 		rIDs[i] = v.Id
 		rCodes[v.Id] = v.Code
-	}
-	if len(rIDs) == 0 {
-		return nil
 	}
 	cond := db.And(
 		db.Cond{`row_id`: id},
