@@ -45,6 +45,9 @@ func GetTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 
 func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
+	if len(ids) == 0 {
+		return m
+	}
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	var condVal interface{}
 	if len(columns) > 0 {
@@ -57,6 +60,9 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 	}
 	rM.ListByOffset(nil, nil, 0, -1, `code`, condVal)
 	rows := rM.Objects()
+	if len(rows) == 0 {
+		return m
+	}
 	rIDs := make([]uint, len(rows))
 	rKeys := map[uint]string{}
 	for i, v := range rows {

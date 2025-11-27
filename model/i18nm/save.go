@@ -54,6 +54,7 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 		ctx.Internal().Delete(`i18n_translation_resource_table`)
 		ctx.Internal().Delete(`i18n_translation_resource_field`)
 	}()
+	langCfg := config.FromFile().Language
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
 			continue
@@ -74,8 +75,8 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 		tM.Reset()
 		formName := com.CamelCase(field)
 		formName2 := com.UpperCaseFirst(formName)
-		langDefault := config.FromFile().Language.Default
-		for _, langCode := range config.FromFile().Language.AllList {
+		langDefault := langCfg.Default
+		for _, langCode := range langCfg.AllList {
 			if langDefault == langCode {
 				continue
 			}
@@ -146,6 +147,9 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 		return err
 	}
 	rows := rM.Objects()
+	if len(rows) == 0 {
+		return nil
+	}
 	rIDs := make([]uint, len(rows))
 	rKeys := map[uint]string{}
 	for i, v := range rows {
