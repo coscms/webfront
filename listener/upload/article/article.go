@@ -47,7 +47,7 @@ func init() {
 				return err
 			}
 		}
-		err = i18nm.DeleteModelTranslations(m, fm.Id)
+		err = i18nm.DeleteModelTranslations(m.Context(), m, fm.Id)
 		return err
 	}, `official_common_article`)
 }

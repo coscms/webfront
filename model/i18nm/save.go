@@ -8,7 +8,6 @@ import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
-	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
 
@@ -22,11 +21,10 @@ import (
 //
 // Returns:
 //   - error: Any error encountered during the save process
-func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...string) error {
+func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, formNamePrefix ...string) error {
 	if !IsMultilingual() {
 		return nil
 	}
-	ctx := mdl.Context()
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	var err error
@@ -131,11 +129,10 @@ func SaveModelTranslations(mdl factory.Model, id uint64, formNamePrefix ...strin
 // It retrieves translations for the given model ID and populates the form with language-specific values.
 // The form field names are prefixed with the given prefix (default "Language") in the format: prefix[lang][field].
 // Returns any error encountered during the operation.
-func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...string) error {
+func SetModelTranslationsToForm(ctx echo.Context, mdl Model, id uint64, formNamePrefix ...string) error {
 	if !IsMultilingual() {
 		return nil
 	}
-	ctx := mdl.Context()
 	table := mdl.Short_()
 	namePrefix := `Language`
 	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
@@ -186,11 +183,10 @@ func SetModelTranslationsToForm(mdl factory.Model, id uint64, formNamePrefix ...
 // Returns:
 //
 //	error - any error encountered during the deletion process
-func DeleteModelTranslations(mdl factory.Model, id uint64) error {
+func DeleteModelTranslations(ctx echo.Context, mdl Model, id uint64) error {
 	if !IsMultilingual() {
 		return nil
 	}
-	ctx := mdl.Context()
 	table := mdl.Short_()
 	rM := dbschema.NewOfficialI18nResource(ctx)
 	_, err := rM.ListByOffset(nil, nil, 0, -1, `code`, db.Like(table+`.%`))

@@ -10,7 +10,6 @@ import (
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
-	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
 
@@ -105,8 +104,8 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 // GetModelTranslationsByIDs retrieves translations for multiple model instances by their IDs.
 // It returns a map where each key is a model ID and the value is another map of language translations.
 // The translations are fetched using the model's context and table name.
-func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64, columns ...string) map[uint64]map[string]string {
-	return GetTranslations(mdl.Context(), mdl.Short_(), ids, columns...)
+func GetModelTranslationsByIDs(ctx echo.Context, mdl Model, ids []uint64, columns ...string) map[uint64]map[string]string {
+	return GetTranslations(ctx, mdl.Short_(), ids, columns...)
 }
 
 // GetModelTranslations retrieves translations for a model instance by its ID.
@@ -115,7 +114,7 @@ func GetModelTranslationsByIDs(mdl factory.Model, ids []uint64, columns ...strin
 // If the context is nil, it uses the model's context.
 // It fetches translations using the model's context and table name.
 // If translations are found, it applies them to the model instance using the FromRow method.
-func GetModelTranslations(ctx echo.Context, mdl factory.Model, columns ...string) {
+func GetModelTranslations(ctx echo.Context, mdl Model, columns ...string) {
 	if !IsMultilingual() {
 		return
 	}
@@ -130,9 +129,6 @@ func GetModelTranslations(ctx echo.Context, mdl factory.Model, columns ...string
 	}
 	if id == 0 {
 		return
-	}
-	if ctx == nil {
-		ctx = mdl.Context()
 	}
 	translations := GetTranslations(ctx, mdl.Short_(), []uint64{id}, columns...)
 	if len(translations) > 0 && len(translations[id]) > 0 {
@@ -152,7 +148,7 @@ func GetModelTranslations(ctx echo.Context, mdl factory.Model, columns ...string
 // For each model, it extracts the ID, fetches translations using GetModelTranslations,
 // and updates the model fields with the translated values.
 // If the input slice is empty or any model lacks an ID field, it returns the original slice unchanged.
-func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, columns ...string) []T {
+func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...string) []T {
 	if len(models) == 0 {
 		return models
 	}
@@ -182,9 +178,6 @@ func GetModelsTranslations[T factory.Model](ctx echo.Context, models []T, column
 	}
 	if len(ids) == 0 {
 		return models
-	}
-	if ctx == nil {
-		ctx = models[0].Context()
 	}
 	table := models[0].Short_()
 	translations := GetTranslations(ctx, table, ids, columns...)

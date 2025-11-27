@@ -45,6 +45,6 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 // param: Additional search parameters
 // columns: Optional columns to search in
 // Returns an error if the search fails
-func SearchModel(ctx echo.Context, mdl factory.Model, keyword string, param *factory.Param, columns ...string) error {
+func SearchModel(ctx echo.Context, mdl Model, keyword string, param *factory.Param, columns ...string) error {
 	return Search(ctx, mdl.Short_(), keyword, param, columns...)
 }

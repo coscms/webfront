@@ -12,7 +12,7 @@ func init() {
 	// - official_common_tags
 	dbschema.DBI.On(factory.EventDeleting, func(m factory.Model, _ ...string) error {
 		fm := m.(*dbschema.OfficialCommonTags)
-		err := i18nm.DeleteModelTranslations(m, uint64(fm.Id))
+		err := i18nm.DeleteModelTranslations(m.Context(), m, uint64(fm.Id))
 		return err
 	}, `official_common_tags`)
 }
