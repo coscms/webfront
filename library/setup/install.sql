@@ -802,9 +802,9 @@ DROP TABLE IF EXISTS `official_customer_level`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_customer_level` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '等级名称',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`等级名称',
   `short` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '等级简称',
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '等级简介',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`等级简介',
   `icon_image` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '图标图片',
   `icon_class` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '图片class名',
   `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '颜色',
@@ -934,8 +934,8 @@ DROP TABLE IF EXISTS `official_customer_role`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_customer_role` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
-  `description` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '说明',
+  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`名称',
+  `description` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`说明',
   `created` int unsigned NOT NULL COMMENT '添加时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否禁用',
@@ -1223,4 +1223,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-25  2:55:23
+-- Dump completed on 2025-11-28 12:11:36
