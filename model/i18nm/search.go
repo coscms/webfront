@@ -21,20 +21,47 @@ import (
 //   - error if any occurs during the search operation
 func Search(ctx echo.Context, table string, keyword string, param *factory.Param, columns ...string) error {
 	rows, err := getResources(ctx, table, columns...)
-	if err != nil || len(rows) == 0 {
+	if err != nil {
+		return err
+	}
+	if len(rows) == 0 {
+		if len(columns) == 0 {
+			return err
+		}
+		fields := make([]string, len(columns))
+		for i, v := range columns {
+			fields[i] = `~` + v
+		}
+		param.AddArgs(mysql.SearchFields(fields, keyword))
 		return err
 	}
 	rIDs := make([]uint, len(rows))
 	for i, v := range rows {
 		rIDs[i] = v.Id
 	}
+	fullTableName := dbschema.WithPrefix(table)
 	cond := db.NewCompounds()
 	cond.Add(db.Cond{`TR.lang`: ctx.Lang().Normalize()})
 	cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
 	cond.From(mysql.SearchField(`~TR.text`, keyword))
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
-	param.AddJoin(`INNER`, tM.Short_(), `TR`, dbschema.WithPrefix(table)+`.id = TR.row_id`).AddArgs(cond.And())
+	param.AddJoin(`INNER`, tM.Short_(), `TR`, fullTableName+`.id = TR.row_id`)
+	if len(columns) > 0 && ctx.Internal().Bool(`searchDefaultLangColumns`) {
+		fields := make([]string, len(columns))
+		for i, v := range columns {
+			fields[i] = `~` + fullTableName + `.` + v
+		}
+		param.AddArgs(db.Or(cond.And(), mysql.SearchFields(fields, keyword)))
+		return err
+	}
+	param.AddArgs(cond.And())
 	return err
+}
+
+// SetSearchDefaultLangColumns sets whether to enable default language columns in search operations.
+// The setting is stored in the echo.Context's internal data.
+func SetSearchDefaultLangColumns(ctx echo.Context, enable bool) {
+	ctx.Internal().Set(`searchDefaultLangColumns`, enable)
 }
 
 // SearchModel searches for records in the specified model using the given keyword and parameters.
