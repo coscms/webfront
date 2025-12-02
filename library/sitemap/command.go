@@ -195,10 +195,11 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 			}
 		}
 	}
+	cfg := config.FromFile()
 	var langCodes []string
 	if len(langCode) == 0 {
-		langCodes = make([]string, len(config.FromFile().Language.AllList))
-		for index, lang := range config.FromFile().Language.AllList {
+		langCodes = make([]string, len(cfg.Language.AllList))
+		for index, lang := range cfg.Language.AllList {
 			langCodes[index] = echo.NewLangCode(lang).Normalize()
 		}
 	} else {
@@ -211,9 +212,13 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	if err = prepare(langCodes); err != nil {
 		return err
 	}
-	lng := config.FromFile().NewLanguage()
+	lng := cfg.NewLanguage()
+	langs := make(map[string]bool, len(cfg.Language.AllList))
+	for _, lang := range cfg.Language.AllList {
+		langs[lang] = true
+	}
 	for _, _lang := range langCodes {
-		tr := lng.AcquireTranslator(_lang)
+		tr := lng.AcquireTranslator(eCtx, _lang, langs, cfg.Language.Default)
 		eCtx.SetTranslator(tr)
 		err = GenerateIndex(eCtx, rootURL, _lang, sitemapCfg.AllChild, subDir)
 		tr.Release()
