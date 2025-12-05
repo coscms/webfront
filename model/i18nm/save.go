@@ -38,6 +38,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 	for _, fn := range options {
 		fn(&cfg)
 	}
+	cfg.SetDefaults()
 	var hasUpload func(field string) bool
 	if pMap, ok := listener.UpdaterInfos[cfg.Project]; ok {
 		if updaterInfo, ok := pMap[table]; ok && updaterInfo != nil {

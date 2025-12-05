@@ -1,6 +1,17 @@
 package i18nm
 
-import "github.com/webx-top/echo"
+import (
+	"github.com/coscms/webcore/library/formbuilder"
+	"github.com/webx-top/echo"
+)
+
+var DefaultSaveModelTranslationsOptions = SaveModelTranslationsOptions{
+	FormNamePrefix: formbuilder.FormInputNamePrefixDefault,
+	ContentType:    map[string]string{},
+	Project:        "",
+	AutoTranslate:  false,
+	Translator:     nil,
+}
 
 type SaveModelTranslationsOptions struct {
 	FormNamePrefix string
@@ -8,6 +19,30 @@ type SaveModelTranslationsOptions struct {
 	Project        string
 	AutoTranslate  bool
 	Translator     func(ctx echo.Context, fieldName string, value string) (string, error)
+}
+
+func (o *SaveModelTranslationsOptions) SetDefaults() {
+	d := DefaultSaveModelTranslationsOptions
+	if len(o.FormNamePrefix) == 0 {
+		o.FormNamePrefix = d.FormNamePrefix
+	}
+	if len(o.Project) == 0 && len(d.Project) > 0 {
+		o.Project = d.Project
+	}
+	if o.Translator == nil && d.Translator != nil {
+		o.Translator = d.Translator
+	}
+	if !o.AutoTranslate && d.AutoTranslate {
+		o.AutoTranslate = d.AutoTranslate
+	}
+	if o.ContentType == nil {
+		o.ContentType = map[string]string{}
+	}
+	if len(o.ContentType) == 0 && len(d.ContentType) > 0 {
+		for fieldName, contentType := range d.ContentType {
+			o.ContentType[fieldName] = contentType
+		}
+	}
 }
 
 // SetContentType sets the content type for the specified field name
