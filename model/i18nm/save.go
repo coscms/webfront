@@ -32,8 +32,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 	var err error
 	table := mdl.Short_()
 	cfg := SaveModelTranslationsOptions{
-		FormNamePrefix: formbuilder.FormInputNamePrefixDefault,
-		ContentType:    map[string]string{},
+		ContentType: map[string]string{},
 	}
 	for _, fn := range options {
 		fn(&cfg)
