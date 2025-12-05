@@ -106,11 +106,14 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				}
 				continue
 			}
+			var contentType string
 			if len(cfg.ContentType) > 0 {
-				if contentType, ok := cfg.ContentType[field]; ok {
-					translate = common.ContentEncode(translate, contentType)
-				}
+				contentType, _ = cfg.ContentType[field]
 			}
+			if len(contentType) == 0 {
+				contentType = `string` // 默认string类型(单行文本)
+			}
+			translate = common.ContentEncode(translate, contentType)
 			err = tM.Get(nil, cond)
 			if err != nil {
 				if err != db.ErrNoMoreRows {
