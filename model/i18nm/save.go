@@ -3,8 +3,10 @@ package i18nm
 import (
 	"strings"
 
+	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/fileupdater/listener"
+	"github.com/coscms/webcore/library/formbuilder"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
@@ -21,7 +23,7 @@ import (
 //
 // Returns:
 //   - error: Any error encountered during the save process
-func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, formNamePrefix ...string) error {
+func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...func(*SaveModelTranslationsOptions)) error {
 	if !IsMultilingual() {
 		return nil
 	}
@@ -29,12 +31,15 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, formNamePrefi
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	var err error
 	table := mdl.Short_()
-	namePrefix := `Language`
-	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
-		namePrefix = formNamePrefix[0]
+	cfg := SaveModelTranslationsOptions{
+		FormNamePrefix: formbuilder.FormInputNamePrefixDefault,
+		ContentType:    map[string]string{},
+	}
+	for _, fn := range options {
+		fn(&cfg)
 	}
 	var hasUpload func(field string) bool
-	if pMap, ok := listener.UpdaterInfos[``]; ok {
+	if pMap, ok := listener.UpdaterInfos[cfg.Project]; ok {
 		if updaterInfo, ok := pMap[table]; ok && updaterInfo != nil {
 			hasUpload = func(field string) bool {
 				_, ok := updaterInfo[field]
@@ -78,12 +83,18 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, formNamePrefi
 			if langDefault == langCode {
 				continue
 			}
-			translate := ctx.FormAny(namePrefix+`[`+langCode+`][`+formName+`]`, namePrefix+`[`+langCode+`][`+formName2+`]`)
+			translate := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formName+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formName2+`]`)
 			cond := db.And(
 				db.Cond{`lang`: langCode},
 				db.Cond{`row_id`: id},
 				db.Cond{`resource_id`: resourceID},
 			)
+			if len(translate) == 0 && cfg.AutoTranslate && cfg.Translator != nil {
+				translate, err = cfg.Translator(ctx, field, translate)
+				if err != nil {
+					return err
+				}
+			}
 			if len(translate) == 0 {
 				if hasUpload(field) {
 					err = tM.Delete(nil, cond)
@@ -94,6 +105,11 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, formNamePrefi
 					return err
 				}
 				continue
+			}
+			if len(cfg.ContentType) > 0 {
+				if contentType, ok := cfg.ContentType[field]; ok {
+					translate = common.ContentEncode(translate, contentType)
+				}
 			}
 			err = tM.Get(nil, cond)
 			if err != nil {
@@ -134,7 +150,7 @@ func SetModelTranslationsToForm(ctx echo.Context, mdl Model, id uint64, formName
 		return nil
 	}
 	table := mdl.Short_()
-	namePrefix := `Language`
+	namePrefix := formbuilder.FormInputNamePrefixDefault
 	if len(formNamePrefix) > 0 && len(formNamePrefix[0]) > 0 {
 		namePrefix = formNamePrefix[0]
 	}
