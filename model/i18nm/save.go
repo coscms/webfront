@@ -76,14 +76,14 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		ctx.Internal().Set(`i18n_translation_resource_field`, field)
 		resourceID := rM.Id
 		tM.Reset()
-		formName := com.CamelCase(field)
-		formName2 := com.UpperCaseFirst(formName)
+		formNameL := com.CamelCase(field)
+		formNameU := com.UpperCaseFirst(formNameL)
 		langDefault := langCfg.Default
 		for _, langCode := range langCfg.AllList {
 			if langDefault == langCode {
 				continue
 			}
-			translate := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formName+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formName2+`]`)
+			translate := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formNameL+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formNameU+`]`)
 			cond := db.And(
 				db.Cond{`lang`: langCode},
 				db.Cond{`row_id`: id},
