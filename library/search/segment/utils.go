@@ -13,6 +13,11 @@ var (
 	lastLoadedDictFile string
 )
 
+// init initializes a filter that determines whether a string should be processed.
+// The filter checks:
+// - For Chinese characters (han), strings shorter than 6 characters are ignored
+// - Strings matching the 'no words' pattern are filtered out
+// - All other strings are allowed by default
 func init() {
 	AddFilter(func(v string) bool {
 		switch {

@@ -28,18 +28,24 @@ var (
 	defaultNop Segment = &nopSegment{}
 )
 
+// Register adds a new segment type with the given name and constructor function.
 func Register(name string, c func() Segment) {
 	segments.Set(name, c)
 }
 
+// IsNop reports whether the given segment is a no-operation segment.
 func IsNop(segment Segment) bool {
 	return defaultNop == segment
 }
 
+// defaultNopSegment returns the default no-operation segment instance.
 func defaultNopSegment() Segment {
 	return defaultNop
 }
 
+// Get returns the segment engine with the given name.
+// If the specified segment engine is not found, it returns a default no-op segment
+// and logs an error message.
 func Get(name string) Segment {
 	fn, ok := segments.GetOk(name)
 	if !ok || fn == nil {
@@ -49,11 +55,13 @@ func Get(name string) Segment {
 	return fn()
 }
 
+// Has checks if a segment with the given name exists in the segments collection.
 func Has(name string) bool {
 	_, ok := segments.GetOk(name)
 	return ok
 }
 
+// Unregister removes the segment with the specified name from the registry
 func Unregister(name string) {
 	segments.Delete(name)
 }

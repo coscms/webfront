@@ -42,20 +42,27 @@ var (
 	onceStopword   once.Once
 )
 
+// initDefaultSegment initializes the default segmentation engine by loading it from the DefaultEngine configuration
+// and storing it in the defaultSegment variable. This function is called during package initialization.
 func initDefaultSegment() {
 	log.Debug("[segment]Default engine:", DefaultEngine)
 	defaultSegment.Store(Get(DefaultEngine.Load()))
 }
 
+// IsInitialized reports whether the default segment has been initialized.
 func IsInitialized() bool {
 	return defaultSegment.Load() != nil
 }
 
+// Default returns the default Segment instance, initializing it if necessary.
+// The initialization is thread-safe and will only occur once.
 func Default() Segment {
 	onceSegment.Do(initDefaultSegment)
 	return defaultSegment.Load().(Segment)
 }
 
+// ResetSegment closes the current segment if it exists and resets the segment initialization state.
+// This allows for a new segment to be created on next use.
 func ResetSegment() {
 	seg := defaultSegment.Load()
 	if seg != nil {
@@ -64,15 +71,21 @@ func ResetSegment() {
 	onceSegment.Reset()
 }
 
+// ResetStopwords resets the stopwords initialization state, allowing stopwords to be reloaded on next use.
 func ResetStopwords() {
 	onceStopword.Reset()
 }
 
+// StopWords returns the list of stop words that are loaded once and cached.
+// The stop words are initialized on first call and returned from cache on subsequent calls.
 func StopWords() []string {
 	onceStopword.Do(initLoadStopWordsDict)
 	return stopWords
 }
 
+// LoadStopWordsDict loads stop words from the specified file into memory.
+// If rebuild is true, it clears existing stop words before loading new ones.
+// Non-empty lines in the file are treated as stop words after trimming whitespace.
 func LoadStopWordsDict(stopWordsFile string, args ...bool) {
 	var rebuild bool
 	if len(args) > 0 {
@@ -96,6 +109,9 @@ func LoadStopWordsDict(stopWordsFile string, args ...bool) {
 	}
 }
 
+// initLoadStopWordsDict initializes the stop words dictionary by searching for stopwords.txt
+// in predefined locations (data/sego/stopwords.txt and GOPATH/src/github.com/coscms/webfront/library/search/segment/stopwords.txt).
+// It loads the first found stop words file and stops searching. Debug logs are printed for files that cannot be accessed.
 func initLoadStopWordsDict() {
 	var stopWordsFiles []string
 	stopWordsFiles = append(stopWordsFiles, filepath.Join(echo.Wd(), `data`, `sego/stopwords.txt`))
@@ -113,6 +129,8 @@ func initLoadStopWordsDict() {
 	}
 }
 
+// CleanStopWords removes all stop words from the input string and replaces them with spaces.
+// It returns the cleaned string with stop words removed.
 func CleanStopWords(v string) string {
 	for _, word := range StopWords() {
 		v = strings.Replace(v, word, ` `, -1)
@@ -120,6 +138,8 @@ func CleanStopWords(v string) string {
 	return v
 }
 
+// CleanStopWordsFromSlice removes stop words from the input string slice and returns a new slice
+// containing only non-stop words. Stop words are loaded from StopWords() if not already initialized.
 func CleanStopWordsFromSlice(v []string) (r []string) {
 	if stopWordsMap == nil {
 		stopWordsMap = make(map[string]bool)
@@ -136,6 +156,8 @@ func CleanStopWordsFromSlice(v []string) (r []string) {
 	return r
 }
 
+// DoFilter checks if the given string passes all registered filters.
+// Returns true if all filters accept the string, false otherwise.
 func DoFilter(v string) bool {
 	for _, f := range Filters {
 		if !f(v) {
@@ -145,10 +167,15 @@ func DoFilter(v string) bool {
 	return true
 }
 
+// AddFilter appends a new filter to the global Filters collection.
 func AddFilter(filter Filter) {
 	Filters = append(Filters, filter)
 }
 
+// ApplySegmentConfig applies segment configuration from the given config object.
+// It initializes or updates the segment engine based on the configuration.
+// If the engine is 'api', it will register a new API segment with the provided URL and key.
+// The function handles engine switching and cleanup of previous segment instances.
 func ApplySegmentConfig(c *config.Config) {
 	segmentCfg := c.Extend.GetStore(`segment`)
 	segmentEngine := segmentCfg.String(`engine`)
@@ -202,18 +229,26 @@ type Segment interface {
 type nopSegment struct {
 }
 
+// LoadDict implements the Segment interface but does nothing, always returning nil.
+// dictFile is the dictionary file path to load (ignored).
+// dictType specifies optional dictionary type (ignored).
 func (s *nopSegment) LoadDict(dictFile string, dictType ...string) error {
 	return nil
 }
 
+// Segment implements the Segmenter interface but returns an empty slice for any input.
+// This is a no-op implementation that performs no actual segmentation.
 func (s *nopSegment) Segment(text string, args ...string) []string {
 	return []string{}
 }
 
+// SegmentBy segments the input text according to the specified mode and returns an empty slice.
+// This is a no-op implementation that always returns an empty result.
 func (s *nopSegment) SegmentBy(text string, mode string, args ...string) []string {
 	return []string{}
 }
 
+// Close implements the Segment interface with a no-op operation.
 func (s *nopSegment) Close() error {
 	return nil
 }

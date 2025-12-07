@@ -22,17 +22,22 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/admpub/log"
-	. "github.com/coscms/webfront/library/search/segment"
 	"github.com/huichen/sego"
 	"github.com/webx-top/echo"
+
+	. "github.com/coscms/webfront/library/search/segment"
 )
 
+// init registers the 'sego' segmenter with the New constructor function
 func init() {
 	Register(`sego`, New)
 }
 
+// New creates and returns a new Sego segmenter instance with default dictionary path.
+// The default dictionary is located at "data/sego/dict.txt" relative to the working directory.
 func New() Segment {
 	return &Sego{
 		segmenter:   &sego.Segmenter{},
@@ -43,22 +48,33 @@ func New() Segment {
 type Sego struct {
 	segmenter   *sego.Segmenter
 	defaultDict string
-	dictLoaded  bool
+	dictLoaded  atomic.Bool
 	once        sync.Once
 }
 
+// LoadDict loads a dictionary file for segmentation. Multiple dictionary files can be specified by comma-separated paths.
+// dictFile specifies the path to the dictionary file(s)
+// dictType optionally specifies the type of dictionary (not currently used)
+// Returns nil on success or an error if loading fails
 func (s *Sego) LoadDict(dictFile string, dictType ...string) error {
 	log.Debug(`[sego]LoadDict:`, dictFile)
 	s.segmenter.LoadDictionary(dictFile) //多个字典文件用半角“,”逗号分隔
-	s.dictLoaded = true
+	s.dictLoaded.Store(true)
 	return nil
 }
 
+func (s *Sego) initDict() {
+	s.LoadDict(s.defaultDict, `default`)
+}
+
+// Segment segments the input text into words with optional filtering by word types.
+//
+// text: the input string to be segmented
+// args: optional word types to filter (e.g. "n" for nouns only)
+// returns: a slice of segmented words after filtering and cleaning
 func (s *Sego) Segment(text string, args ...string) []string {
-	if !s.dictLoaded {
-		s.once.Do(func() {
-			s.LoadDict(s.defaultDict, `default`)
-		})
+	if !s.dictLoaded.Load() {
+		s.once.Do(s.initDict)
 	}
 	segments := s.segmenter.Segment([]byte(text))
 	var (
@@ -94,10 +110,13 @@ func (s *Sego) Segment(text string, args ...string) []string {
 	return words
 }
 
+// SegmentBy segments the input text using the specified mode and additional arguments.
+// It delegates to the Segment method with the provided text and arguments.
 func (s *Sego) SegmentBy(text string, mode string, args ...string) []string {
 	return s.Segment(text, args...)
 }
 
+// Close implements io.Closer interface to clean up resources when the Sego instance is no longer needed.
 func (s *Sego) Close() error {
 	return nil
 }

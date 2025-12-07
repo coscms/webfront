@@ -5,12 +5,12 @@ import (
 	"io"
 	"strings"
 
-	"github.com/webx-top/db"
-	"github.com/webx-top/echo/defaults"
-
 	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
 	"github.com/admpub/sensitive"
+	"github.com/webx-top/db"
+	"github.com/webx-top/echo/defaults"
+
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webfront/dbschema"

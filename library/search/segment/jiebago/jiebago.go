@@ -22,17 +22,22 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/admpub/log"
-	. "github.com/coscms/webfront/library/search/segment"
 	"github.com/wangbin/jiebago"
 	"github.com/webx-top/echo"
+
+	. "github.com/coscms/webfront/library/search/segment"
 )
 
+// init registers the jiebago segmenter with the default New constructor
 func init() {
 	Register(`jiebago`, New)
 }
 
+// New creates and returns a new Jieba segmenter instance with default dictionary path.
+// The default dictionary is located at 'data/sego/dict.txt' relative to the working directory.
 func New() Segment {
 	return &Jieba{
 		segmenter:   &jiebago.Segmenter{},
@@ -43,10 +48,13 @@ func New() Segment {
 type Jieba struct {
 	segmenter   *jiebago.Segmenter
 	defaultDict string
-	dictLoaded  bool
+	dictLoaded  atomic.Bool
 	once        sync.Once
 }
 
+// LoadDict loads dictionary files for Jieba segmenter. Multiple dictionary files can be specified
+// separated by commas. The first file is loaded as main dictionary, subsequent files are loaded
+// as user dictionaries. Returns nil after loading all dictionaries.
 func (s *Jieba) LoadDict(dictFile string, dictType ...string) error {
 	for index, file := range strings.Split(dictFile, `,`) { //多个字典文件用半角“,”逗号分隔
 		var err error
@@ -61,15 +69,25 @@ func (s *Jieba) LoadDict(dictFile string, dictType ...string) error {
 			log.Error(`[jiebago]LoadDict:`, err)
 		}
 	}
-	s.dictLoaded = true
+	s.dictLoaded.Store(true)
 	return nil
 }
 
+// initDict initializes the Jieba segmenter by loading the default dictionary.
+func (s *Jieba) initDict() {
+	s.LoadDict(s.defaultDict, `default`)
+}
+
+// Segment splits the input text into words using Jieba segmentation.
+// It performs the following steps:
+// - Initializes the dictionary if not loaded
+// - Uses precise mode segmentation
+// - Filters out empty words and applies word filtering
+// - Removes stop words from the result
+// Returns a slice of segmented and filtered words.
 func (s *Jieba) Segment(text string, args ...string) []string {
-	if !s.dictLoaded {
-		s.once.Do(func() {
-			s.LoadDict(s.defaultDict, `default`)
-		})
+	if !s.dictLoaded.Load() {
+		s.once.Do(s.initDict)
 	}
 	var (
 		words = []string{}
@@ -87,11 +105,14 @@ func (s *Jieba) Segment(text string, args ...string) []string {
 	return words
 }
 
+// SegmentBy segments the input text using the specified mode.
+// Supported modes: "all" (full mode), "new" (new word recognition),
+// "search" (search engine mode), or default (accurate mode).
+// Returns a slice of filtered and cleaned words after segmentation.
+// The words are filtered by DoFilter and cleaned from stop words.
 func (s *Jieba) SegmentBy(text string, mode string, args ...string) []string {
-	if !s.dictLoaded {
-		s.once.Do(func() {
-			s.LoadDict(s.defaultDict, `default`)
-		})
+	if !s.dictLoaded.Load() {
+		s.once.Do(s.initDict)
 	}
 	var (
 		words = []string{}
@@ -125,6 +146,7 @@ func (s *Jieba) SegmentBy(text string, mode string, args ...string) []string {
 	return words
 }
 
+// Close implements io.Closer interface for Jieba segmenter, currently a no-op.
 func (s *Jieba) Close() error {
 	return nil
 }

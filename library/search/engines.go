@@ -7,9 +7,7 @@ func Register(name string, engine Searcher) {
 }
 
 func Unregister(name string) {
-	if _, ok := engines[name]; ok {
-		delete(engines, name)
-	}
+	delete(engines, name)
 }
 
 func Get(name string) Searcher {
