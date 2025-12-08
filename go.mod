@@ -29,7 +29,7 @@ require (
 	github.com/admpub/pinyin-golang v1.0.1
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/redsync/v4 v4.0.3
-	github.com/admpub/resty/v2 v2.7.2
+	github.com/admpub/resty/v2 v2.7.3
 	github.com/admpub/sensitive v0.0.1
 	github.com/admpub/useragent v0.0.2
 	github.com/coscms/forms v1.16.0
@@ -66,7 +66,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739
-	github.com/admpub/translate v0.0.0-20251208040323-6bb6feffc41e
+	github.com/admpub/translate v0.0.0-20251208042346-ceb8264ba964
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.3.0
