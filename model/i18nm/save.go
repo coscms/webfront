@@ -89,8 +89,13 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				db.Cond{`row_id`: id},
 				db.Cond{`resource_id`: resourceID},
 			)
-			if len(translate) == 0 && cfg.AutoTranslate && cfg.Translator != nil {
-				translate, err = cfg.Translator(ctx, field, translate)
+			if cfg.ForceTranslate {
+				translate, err = cfg.Translate(ctx, field, translate, langCode)
+				if err != nil {
+					return err
+				}
+			} else if len(translate) == 0 && cfg.AutoTranslate {
+				translate, err = cfg.Translate(ctx, field, translate, langCode)
 				if err != nil {
 					return err
 				}

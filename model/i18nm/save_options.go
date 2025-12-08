@@ -10,17 +10,24 @@ var DefaultSaveModelTranslationsOptions = SaveModelTranslationsOptions{
 	ContentType:    map[string]string{},
 	Project:        "",
 	AutoTranslate:  false,
-	Translator:     nil,
+	translator:     nil,
 }
+
+type Translator = func(ctx echo.Context, fieldName string, value string, langCode string) (string, error)
 
 type SaveModelTranslationsOptions struct {
 	FormNamePrefix string
 	ContentType    map[string]string // map[fieldName]contentType
 	Project        string
 	AutoTranslate  bool
-	Translator     func(ctx echo.Context, fieldName string, value string) (string, error)
+	ForceTranslate bool
+	translator     Translator
 }
 
+// SetDefaults sets default values for SaveModelTranslationsOptions fields
+// when they are not explicitly set. It copies values from DefaultSaveModelTranslationsOptions
+// to the receiver for empty/zero fields including FormNamePrefix, Project,
+// translator, AutoTranslate and ContentType.
 func (o *SaveModelTranslationsOptions) SetDefaults() {
 	d := DefaultSaveModelTranslationsOptions
 	if len(o.FormNamePrefix) == 0 {
@@ -29,8 +36,8 @@ func (o *SaveModelTranslationsOptions) SetDefaults() {
 	if len(o.Project) == 0 && len(d.Project) > 0 {
 		o.Project = d.Project
 	}
-	if o.Translator == nil && d.Translator != nil {
-		o.Translator = d.Translator
+	if o.translator == nil && d.translator != nil {
+		o.translator = d.translator
 	}
 	if !o.AutoTranslate && d.AutoTranslate {
 		o.AutoTranslate = d.AutoTranslate
@@ -66,8 +73,23 @@ func (o *SaveModelTranslationsOptions) SetAutoTranslate(autoTranslate bool) {
 }
 
 // SetTranslator sets the translator function for converting field values
-func (o *SaveModelTranslationsOptions) SetTranslator(translator func(ctx echo.Context, fieldName string, value string) (string, error)) {
-	o.Translator = translator
+func (o *SaveModelTranslationsOptions) SetTranslator(translator Translator) {
+	o.translator = translator
+}
+
+// Translate translates the given field value for the specified language code.
+// If a translator function is set in options, it will be used for translation.
+// Returns the translated value or the original value if no translator is set.
+func (o *SaveModelTranslationsOptions) Translate(ctx echo.Context, fieldName string, value string, langCode string) (string, error) {
+	if o.translator != nil {
+		return o.translator(ctx, fieldName, value, langCode)
+	}
+	return value, nil
+}
+
+// SetForceTranslate sets whether to force translation updates regardless of existing translations
+func (o *SaveModelTranslationsOptions) SetForceTranslate(forceTranslate bool) {
+	o.ForceTranslate = forceTranslate
 }
 
 // OptionContentType returns a function that sets the content type for the specified field
@@ -111,7 +133,14 @@ func OptionAutoTranslate(autoTranslate bool) func(*SaveModelTranslationsOptions)
 }
 
 // OptionTranslator sets the translator function for SaveModelTranslationsOptions
-func OptionTranslator(translator func(ctx echo.Context, fieldName string, value string) (string, error)) func(*SaveModelTranslationsOptions) {
+func OptionForceTranslate(forceTranslate bool) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetForceTranslate(forceTranslate)
+	}
+}
+
+// OptionTranslator sets the translator function for SaveModelTranslationsOptions
+func OptionTranslator(translator Translator) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetTranslator(translator)
 	}
