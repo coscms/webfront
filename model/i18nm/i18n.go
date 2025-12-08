@@ -158,8 +158,8 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 	if config.FromFile().Language.Default == ctx.Lang().Normalize() {
 		return models
 	}
-	ids := make([]uint64, len(models))
-	idk := map[uint64]int{}
+	ids := make([]uint64, 0, len(models))
+	idk := map[uint64][]int{}
 	for index, row := range models {
 		var id uint64
 		switch v := row.GetField(`Id`).(type) {
@@ -173,8 +173,11 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 		if id == 0 {
 			return models
 		}
-		ids[index] = id
-		idk[id] = index
+		if _, ok := idk[id]; !ok {
+			idk[id] = []int{}
+			ids = append(ids, id)
+		}
+		idk[id] = append(idk[id], index)
 	}
 	if len(ids) == 0 {
 		return models
@@ -182,15 +185,16 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 	table := models[0].Short_()
 	translations := GetTranslations(ctx, table, ids, columns...)
 	for id, row := range translations {
-		index := idk[id]
-		rowI := map[string]interface{}{}
+		mp := map[string]interface{}{}
 		for field, text := range row {
 			if len(text) == 0 {
 				continue
 			}
-			rowI[field] = text
+			mp[field] = text
 		}
-		models[index].FromRow(rowI)
+		for _, index := range idk[id] {
+			models[index].FromRow(mp)
+		}
 	}
 	return models
 }
