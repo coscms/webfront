@@ -79,28 +79,36 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		formNameL := com.CamelCase(field)
 		formNameU := com.UpperCaseFirst(formNameL)
 		langDefault := langCfg.Default
+		originalText, _ := mdl.GetField(formNameU).(string)
 		for _, langCode := range langCfg.AllList {
 			if langDefault == langCode {
 				continue
 			}
-			translate := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formNameL+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formNameU+`]`)
+			translatedText := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formNameL+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formNameU+`]`)
 			cond := db.And(
 				db.Cond{`lang`: langCode},
 				db.Cond{`row_id`: id},
 				db.Cond{`resource_id`: resourceID},
 			)
+			var contentType string
+			if len(cfg.ContentType) > 0 {
+				contentType, _ = cfg.ContentType[field]
+			}
+			if len(contentType) == 0 {
+				contentType = `string` // 默认string类型(单行文本)
+			}
 			if cfg.ForceTranslate {
-				translate, err = cfg.Translate(ctx, field, translate, langCode)
+				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
 				}
-			} else if len(translate) == 0 && cfg.AutoTranslate {
-				translate, err = cfg.Translate(ctx, field, translate, langCode)
+			} else if len(translatedText) == 0 && cfg.AutoTranslate {
+				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
 				}
 			}
-			if len(translate) == 0 {
+			if len(translatedText) == 0 {
 				if hasUpload(field) {
 					err = tM.Delete(nil, cond)
 				} else {
@@ -111,14 +119,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				}
 				continue
 			}
-			var contentType string
-			if len(cfg.ContentType) > 0 {
-				contentType, _ = cfg.ContentType[field]
-			}
-			if len(contentType) == 0 {
-				contentType = `string` // 默认string类型(单行文本)
-			}
-			translate = common.ContentEncode(translate, contentType)
+			translatedText = common.ContentEncode(translatedText, contentType)
 			err = tM.Get(nil, cond)
 			if err != nil {
 				if err != db.ErrNoMoreRows {
@@ -127,17 +128,17 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				tM.Lang = langCode
 				tM.ResourceId = resourceID
 				tM.RowId = id
-				tM.Text = translate
+				tM.Text = translatedText
 				if hasUpload(field) {
 					_, err = tM.Insert()
 				} else {
 					_, err = tM.EventOFF().Insert()
 				}
-			} else if translate != tM.Text {
+			} else if translatedText != tM.Text {
 				if hasUpload(field) {
-					err = tM.UpdateField(nil, `text`, translate, cond)
+					err = tM.UpdateField(nil, `text`, translatedText, cond)
 				} else {
-					err = tM.EventOFF().UpdateField(nil, `text`, translate, cond)
+					err = tM.EventOFF().UpdateField(nil, `text`, translatedText, cond)
 				}
 			}
 			if err != nil {

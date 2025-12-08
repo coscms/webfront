@@ -13,7 +13,7 @@ var DefaultSaveModelTranslationsOptions = SaveModelTranslationsOptions{
 	translator:     nil,
 }
 
-type Translator = func(ctx echo.Context, fieldName string, value string, langCode string) (string, error)
+type Translator = func(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error)
 
 type SaveModelTranslationsOptions struct {
 	FormNamePrefix string
@@ -80,9 +80,9 @@ func (o *SaveModelTranslationsOptions) SetTranslator(translator Translator) {
 // Translate translates the given field value for the specified language code.
 // If a translator function is set in options, it will be used for translation.
 // Returns the translated value or the original value if no translator is set.
-func (o *SaveModelTranslationsOptions) Translate(ctx echo.Context, fieldName string, value string, langCode string) (string, error) {
+func (o *SaveModelTranslationsOptions) Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
 	if o.translator != nil {
-		return o.translator(ctx, fieldName, value, langCode)
+		return o.translator(ctx, fieldName, value, originalValue, contentType, langCode, originalLangCode)
 	}
 	return value, nil
 }
