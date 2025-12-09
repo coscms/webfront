@@ -5,22 +5,23 @@ import (
 	"github.com/webx-top/echo"
 )
 
+// DefaultSaveModelTranslationsOptions is the default options for SaveModelTranslations.
 var DefaultSaveModelTranslationsOptions = SaveModelTranslationsOptions{
 	FormNamePrefix: formbuilder.FormInputNamePrefixDefault,
 	ContentType:    map[string]string{},
 	Project:        "",
-	AutoTranslate:  false,
-	translator:     nil,
 }
 
+// Translator is a function that translates a field value to the specified language code.
 type Translator = func(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error)
 
+// SaveModelTranslationsOptions is a struct that holds options for saving model translations.
 type SaveModelTranslationsOptions struct {
 	FormNamePrefix string
 	ContentType    map[string]string // map[fieldName]contentType
 	Project        string
-	AutoTranslate  bool
-	ForceTranslate bool
+	AutoTranslate  *bool
+	ForceTranslate *bool
 	translator     Translator
 }
 
@@ -39,8 +40,11 @@ func (o *SaveModelTranslationsOptions) SetDefaults() {
 	if o.translator == nil && d.translator != nil {
 		o.translator = d.translator
 	}
-	if !o.AutoTranslate && d.AutoTranslate {
+	if o.AutoTranslate == nil && d.AutoTranslate != nil {
 		o.AutoTranslate = d.AutoTranslate
+	}
+	if o.ForceTranslate == nil && d.ForceTranslate != nil {
+		o.ForceTranslate = d.ForceTranslate
 	}
 	if o.ContentType == nil {
 		o.ContentType = map[string]string{}
@@ -69,7 +73,7 @@ func (o *SaveModelTranslationsOptions) SetProject(project string) {
 
 // SetAutoTranslate sets whether translations should be automatically generated when missing
 func (o *SaveModelTranslationsOptions) SetAutoTranslate(autoTranslate bool) {
-	o.AutoTranslate = autoTranslate
+	o.AutoTranslate = &autoTranslate
 }
 
 // SetTranslator sets the translator function for converting field values
@@ -89,7 +93,7 @@ func (o *SaveModelTranslationsOptions) Translate(ctx echo.Context, fieldName str
 
 // SetForceTranslate sets whether to force translation updates regardless of existing translations
 func (o *SaveModelTranslationsOptions) SetForceTranslate(forceTranslate bool) {
-	o.ForceTranslate = forceTranslate
+	o.ForceTranslate = &forceTranslate
 }
 
 // OptionContentType returns a function that sets the content type for the specified field

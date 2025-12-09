@@ -13,6 +13,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
+// IsMultilingual returns true if the application supports multiple languages based on the configuration
 func IsMultilingual() bool {
 	return len(config.FromFile().Language.AllList) > 1
 }
@@ -70,6 +71,15 @@ func getResources(ctx echo.Context, table string, columns ...string) ([]*dbschem
 	return rM.Objects(), err
 }
 
+// getTranslations retrieves translations for specified table rows and columns
+// Returns a nested map where outer key is row ID and inner map contains column-value pairs
+// Parameters:
+//   - ctx: echo context containing request information
+//   - table: database table name
+//   - ids: slice of row IDs to retrieve translations for
+//   - columns: optional list of specific columns to retrieve (empty for all columns)
+//
+// Returns empty map if no translations found or on error
 func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
 	if len(ids) == 0 {

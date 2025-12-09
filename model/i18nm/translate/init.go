@@ -43,21 +43,19 @@ func Translate(ctx echo.Context, fieldName string, value string, originalValue s
 	if trs == nil {
 		return value, nil
 	}
-	tc := &translate.Config{
-		Input:     originalValue,
-		From:      originalLangCode,
-		To:        langCode,
-		Format:    `text`,
-		APIConfig: cfg.APIConfig[cfg.Provider],
-	}
+	translateConfig := translate.AcquireConfig()
+	translateConfig.Input = originalValue
+	translateConfig.From = originalLangCode
+	translateConfig.To = langCode
+	translateConfig.Format = `text`
+	translateConfig.APIConfig = cfg.APIConfig[cfg.Provider]
 	switch contentType {
 	case `html`:
-		tc.Format = `html`
+		translateConfig.Format = `html`
 	case `markdown`:
-		tc.Format = `markdown`
+		translateConfig.Format = `markdown`
 	}
-	if tc.APIConfig == nil {
-		tc.APIConfig = map[string]string{}
-	}
-	return trs.Translate(ctx, tc)
+	translateConfig.SetDefaults()
+	defer translateConfig.Release()
+	return trs.Translate(ctx, translateConfig)
 }

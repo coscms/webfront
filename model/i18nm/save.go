@@ -57,6 +57,14 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		ctx.Internal().Delete(`i18n_translation_resource_table`)
 		ctx.Internal().Delete(`i18n_translation_resource_field`)
 	}()
+	var autoTranslate bool
+	var forceTranslate bool
+	if cfg.AutoTranslate != nil {
+		autoTranslate = *cfg.AutoTranslate
+	}
+	if cfg.ForceTranslate != nil {
+		forceTranslate = *cfg.ForceTranslate
+	}
 	langCfg := config.FromFile().Language
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
@@ -97,12 +105,12 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 			if len(contentType) == 0 {
 				contentType = `string` // 默认string类型(单行文本)
 			}
-			if cfg.ForceTranslate {
+			if forceTranslate {
 				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
 				}
-			} else if len(translatedText) == 0 && cfg.AutoTranslate {
+			} else if len(translatedText) == 0 && autoTranslate {
 				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
