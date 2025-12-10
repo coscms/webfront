@@ -4,15 +4,15 @@ import "github.com/coscms/webcore/library/config"
 
 // Config 配置
 type Config struct {
-	Providers           []ProviderConfig `json:"providers"`
-	On                  bool             `json:"on"`
-	AllowForceTranslate bool             `json:"allowForceTranslate"`
+	Providers           []ProviderConfig `json:"providers"`           // 翻译提供商
+	On                  bool             `json:"on"`                  // 是否开启翻译
+	AllowForceTranslate bool             `json:"allowForceTranslate"` // 是否允许强制翻译
 }
 
 // ProviderConfig 配置
 type ProviderConfig struct {
-	Provider string            `json:"provider"`
-	Config   map[string]string `json:"config"`
+	Provider string            `json:"provider"` // 翻译提供商名称
+	Config   map[string]string `json:"config"`   // 翻译提供商配置
 }
 
 // NewConfig creates and returns a new Config instance with initialized APIConfig map
