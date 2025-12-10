@@ -1,6 +1,9 @@
 package translate
 
 import (
+	"fmt"
+
+	"github.com/admpub/log"
 	"github.com/admpub/translate"
 	"github.com/webx-top/echo"
 
@@ -36,11 +39,7 @@ func init() {
 //   - error if translation fails
 func Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
 	cfg := GetConfig()
-	if len(cfg.Provider) == 0 {
-		return value, nil
-	}
-	trs := translate.GetProvider(cfg.Provider)
-	if trs == nil {
+	if len(cfg.Providers) == 0 {
 		return value, nil
 	}
 	translateConfig := translate.AcquireConfig()
@@ -48,14 +47,29 @@ func Translate(ctx echo.Context, fieldName string, value string, originalValue s
 	translateConfig.From = originalLangCode
 	translateConfig.To = langCode
 	translateConfig.Format = `text`
-	translateConfig.APIConfig = cfg.APIConfig[cfg.Provider]
 	switch contentType {
 	case `html`:
 		translateConfig.Format = `html`
 	case `markdown`:
 		translateConfig.Format = `markdown`
 	}
-	translateConfig.SetDefaults()
 	defer translateConfig.Release()
-	return trs.Translate(ctx, translateConfig)
+	var err error
+	var translatedText string
+	for _, provider := range cfg.Providers {
+		trs := translate.GetProvider(provider.Provider)
+		if trs == nil {
+			err = fmt.Errorf(`invalid provider: %s`, provider)
+			continue
+		}
+		translateConfig.APIConfig = provider.Config
+		translateConfig.SetDefaults()
+		translatedText, err = trs.Translate(ctx, translateConfig)
+		if err != nil {
+			log.Debugf(`[i18nm.Translate] %v`, err)
+			continue
+		}
+		return translatedText, nil
+	}
+	return value, err
 }
