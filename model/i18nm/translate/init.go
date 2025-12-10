@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/config/extend"
+	formbuilderCore "github.com/coscms/webcore/library/formbuilder"
 	"github.com/coscms/webfront/model/i18nm"
 
 	_ "github.com/admpub/translate/providers"
@@ -21,9 +22,18 @@ func init() {
 	i18nm.DefaultSaveModelTranslationsOptions.SetAllowForceTranslate(func(ctx echo.Context) bool {
 		return GetConfig().AllowForceTranslate
 	})
-	extend.Register(`translate`, func() interface{} {
-		return NewConfig()
-	})
+	extend.Register(`translate`, initTranslateConfig)
+	formbuilderCore.TranslateableGetter = func(ctx echo.Context) bool {
+		cfg := GetConfig()
+		if !cfg.On || len(cfg.Providers) == 0 {
+			return false
+		}
+		return cfg.AllowForceTranslate
+	}
+}
+
+func initTranslateConfig() interface{} {
+	return NewConfig()
 }
 
 // Translate translates the given value from originalLangCode to langCode based on content type.
