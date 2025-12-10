@@ -1,6 +1,8 @@
 package i18nm
 
 import (
+	"strings"
+
 	"github.com/coscms/webcore/library/formbuilder"
 	"github.com/webx-top/echo"
 )
@@ -89,7 +91,7 @@ func (o *SaveModelTranslationsOptions) SetTranslator(translator Translator) {
 // If a translator function is set in options, it will be used for translation.
 // Returns the translated value or the original value if no translator is set.
 func (o *SaveModelTranslationsOptions) Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
-	if len(originalValue) == 0 {
+	if len(strings.TrimSpace(originalValue)) == 0 {
 		return value, nil
 	}
 	if o.translator != nil {
