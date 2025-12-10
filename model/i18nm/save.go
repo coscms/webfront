@@ -59,11 +59,19 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 	}()
 	var autoTranslate bool
 	var forceTranslate bool
+	var allowForceTranslate bool
 	if cfg.AutoTranslate != nil {
 		autoTranslate = *cfg.AutoTranslate
 	}
-	if cfg.ForceTranslate != nil {
-		forceTranslate = *cfg.ForceTranslate
+	if cfg.AllowForceTranslate != nil {
+		allowForceTranslate = cfg.AllowForceTranslate(ctx)
+	}
+	if allowForceTranslate {
+		if cfg.ForceTranslate != nil {
+			forceTranslate = *cfg.ForceTranslate
+		} else {
+			forceTranslate = ctx.Formx(`forceTranslate`).Bool()
+		}
 	}
 	langCfg := config.FromFile().Language
 	for field, info := range dbschema.DBI.Fields[table] {

@@ -4,7 +4,9 @@ import "github.com/coscms/webcore/library/config"
 
 // Config 配置
 type Config struct {
-	Providers []ProviderConfig `json:"providers"`
+	Providers           []ProviderConfig `json:"providers"`
+	On                  bool             `json:"on"`
+	AllowForceTranslate bool             `json:"allowForceTranslate"`
 }
 
 // ProviderConfig 配置
@@ -34,6 +36,8 @@ func NewConfig() *Config {
 //					}
 //				}
 //			]
+//			on : true
+//			allowForceTranslate : true
 //		}
 //	}
 func GetConfig() *Config {

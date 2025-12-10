@@ -17,12 +17,13 @@ type Translator = func(ctx echo.Context, fieldName string, value string, origina
 
 // SaveModelTranslationsOptions is a struct that holds options for saving model translations.
 type SaveModelTranslationsOptions struct {
-	FormNamePrefix string
-	ContentType    map[string]string // map[fieldName]contentType
-	Project        string
-	AutoTranslate  *bool
-	ForceTranslate *bool
-	translator     Translator
+	FormNamePrefix      string
+	ContentType         map[string]string // map[fieldName]contentType
+	Project             string
+	AutoTranslate       *bool
+	ForceTranslate      *bool
+	AllowForceTranslate func(echo.Context) bool
+	translator          Translator
 }
 
 // SetDefaults sets default values for SaveModelTranslationsOptions fields
@@ -45,6 +46,9 @@ func (o *SaveModelTranslationsOptions) SetDefaults() {
 	}
 	if o.ForceTranslate == nil && d.ForceTranslate != nil {
 		o.ForceTranslate = d.ForceTranslate
+	}
+	if o.AllowForceTranslate == nil && d.AllowForceTranslate != nil {
+		o.AllowForceTranslate = d.AllowForceTranslate
 	}
 	if o.ContentType == nil {
 		o.ContentType = map[string]string{}
@@ -96,6 +100,11 @@ func (o *SaveModelTranslationsOptions) SetForceTranslate(forceTranslate bool) {
 	o.ForceTranslate = &forceTranslate
 }
 
+// SetAllowForceTranslate sets whether to allow force translation updates
+func (o *SaveModelTranslationsOptions) SetAllowForceTranslate(allowForceTranslate func(echo.Context) bool) {
+	o.AllowForceTranslate = allowForceTranslate
+}
+
 // OptionContentType returns a function that sets the content type for the specified field
 // in SaveModelTranslationsOptions. The returned function can be used as an option when saving
 // model translations.
@@ -140,6 +149,14 @@ func OptionAutoTranslate(autoTranslate bool) func(*SaveModelTranslationsOptions)
 func OptionForceTranslate(forceTranslate bool) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetForceTranslate(forceTranslate)
+	}
+}
+
+// OptionAllowForceTranslate 返回一个配置函数，用于设置是否允许强制翻译
+// allowForceTranslate: 是否允许强制覆盖现有翻译
+func OptionAllowForceTranslate(allowForceTranslate func(echo.Context) bool) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetAllowForceTranslate(allowForceTranslate)
 	}
 }
 

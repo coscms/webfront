@@ -18,6 +18,9 @@ import (
 // for creating new translation configurations under the "translate" extension point.
 func init() {
 	i18nm.DefaultSaveModelTranslationsOptions.SetTranslator(Translate)
+	i18nm.DefaultSaveModelTranslationsOptions.SetAllowForceTranslate(func(ctx echo.Context) bool {
+		return GetConfig().AllowForceTranslate
+	})
 	extend.Register(`translate`, func() interface{} {
 		return NewConfig()
 	})
@@ -39,7 +42,7 @@ func init() {
 //   - error if translation fails
 func Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
 	cfg := GetConfig()
-	if len(cfg.Providers) == 0 {
+	if !cfg.On || len(cfg.Providers) == 0 {
 		return value, nil
 	}
 	translateConfig := translate.AcquireConfig()
