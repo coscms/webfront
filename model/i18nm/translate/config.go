@@ -29,10 +29,10 @@ func NewConfig() *Config {
 //		translate : {
 //			providers : [
 //				{
-//					provider  : "tencent",
+//					provider  : "tencent"
 //					config : {
-//						"appid": "",
-//						"secret": ""
+//						appid  : ""
+//						secret : ""
 //					}
 //				}
 //			]
