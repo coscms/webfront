@@ -1,6 +1,9 @@
 package i18nm
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/admpub/log"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/db/lib/factory"
@@ -8,6 +11,7 @@ import (
 
 // ListenTable listen table
 func ListenTable() {
+	var tables []string
 	for table, fieldInfo := range dbschema.DBI.Fields {
 		var hasMultilingual bool
 		for _, info := range fieldInfo {
@@ -28,6 +32,11 @@ func ListenTable() {
 			err := DeleteModelTranslations(m.Context(), m, id)
 			return err
 		}, table)
-		log.Infof(`[i18nm.ListenTable] %v`, table)
+		tables = append(tables, table)
 	}
+	if len(tables) == 0 {
+		return
+	}
+	sort.Strings(tables)
+	log.Infof(`[i18nm.ListenTable] %v`, strings.Join(tables, `, `))
 }
