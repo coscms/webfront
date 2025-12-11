@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/coscms/webcore/cmd"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/model/i18nm"
 	"github.com/spf13/cobra"
 	"github.com/webx-top/echo/defaults"
@@ -20,7 +21,10 @@ func dbI18nResourceRunE(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return cmd.Usage()
 	}
-	var err error
+	err := config.ParseConfig()
+	if err != nil {
+		return err
+	}
 	operation := args[0]
 	switch operation {
 	case `init`:
