@@ -106,8 +106,8 @@ type OfficialAdSettings struct {
 	Value    string `db:"value" bson:"value" comment:"值" json:"value" xml:"value"`
 	VStart   uint   `db:"v_start" bson:"v_start" comment:"起始值" json:"v_start" xml:"v_start"`
 	VEnd     uint   `db:"v_end" bson:"v_end" comment:"结束值" json:"v_end" xml:"v_end"`
-	TStart   uint   `db:"t_start" bson:"t_start" comment:"起始时间" json:"t_start" xml:"t_start"`
-	TEnd     uint   `db:"t_end" bson:"t_end" comment:"结束时间" json:"t_end" xml:"t_end"`
+	TStart   uint   `db:"t_start" bson:"t_start" comment:"起始时间" json:"t_start" xml:"t_start" form_decoder:"time2unix" form_encoder:"unix2time"`
+	TEnd     uint   `db:"t_end" bson:"t_end" comment:"结束时间" json:"t_end" xml:"t_end" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Disabled string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 }
 

@@ -32,8 +32,8 @@ CREATE TABLE `official_ad_item` (
   `mode` enum('CPA','CPM','CPC','CPS','CPT') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'CPS' COMMENT '广告模式',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '广告链接',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
-  `start` int unsigned NOT NULL DEFAULT '0' COMMENT '生效起始时间',
-  `end` int unsigned NOT NULL DEFAULT '0' COMMENT '生效结束时间',
+  `start` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`生效起始时间',
+  `end` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`生效结束时间',
   `sort` int NOT NULL DEFAULT '500' COMMENT '序号',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
@@ -57,7 +57,7 @@ CREATE TABLE `official_ad_position` (
   `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '位置名称',
   `width` int unsigned NOT NULL DEFAULT '0' COMMENT '宽度',
   `height` int unsigned NOT NULL DEFAULT '0' COMMENT '高度',
-  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '默认内容',
+  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`默认内容',
   `contype` enum('text','image','video','audio') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'image' COMMENT '内容类型',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '广告链接',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
@@ -102,8 +102,8 @@ CREATE TABLE `official_ad_settings` (
   `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '`i18n`值',
   `v_start` int unsigned NOT NULL DEFAULT '0' COMMENT '起始值',
   `v_end` int unsigned NOT NULL DEFAULT '0' COMMENT '结束值',
-  `t_start` int unsigned NOT NULL DEFAULT '0' COMMENT '起始时间',
-  `t_end` int unsigned NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `t_start` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`起始时间',
+  `t_end` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`结束时间',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='广告设置';
@@ -1223,4 +1223,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-11  4:55:13
+-- Dump completed on 2025-12-11  5:26:00
