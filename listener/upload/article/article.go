@@ -10,7 +10,6 @@ import (
 	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webcore/registry/upload/thumb"
 	"github.com/coscms/webfront/dbschema"
-	"github.com/coscms/webfront/model/i18nm"
 	"github.com/coscms/webfront/model/official"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 )
@@ -47,7 +46,6 @@ func init() {
 				return err
 			}
 		}
-		err = i18nm.DeleteModelTranslations(m.Context(), m, fm.Id)
 		return err
 	}, `official_common_article`)
 }

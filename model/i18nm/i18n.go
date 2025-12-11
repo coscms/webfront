@@ -128,15 +128,7 @@ func GetModelTranslations(ctx echo.Context, mdl Model, columns ...string) {
 	if !IsMultilingual() {
 		return
 	}
-	var id uint64
-	switch v := mdl.GetField(`Id`).(type) {
-	case uint64:
-		id = v
-	case uint:
-		id = uint64(v)
-	default:
-		return
-	}
+	id := GetRowID(mdl)
 	if id == 0 {
 		return
 	}
@@ -171,15 +163,7 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 	ids := make([]uint64, 0, len(models))
 	idk := map[uint64][]int{}
 	for index, row := range models {
-		var id uint64
-		switch v := row.GetField(`Id`).(type) {
-		case uint64:
-			id = v
-		case uint:
-			id = uint64(v)
-		default:
-			return models
-		}
+		id := GetRowID(row)
 		if id == 0 {
 			return models
 		}
