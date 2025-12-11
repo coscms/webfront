@@ -60,6 +60,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 	var autoTranslate bool
 	var forceTranslate bool
 	var allowForceTranslate bool
+	var trimOverflowText bool
 	if cfg.AutoTranslate != nil {
 		autoTranslate = *cfg.AutoTranslate
 	}
@@ -72,6 +73,9 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		} else {
 			forceTranslate = ctx.Formx(`forceTranslate`).Bool()
 		}
+	}
+	if cfg.TrimOverflowText != nil {
+		trimOverflowText = *cfg.TrimOverflowText
 	}
 	langCfg := config.FromFile().Language
 	for field, info := range dbschema.DBI.Fields[table] {
@@ -135,10 +139,10 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				}
 				continue
 			}
-			if info.GetMaxSize() > 0 && len(translatedText) > info.GetMaxSize() {
+			translatedText = common.ContentEncode(translatedText, contentType)
+			if trimOverflowText && info.GetMaxSize() > 0 && len(translatedText) > info.GetMaxSize() {
 				translatedText = info.TrimOverflowText(translatedText)
 			}
-			translatedText = common.ContentEncode(translatedText, contentType)
 			err = tM.Get(nil, cond)
 			if err != nil {
 				if err != db.ErrNoMoreRows {

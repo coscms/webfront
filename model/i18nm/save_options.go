@@ -24,6 +24,7 @@ type SaveModelTranslationsOptions struct {
 	Project             string
 	AutoTranslate       *bool
 	ForceTranslate      *bool
+	TrimOverflowText    *bool
 	AllowForceTranslate func(echo.Context) bool
 	translator          Translator
 }
@@ -80,6 +81,11 @@ func (o *SaveModelTranslationsOptions) SetProject(project string) {
 // SetAutoTranslate sets whether translations should be automatically generated when missing
 func (o *SaveModelTranslationsOptions) SetAutoTranslate(autoTranslate bool) {
 	o.AutoTranslate = &autoTranslate
+}
+
+// SetTrimOverflowText sets whether to trim overflow text when saving translations
+func (o *SaveModelTranslationsOptions) SetTrimOverflowText(trimOverflowText bool) {
+	o.TrimOverflowText = &trimOverflowText
 }
 
 // SetTranslator sets the translator function for converting field values
@@ -162,6 +168,14 @@ func OptionForceTranslate(forceTranslate bool) func(*SaveModelTranslationsOption
 func OptionAllowForceTranslate(allowForceTranslate func(echo.Context) bool) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetAllowForceTranslate(allowForceTranslate)
+	}
+}
+
+// OptionTrimOverflowText returns a function option that sets whether to trim overflow text when saving translations
+// trimOverflowText: if true, will trim text that exceeds the field length limit
+func OptionTrimOverflowText(trimOverflowText bool) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetTrimOverflowText(trimOverflowText)
 	}
 }
 
