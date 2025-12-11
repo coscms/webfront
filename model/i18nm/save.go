@@ -135,6 +135,9 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				}
 				continue
 			}
+			if info.GetMaxSize() > 0 && len(translatedText) > info.GetMaxSize() {
+				translatedText = info.TrimOverflowText(translatedText)
+			}
 			translatedText = common.ContentEncode(translatedText, contentType)
 			err = tM.Get(nil, cond)
 			if err != nil {
