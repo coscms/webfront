@@ -9,14 +9,14 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
-var i18nResourceCmd = &cobra.Command{
-	Use:   "i18nResource",
+var dbI18nResourceCmd = &cobra.Command{
+	Use:   "dbI18nResource",
 	Short: "official_i18n_resource table initialize",
-	Long:  `Usage ./webx i18nResource init`,
-	RunE:  i18nResourceRunE,
+	Long:  `Usage ./webx dbI18nResource init`,
+	RunE:  dbI18nResourceRunE,
 }
 
-func i18nResourceRunE(cmd *cobra.Command, args []string) error {
+func dbI18nResourceRunE(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return cmd.Usage()
 	}
@@ -32,5 +32,5 @@ func i18nResourceRunE(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	cmd.Add(i18nResourceCmd)
+	cmd.Add(dbI18nResourceCmd)
 }
