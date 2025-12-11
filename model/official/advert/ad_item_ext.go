@@ -53,11 +53,11 @@ func (c *CachedAdvert) GenHTML() *CachedAdvert {
 func GetCachedAdvert(ctx echo.Context, idents ...string) (*CachedAdvert, error) {
 	res := &CachedAdvert{}
 	if len(idents) > 0 {
-		key := `advert:` + strings.Join(idents, `,`)
+		key := `advert:` + ctx.Lang().Normalize() + `:` + strings.Join(idents, `,`)
 		err := cache.XFunc(ctx, key, res, func() error {
 			m := NewAdPosition(ctx)
 			var err error
-			res.List, err = m.GetAdvertsByIdent(idents...)
+			res.List, err = m.GetAdvertsByIdent(true, idents...)
 			if err != nil {
 				return err
 			}

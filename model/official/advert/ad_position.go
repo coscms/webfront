@@ -11,6 +11,7 @@ import (
 	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/model/i18nm"
 )
 
 func NewAdPosition(ctx echo.Context) *AdPosition {
@@ -126,20 +127,20 @@ func GenAdvertCondition() db.Compounds {
 	}
 }
 
-func (f *AdPosition) GetAdvertsByIdent(idents ...string) (PositionAdverts, error) {
+func (f *AdPosition) GetAdvertsByIdent(multilingual bool, idents ...string) (PositionAdverts, error) {
 	_, err := f.OfficialAdPosition.ListByOffset(nil, nil, 0, -1, db.And(
 		db.Cond{`ident`: db.In(idents)},
 		db.Cond{`disabled`: `N`},
 	))
 	if err != nil {
-		if err == db.ErrNoMoreRows {
-			err = nil
-		}
 		return nil, err
 	}
 	positions := f.OfficialAdPosition.Objects()
 	if len(positions) == 0 {
 		return nil, nil
+	}
+	if multilingual {
+		i18nm.GetModelsTranslations(f.Context(), positions)
 	}
 	posIDs := make([]uint64, len(positions))
 	posIDi := map[uint64]*dbschema.OfficialAdPosition{}
@@ -154,7 +155,14 @@ func (f *AdPosition) GetAdvertsByIdent(idents ...string) (PositionAdverts, error
 	_, err = item.ListByOffset(nil, func(r db.Result) db.Result {
 		return r.OrderBy(`position_id`, `sort`, `id`)
 	}, 0, -1, cond.And(GenAdvertCondition()...))
-	for _, row := range item.Objects() {
+	if err != nil {
+		return nil, err
+	}
+	adverts := item.Objects()
+	if multilingual {
+		i18nm.GetModelsTranslations(f.Context(), adverts)
+	}
+	for _, row := range adverts {
 		pos := posIDi[row.PositionId]
 		if _, ok := list[pos.Ident]; !ok {
 			list[pos.Ident] = ItemsResponse{}
