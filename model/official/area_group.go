@@ -6,6 +6,7 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webfront/dbschema"
 )
@@ -36,6 +37,10 @@ func (f *AreaGroup) ExistsOther(countryAbbr string, abbr string, id uint) (bool,
 }
 
 func (f *AreaGroup) check() error {
+	f.Name = strings.TrimSpace(f.Name)
+	if len(f.Name) == 0 {
+		return f.Context().NewError(code.InvalidParameter, `请输入地区组名称`).SetZone(`name`)
+	}
 	var (
 		exists bool
 		err    error
