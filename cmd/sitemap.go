@@ -10,14 +10,17 @@ import (
 	"github.com/coscms/webfront/library/sitemap"
 )
 
+var executable = cmd.Executable()
+
 var sitemapCmd = &cobra.Command{
 	Use:   "sitemap",
 	Short: "sitemap generate",
-	Long: `Usage ./webx sitemap <rootURL> [languageCode...]
-删除所有: ./webx sitemap --mode=clear
-删除指定域名或者指定语言: ./webx sitemap --mode=clear <rootURL> en,zh-CN
-删除所有域名下指定语言: ./webx sitemap --mode=clear all en,zh-CN`,
-	RunE: sitemapRunE,
+	Long: `Usage ` + executable + ` sitemap <rootURL> [languageCode...]
+删除所有: ` + executable + ` sitemap --mode=clear
+删除指定域名或者指定语言: ` + executable + ` sitemap --mode=clear <rootURL> en,zh-CN
+删除所有域名下指定语言: ` + executable + ` sitemap --mode=clear all en,zh-CN`,
+	Example: executable + ` sitemap https://mysite en,zh-CN`,
+	RunE:    sitemapRunE,
 }
 
 var sitemapCfg = sitemap.NewConfig()

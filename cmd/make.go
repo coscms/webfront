@@ -12,7 +12,7 @@ import (
 var makeCmd = &cobra.Command{
 	Use:   "make",
 	Short: "Generate code",
-	Long:  `Usage ./webx  make --group "official/b2c" --switchableFields "online"`,
+	Long:  `Usage ` + executable + ` make --group "official/b2c" --switchableFields "online"`,
 	RunE:  makeRunE,
 }
 

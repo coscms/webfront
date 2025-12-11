@@ -11,10 +11,11 @@ import (
 )
 
 var dbI18nResourceCmd = &cobra.Command{
-	Use:   "dbI18nResource",
-	Short: "official_i18n_resource table initialize",
-	Long:  `Usage ./webx dbI18nResource init`,
-	RunE:  dbI18nResourceRunE,
+	Use:     "dbI18nResource",
+	Short:   "official_i18n_resource table initialize",
+	Long:    `Usage ` + executable + ` dbI18nResource init`,
+	Example: executable + ` dbI18nResource init`,
+	RunE:    dbI18nResourceRunE,
 }
 
 func dbI18nResourceRunE(cmd *cobra.Command, args []string) error {

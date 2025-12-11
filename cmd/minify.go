@@ -18,7 +18,7 @@ import (
 var minifyCmd = &cobra.Command{
 	Use:   "minify",
 	Short: "minify file",
-	Long:  `Usage ./webx minify src.jpg dest.jpg`,
+	Long:  `Usage ` + executable + ` minify src.jpg dest.jpg`,
 	RunE:  minifyRunE,
 }
 
