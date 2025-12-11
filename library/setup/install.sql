@@ -730,8 +730,8 @@ DROP TABLE IF EXISTS `official_customer_group_package`;
 CREATE TABLE `official_customer_group_package` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `group` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '等级组',
-  `title` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标题',
-  `description` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '说明',
+  `title` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`标题',
+  `description` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`说明',
   `price` decimal(12,2) unsigned NOT NULL COMMENT '价格',
   `time_duration` int unsigned NOT NULL DEFAULT '0' COMMENT '时间长度',
   `time_unit` enum('day','week','month','year','forever') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'forever' COMMENT '时间单位',
@@ -1223,4 +1223,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-28 12:11:36
+-- Dump completed on 2025-12-11  4:55:13
