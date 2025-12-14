@@ -15,9 +15,10 @@ var Contype = official.Contype
 
 type ArticleWithOwner struct {
 	*dbschema.OfficialCommonArticle
-	User     *modelAuthor.User     `db:"-,relation=id:owner_id|gtZero|eq(owner_type:user),columns=id&username&avatar" json:",omitempty"`
-	Customer *modelAuthor.Customer `db:"-,relation=id:owner_id|gtZero|eq(owner_type:customer),columns=id&name&avatar" json:",omitempty"`
-	Category *Category             `db:"-,relation=id:category_id|gtZero,columns=id&name" json:",omitempty"`
+	User     *modelAuthor.User              `db:"-,relation=id:owner_id|gtZero|eq(owner_type:user),columns=id&username&avatar" json:",omitempty"`
+	Customer *modelAuthor.Customer          `db:"-,relation=id:owner_id|gtZero|eq(owner_type:customer),columns=id&name&avatar" json:",omitempty"`
+	Category *Category                      `db:"-,relation=id:category_id|gtZero,columns=id&name" json:",omitempty"`
+	TagList  []*dbschema.OfficialCommonTags `db:"-,relation=name:tags|notEmpty|split" json:",omitempty"`
 }
 
 func MultilingualArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
@@ -25,25 +26,21 @@ func MultilingualArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
 		return
 	}
 	i18nm.GetModelsTranslations(ctx, list)
-	cateIDs := map[uint][]int{}
 	categories := []*Category{}
-	for i, a := range list {
+	tagList := []*dbschema.OfficialCommonTags{}
+	for _, a := range list {
 		if a.Category != nil {
-			if _, ok := cateIDs[a.Category.Id]; !ok {
-				cateIDs[a.Category.Id] = []int{}
-				categories = append(categories, a.Category)
-			}
-			cateIDs[a.Category.Id] = append(cateIDs[a.Category.Id], i)
+			categories = append(categories, a.Category)
+		}
+		if a.TagList != nil {
+			tagList = append(tagList, a.TagList...)
 		}
 	}
-	if len(categories) == 0 {
-		return
+	if len(categories) > 0 {
+		i18nm.GetModelsTranslations(ctx, categories, `name`)
 	}
-	i18nm.GetModelsTranslations(ctx, categories, `name`)
-	for _, v := range categories {
-		for _, i := range cateIDs[v.Id] {
-			list[i].Category.Name = v.Name
-		}
+	if len(tagList) > 0 {
+		i18nm.GetModelsTranslations(ctx, tagList, `name`)
 	}
 }
 
