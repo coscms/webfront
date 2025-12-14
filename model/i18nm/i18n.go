@@ -1,6 +1,7 @@
 package i18nm
 
 import (
+	"database/sql"
 	"maps"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
 
@@ -126,7 +128,14 @@ func GetModelTranslationsByIDs(ctx echo.Context, mdl Model, ids []uint64, column
 // It first gets the resource ID from the model and column, then looks up the translation matching the given text.
 // Returns the row ID if found, or 0 with an error if the resource or translation cannot be found.
 func GetModelRowID(ctx echo.Context, mdl Model, column string, text string) (uint64, error) {
-	rows, err := getResources(ctx, mdl.Short_(), column)
+	return GetResourceRowID(ctx, mdl.Short_(), column, text)
+}
+
+// GetResourceRowID retrieves the row ID for a given internationalized text in the specified table and column.
+// It first looks up the resource ID for the table-column pair, then finds the translation matching the given text and language.
+// Returns the row ID (0 if not found) and any error that occurred during the lookup.
+func GetResourceRowID(ctx echo.Context, table string, column string, text string) (uint64, error) {
+	rows, err := getResources(ctx, table, column)
 	if err != nil || len(rows) == 0 {
 		return 0, err
 	}
@@ -145,6 +154,31 @@ func GetModelRowID(ctx echo.Context, mdl Model, column string, text string) (uin
 		}
 	}
 	return tM.RowId, nil
+}
+
+// GetColumnDefaultLangText retrieves the default language text for a specific column in a table.
+// It first gets the resource row ID using GetResourceRowID, then queries the database for the column value.
+// Returns the text in default language or empty string if not found, along with any error encountered.
+func GetColumnDefaultLangText(ctx echo.Context, table string, column string, text string) (string, error) {
+	rowID, err := GetResourceRowID(ctx, table, column, text)
+	if err != nil {
+		return ``, err
+	}
+	p := factory.ParamPoolGet()
+	defer p.Release()
+	var row *sql.Row
+	row, err = p.SetCollection(dbschema.WithPrefix(table)).SetMW(func(r db.Result) db.Result {
+		return r.Select(column)
+	}).SetArgs(db.Cond{`row_id`: rowID}).QueryRow()
+	if err != nil {
+		if err == db.ErrNoMoreRows {
+			err = nil
+		}
+		return ``, err
+	}
+	result := sql.NullString{}
+	err = row.Scan(&result)
+	return result.String, err
 }
 
 // GetModelTranslations retrieves translations for a model instance by its ID.
