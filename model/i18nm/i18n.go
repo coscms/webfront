@@ -1,7 +1,6 @@
 package i18nm
 
 import (
-	"database/sql"
 	"maps"
 	"strings"
 
@@ -179,19 +178,19 @@ func GetColumnDefaultLangText(ctx echo.Context, table string, column string, tex
 	}
 	p := factory.ParamPoolGet()
 	defer p.Release()
-	var row *sql.Row
-	row, err = p.SetCollection(dbschema.WithPrefix(table)).SetMW(func(r db.Result) db.Result {
-		return r.Select(column)
-	}).SetArgs(db.Cond{`row_id`: rowID}).QueryRow()
+	row := struct {
+		V string `db:"_v"`
+	}{}
+	err = p.SetCollection(dbschema.WithPrefix(table)).SetMW(func(r db.Result) db.Result {
+		return r.Select(db.Raw(column + ` AS _v`))
+	}).SetArgs(db.Cond{`id`: rowID}).SetRecv(&row).One()
 	if err != nil {
 		if err == db.ErrNoMoreRows {
 			err = nil
 		}
 		return ``, err
 	}
-	result := sql.NullString{}
-	err = row.Scan(&result)
-	return result.String, err
+	return row.V, err
 }
 
 // GetModelTranslations retrieves translations for a model instance by its ID.
