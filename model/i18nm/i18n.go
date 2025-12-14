@@ -20,6 +20,16 @@ func IsMultilingual() bool {
 	return len(config.FromFile().Language.AllList) > 1
 }
 
+// LangIsDefault checks if the given language is the default language configured in the system.
+func LangIsDefault(lang string) bool {
+	return lang == config.FromFile().Language.Default
+}
+
+// IsDefaultLang checks if the current language in context is the default language
+func IsDefaultLang(ctx echo.Context) bool {
+	return LangIsDefault(ctx.Lang().Normalize())
+}
+
 // SetTranstationsTTL sets the TTL (Time To Live) for translations in the given echo context.
 // The ttl parameter specifies the duration in seconds that translations should be cached.
 func SetTranstationsTTL(ctx echo.Context, ttl int64) {
@@ -160,6 +170,9 @@ func GetResourceRowID(ctx echo.Context, table string, column string, text string
 // It first gets the resource row ID using GetResourceRowID, then queries the database for the column value.
 // Returns the text in default language or empty string if not found, along with any error encountered.
 func GetColumnDefaultLangText(ctx echo.Context, table string, column string, text string) (string, error) {
+	if !IsMultilingual() || IsDefaultLang(ctx) {
+		return text, nil
+	}
 	rowID, err := GetResourceRowID(ctx, table, column, text)
 	if err != nil {
 		return ``, err
@@ -217,10 +230,7 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 	if len(models) == 0 {
 		return models
 	}
-	if !IsMultilingual() {
-		return models
-	}
-	if config.FromFile().Language.Default == ctx.Lang().Normalize() {
+	if !IsMultilingual() || IsDefaultLang(ctx) {
 		return models
 	}
 	ids := make([]uint64, 0, len(models))
