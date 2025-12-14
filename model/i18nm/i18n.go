@@ -60,7 +60,11 @@ func getResources(ctx echo.Context, table string, columns ...string) ([]*dbschem
 		for i, v := range columns {
 			columns[i] = table + `.` + v
 		}
-		condVal = db.In(columns)
+		if len(columns) == 1 {
+			condVal = columns[0]
+		} else {
+			condVal = db.In(columns)
+		}
 	} else {
 		condVal = db.Like(table + `.%`)
 	}
@@ -116,6 +120,31 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 // The translations are fetched using the model's context and table name.
 func GetModelTranslationsByIDs(ctx echo.Context, mdl Model, ids []uint64, columns ...string) map[uint64]map[string]string {
 	return GetTranslations(ctx, mdl.Short_(), ids, columns...)
+}
+
+// GetModelRowID retrieves the row ID of a model based on the specified column and text in the current language context.
+// It first gets the resource ID from the model and column, then looks up the translation matching the given text.
+// Returns the row ID if found, or 0 with an error if the resource or translation cannot be found.
+func GetModelRowID(ctx echo.Context, mdl Model, column string, text string) (uint64, error) {
+	rows, err := getResources(ctx, mdl.Short_(), column)
+	if err != nil || len(rows) == 0 {
+		return 0, err
+	}
+	resID := rows[0].Id
+	tM := dbschema.NewOfficialI18nTranslation(ctx)
+	err = tM.Get(func(r db.Result) db.Result {
+		return r.Select(`row_id`)
+	}, db.And(
+		db.Cond{`lang`: ctx.Lang().Normalize()},
+		db.Cond{`resource_id`: resID},
+		db.Cond{`text`: text},
+	))
+	if err != nil {
+		if err == db.ErrNoMoreRows {
+			err = nil
+		}
+	}
+	return tM.RowId, nil
 }
 
 // GetModelTranslations retrieves translations for a model instance by its ID.
