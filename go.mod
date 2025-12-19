@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251216113030-233b10b1d9cc
+require github.com/coscms/webcore v0.13.3-0.20251219095148-43b5ae382b32
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -117,7 +117,7 @@ require (
 	github.com/admpub/go-ps v0.0.1 // indirect
 	github.com/admpub/go-reuseport v0.5.0 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
-	github.com/admpub/go-zbar-wasm v0.0.0-20251216112504-432bea056f3a // indirect
+	github.com/admpub/go-zbar-wasm v0.0.0-20251219053451-e85456633a16 // indirect
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
