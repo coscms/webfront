@@ -350,8 +350,8 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 //
 //	返回一个切片，每个元素是一个映射，包含对应模型的多语言翻译数据
 //	映射的键是语言代码，值是字段到翻译文本的映射
-func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...string) []map[string]echo.H {
-	var result []map[string]echo.H
+func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...string) []map[string]map[string]string {
+	var result []map[string]map[string]string
 	if len(models) == 0 {
 		return result
 	}
@@ -376,11 +376,11 @@ func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...
 	}
 	table := models[0].Short_()
 	translations := GetAllTranslations(ctx, table, ids, columns...)
-	result = make([]map[string]echo.H, len(models))
+	result = make([]map[string]map[string]string, len(models))
 	for id, row := range translations {
-		mp := map[string]echo.H{}
+		mp := map[string]map[string]string{}
 		for lang, texts := range row {
-			vals := echo.H{}
+			vals := map[string]string{}
 			for field, text := range texts {
 				if len(text) == 0 {
 					continue
