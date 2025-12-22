@@ -360,7 +360,7 @@ func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...
 	if len(models) == 0 {
 		return result
 	}
-	if !IsMultilingual() || IsDefaultLang(ctx) {
+	if !IsMultilingual() {
 		return result
 	}
 	ids := make([]uint64, 0, len(models))
