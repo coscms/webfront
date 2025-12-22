@@ -338,8 +338,20 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 	return models
 }
 
-func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...string) []map[string]T {
-	var result []map[string]T
+// GetModelsAllTranslations 获取多个模型的所有翻译数据
+//
+// 参数:
+//
+//	ctx - echo 上下文对象
+//	models - 模型实例切片
+//	columns - 可选的要获取的字段列表
+//
+// 返回值:
+//
+//	返回一个切片，每个元素是一个映射，包含对应模型的多语言翻译数据
+//	映射的键是语言代码，值是字段到翻译文本的映射
+func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...string) []map[string]echo.H {
+	var result []map[string]echo.H
 	if len(models) == 0 {
 		return result
 	}
@@ -364,22 +376,17 @@ func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...
 	}
 	table := models[0].Short_()
 	translations := GetAllTranslations(ctx, table, ids, columns...)
-	result = make([]map[string]T, len(models))
+	result = make([]map[string]echo.H, len(models))
 	for id, row := range translations {
-		mp := map[string]T{}
+		mp := map[string]echo.H{}
 		for lang, texts := range row {
-			vals := T{}
-
-			mp := map[string]interface{}{}
+			vals := echo.H{}
 			for field, text := range texts {
 				if len(text) == 0 {
 					continue
 				}
-				mp[field] = text
+				vals[field] = text
 			}
-
-			vals.FromRow(mp)
-
 			mp[lang] = vals
 		}
 		for _, index := range idk[id] {
