@@ -54,6 +54,33 @@ func GetTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 	return getTranslations(ctx, table, ids, columns...)
 }
 
+// GetAllTranslations 获取指定表和ID集合的多语言翻译数据
+//
+// 参数:
+//   - ctx: echo上下文对象
+//   - table: 数据库表名
+//   - ids: 需要查询的ID集合
+//   - columns: 可选字段列表，指定要获取的列
+//
+// 返回值:
+//   - 三层嵌套map结构: ID -> 语言代码 -> 字段名 -> 翻译值
+//   - 如果未启用多语言功能，返回空map
+func GetAllTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]map[string]string {
+	if !IsMultilingual() {
+		return map[uint64]map[string]map[string]string{}
+	}
+	if ttl, ok := ctx.Internal().Get(`translationsTTL`).(int64); ok {
+		m := map[uint64]map[string]map[string]string{}
+		cache.XFunc(ctx, `allTranslations.`+table+`.`+com.JoinNumbers(ids, `_`), &m, func() error {
+			r := getAllTranslations(ctx, table, ids, columns...)
+			maps.Copy(m, r)
+			return nil
+		}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(ttl)))
+		return m
+	}
+	return getAllTranslations(ctx, table, ids, columns...)
+}
+
 // getResources retrieves i18n resources from the specified table with optional column filtering.
 // It returns a slice of OfficialI18nResource objects and any error encountered during the operation.
 // Parameters:
@@ -95,6 +122,16 @@ func getResources(ctx echo.Context, table string, columns ...string) ([]*dbschem
 //   - columns: optional list of specific columns to retrieve (empty for all columns)
 //
 // Returns empty map if no translations found or on error
+//
+//	{
+//	  rowID1: {
+//	    column1: "translated text 1",
+//	    column2: "translated text 2",
+//	  },
+//	  rowID2: {
+//	    column1: "translated text 3",
+//	  },
+//	}
 func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]string {
 	m := map[uint64]map[string]string{}
 	if len(ids) == 0 {
@@ -122,6 +159,42 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 			m[v.RowId] = map[string]string{}
 		}
 		m[v.RowId][rKeys[v.ResourceId]] = v.Text
+	}
+	return m
+}
+
+// getAllTranslations 获取指定表、ID列表和列的多语言翻译结果
+// 返回格式为 map[行ID]map[语言]map[字段名]翻译文本
+// 如果ids为空或查询无结果，返回空map
+func getAllTranslations(ctx echo.Context, table string, ids []uint64, columns ...string) map[uint64]map[string]map[string]string {
+	m := map[uint64]map[string]map[string]string{}
+	if len(ids) == 0 {
+		return m
+	}
+	rows, err := getResources(ctx, table, columns...)
+	if err != nil || len(rows) == 0 {
+		return m
+	}
+	rIDs := make([]uint, len(rows))
+	rKeys := map[uint]string{}
+	for i, v := range rows {
+		rIDs[i] = v.Id
+		rKeys[v.Id] = strings.SplitN(v.Code, `.`, 2)[1]
+	}
+	tM := dbschema.NewOfficialI18nTranslation(ctx)
+	tM.ListByOffset(nil, nil, 0, -1, db.And(
+		db.Cond{`row_id`: db.In(ids)},
+		db.Cond{`resource_id`: db.In(rIDs)},
+	))
+	tRows := tM.Objects()
+	for _, v := range tRows {
+		if _, ok := m[v.RowId]; !ok {
+			m[v.RowId] = map[string]map[string]string{}
+		}
+		if _, ok := m[v.RowId][v.Lang]; !ok {
+			m[v.RowId][v.Lang] = map[string]string{}
+		}
+		m[v.RowId][v.Lang][rKeys[v.ResourceId]] = v.Text
 	}
 	return m
 }
@@ -263,4 +336,55 @@ func GetModelsTranslations[T Model](ctx echo.Context, models []T, columns ...str
 		}
 	}
 	return models
+}
+
+func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...string) []map[string]T {
+	var result []map[string]T
+	if len(models) == 0 {
+		return result
+	}
+	if !IsMultilingual() || IsDefaultLang(ctx) {
+		return result
+	}
+	ids := make([]uint64, 0, len(models))
+	idk := map[uint64][]int{}
+	for index, row := range models {
+		id := GetRowID(row)
+		if id == 0 {
+			return result
+		}
+		if _, ok := idk[id]; !ok {
+			idk[id] = []int{}
+			ids = append(ids, id)
+		}
+		idk[id] = append(idk[id], index)
+	}
+	if len(ids) == 0 {
+		return result
+	}
+	table := models[0].Short_()
+	translations := GetAllTranslations(ctx, table, ids, columns...)
+	result = make([]map[string]T, len(models))
+	for id, row := range translations {
+		mp := map[string]T{}
+		for lang, texts := range row {
+			vals := T{}
+
+			mp := map[string]interface{}{}
+			for field, text := range texts {
+				if len(text) == 0 {
+					continue
+				}
+				mp[field] = text
+			}
+
+			vals.FromRow(mp)
+
+			mp[lang] = vals
+		}
+		for _, index := range idk[id] {
+			result[index] = mp
+		}
+	}
+	return result
 }
