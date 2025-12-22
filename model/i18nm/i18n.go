@@ -21,7 +21,12 @@ func IsMultilingual() bool {
 
 // LangIsDefault checks if the given language is the default language configured in the system.
 func LangIsDefault(lang string) bool {
-	return lang == config.FromFile().Language.Default
+	return lang == LangDefault()
+}
+
+// LangDefault 返回配置文件中设置的默认语言代码
+func LangDefault() string {
+	return config.FromFile().Language.Default
 }
 
 // IsDefaultLang checks if the current language in context is the default language
