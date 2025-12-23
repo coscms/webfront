@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20251221071825-876529ad1b55
+require github.com/coscms/webcore v0.13.3-0.20251223054848-5164c46804c2
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -45,7 +45,7 @@ require (
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.1
-	github.com/webx-top/db v1.28.12
+	github.com/webx-top/db v1.28.15
 	github.com/webx-top/echo v1.22.19
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
@@ -181,7 +181,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.29.0 // indirect
+	github.com/go-playground/validator/v10 v10.30.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-redsync/redsync/v4 v4.15.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.3 // indirect
