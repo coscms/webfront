@@ -32,8 +32,8 @@ func TestGenerate(t *testing.T) {
 	eCtx := defaults.NewMockContext()
 	now := time.Now().UTC()
 	cfg := Sitemap{
-		Do: func(ctx echo.Context, sm *smg.Sitemap, langCodes []string, subDirName string) (string, error) {
-			sm.Add(&smg.SitemapLoc{
+		Do: func(ctx echo.Context, lastID string, receiver LocReceiver) (string, error) {
+			receiver(&smg.SitemapLoc{
 				Loc:        "https://www.coscms.com/news/2021-01-05/a-news-page",
 				LastMod:    &now,
 				ChangeFreq: smg.Weekly,
@@ -43,13 +43,13 @@ func TestGenerate(t *testing.T) {
 					{ImageLoc: `/test.jpg`},
 					{ImageLoc: `test.jpg`},
 				},
-			})
-			sm.Add(&smg.SitemapLoc{
+			}, nil)
+			receiver(&smg.SitemapLoc{
 				Loc:        "news/2021-01-05/a-news-page",
 				LastMod:    &now,
 				ChangeFreq: smg.Weekly,
 				Priority:   1,
-			})
+			}, nil)
 			return ``, nil
 		},
 	}

@@ -22,7 +22,8 @@ func Register(k, v string, x Sitemap) {
 	Registry.Add(k, v, echo.KVxOptX[Sitemap, any](x))
 }
 
-type LocGenerator func(ctx echo.Context, sm *smg.Sitemap, langCodes []string, lastID string) (newLastID string, err error)
+type LocReceiver func(item *smg.SitemapLoc, relativeLink func() string) error
+type LocGenerator func(ctx echo.Context, lastID string, receiver LocReceiver) (newLastID string, err error)
 
 type Sitemap struct {
 	Do LocGenerator
@@ -32,14 +33,38 @@ func (a Sitemap) Run(ctx echo.Context, sm *smg.Sitemap, langCodes []string, name
 	inkey := `sitemapGen.` + subDirName + `.` + name + `LastID`
 	lastID := ctx.Internal().String(inkey)
 	var err error
-	lastID, err = a.Do(ctx, sm, langCodes, lastID)
+	lastID, err = a.Do(ctx, lastID, func(item *smg.SitemapLoc, relativeLink func() string) error {
+		return LocReceive(ctx, sm, item, langCodes, relativeLink)
+	})
 	if len(lastID) > 0 {
 		ctx.Internal().Set(inkey, lastID)
 	}
 	return err
 }
 
-func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCodes []string, lastID string) (string, error) {
+func LocReceive(ctx echo.Context, sm *smg.Sitemap, item *smg.SitemapLoc, langCodes []string, relativeLink func() string) error {
+	if len(langCodes) > 1 {
+		item.Alternate = make([]*smg.SitemapAlternateLoc, 0, len(langCodes)+1)
+		item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
+			Hreflang: `x-default`,
+			Href:     item.Loc,
+			Rel:      `alternate`,
+		})
+		if relativeLink != nil {
+			generatedRelativeLink := relativeLink()
+			for _, langCode := range langCodes {
+				item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
+					Hreflang: langCode,
+					Href:     ctx.SiteRoot() + `/` + langCode + generatedRelativeLink,
+					Rel:      `alternate`,
+				})
+			}
+		}
+	}
+	return sm.Add(item)
+}
+
+func articleSitemap(ctx echo.Context, lastID string, receiver LocReceiver) (string, error) {
 	source := ctx.Form(`source`)
 	articleM := modelArticle.NewArticle(ctx)
 	cond := db.NewCompounds()
@@ -71,28 +96,12 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCodes []string, lastI
 				ChangeFreq: smg.Weekly,
 				Priority:   PriorityDetail,
 			}
-			if len(langCodes) > 1 {
-				item.Alternate = make([]*smg.SitemapAlternateLoc, 0, len(langCodes)+1)
-				item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
-					Hreflang: `x-default`,
-					Href:     link,
-					Rel:      `alternate`,
-				})
-				relativeLink := ctx.RelativeURLByName(`article.detail`, row.Id)
-				for _, langCode := range langCodes {
-					item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
-						Hreflang: langCode,
-						Href:     ctx.SiteRoot() + `/` + langCode + relativeLink,
-						Rel:      `alternate`,
-					})
-				}
-			}
 			if len(row.Image) > 0 {
 				item.Images = append(item.Images, &smg.SitemapImage{
 					ImageLoc: row.Image,
 				})
 			}
-			err = sm.Add(item)
+			err = receiver(item, func() string { return ctx.RelativeURLByName(`article.detail`, row.Id) })
 			if err != nil {
 				return
 			}
