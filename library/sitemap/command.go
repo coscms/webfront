@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"path/filepath"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/cmd/bootconfig"
@@ -60,43 +59,13 @@ func validateLangCode(langCodes []string) error {
 	return nil
 }
 
-func clearAllSubdirLanguages(langCodes []string) error {
-	root := filepath.Join(echo.Wd(), `public`, `sitemap`)
-	dirs, err := os.ReadDir(root)
-	if err != nil {
-		return err
-	}
-	var subDirs []string
-	for _, info := range dirs {
-		if info.IsDir() {
-			subDirs = append(subDirs, info.Name())
-		}
-	}
-	if len(subDirs) == 0 {
-		return err
-	}
-	for _, _lang := range langCodes {
-		RemoveLanguage(_lang, subDirs...)
-	}
-	return err
-}
-
 func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	if sitemapCfg.Mode == `clear` {
 		switch rootURL {
 		case ``, `all`:
-			if len(langCode) == 0 {
-				RemoveAll()
-				return nil
-			}
-			langCodes := param.Split(langCode, `,`).Filter(normalizeLangCode).String()
-			err := validateLangCode(langCodes)
-			if err != nil {
-				return err
-			}
-			err = clearAllSubdirLanguages(langCodes)
+			RemoveAll()
 			log.Info(`removing sitemap is done`)
-			return err
+			return nil
 		}
 	}
 	if len(rootURL) == 0 {
@@ -117,19 +86,7 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	}
 	subDir := u.Hostname()
 	if sitemapCfg.Mode == `clear` {
-		if len(langCode) == 0 {
-			RemoveAll(subDir)
-			log.Info(`removing sitemap is done`)
-			return nil
-		}
-		langCodes := param.Split(langCode, `,`).Filter(normalizeLangCode).String()
-		err = validateLangCode(langCodes)
-		if err != nil {
-			return err
-		}
-		for _, _lang := range langCodes {
-			RemoveLanguage(_lang, subDir)
-		}
+		RemoveAll(subDir)
 		log.Info(`removing sitemap is done`)
 		return nil
 	}
@@ -159,39 +116,35 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 		frontend.TempInitRoute(u.Host)
 	}
 
-	var prepare func(langCodes []string) error
+	var prepare func() error
 	if sitemapCfg.Mode == `incr` {
-		prepare = func(langCodes []string) error {
+		prepare = func() error {
 			for _, v := range groupItems {
-				for _, _lang := range langCodes {
-					b, err := filecache.ReadCache(`sitemap`, v.K+`_`+_lang+`_`+subDir+`.txt`)
-					if err != nil && !os.IsNotExist(err) {
-						return err
-					}
-					if len(b) > 0 {
-						lastID := param.AsUint64(string(b))
-						eCtx.Internal().Set(subDir+`.`+_lang+`.`+v.K+`LastID`, lastID)
-					}
+				b, err := filecache.ReadCache(`sitemap`, v.K+`_`+subDir+`.txt`)
+				if err != nil && !os.IsNotExist(err) {
+					return err
+				}
+				if len(b) > 0 {
+					lastID := param.AsUint64(string(b))
+					eCtx.Internal().Set(`sitemapGen.`+subDir+`.`+v.K+`LastID`, lastID) // sitemapGen.<Hostname>.articleLastID
 				}
 			}
 			return nil
 		}
 	}
 	if prepare == nil {
-		prepare = func(_ []string) error { return nil }
+		prepare = func() error { return nil }
 	}
-	save := func(langCodes []string) {
+	save := func() {
 		var err error
 		for _, v := range groupItems {
-			for _, _lang := range langCodes {
-				lastID := eCtx.Internal().Uint64(subDir + `.` + _lang + `.` + v.K + `LastID`)
-				if lastID <= 0 {
-					continue
-				}
-				err = filecache.WriteCache(`sitemap`, v.K+`_`+_lang+`_`+subDir+`.txt`, []byte(param.AsString(lastID)))
-				if err != nil {
-					log.Error(err.Error())
-				}
+			lastID := eCtx.Internal().Uint64(`sitemapGen.` + subDir + `.` + v.K + `LastID`) // sitemapGen.<Hostname>.articleLastID
+			if lastID <= 0 {
+				continue
+			}
+			err = filecache.WriteCache(`sitemap`, v.K+`_`+subDir+`.txt`, []byte(param.AsString(lastID)))
+			if err != nil {
+				log.Error(err.Error())
 			}
 		}
 	}
@@ -209,24 +162,11 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 			return err
 		}
 	}
-	if err = prepare(langCodes); err != nil {
+	if err = prepare(); err != nil {
 		return err
 	}
-	lng := cfg.NewLanguage()
-	langs := make(map[string]bool, len(cfg.Language.AllList))
-	for _, lang := range cfg.Language.AllList {
-		langs[lang] = true
-	}
-	for _, _lang := range langCodes {
-		tr := lng.AcquireTranslator(eCtx, _lang, langs, cfg.Language.Default)
-		eCtx.SetTranslator(tr)
-		err = GenerateIndex(eCtx, rootURL, _lang, sitemapCfg.AllChild, subDir)
-		tr.Release()
-		if err != nil {
-			log.Error(err.Error())
-		}
-	}
+	err = GenerateIndex(eCtx, rootURL, langCodes, sitemapCfg.AllChild, subDir)
 	log.Info(`sitemap generation is complete`)
-	save(langCodes)
+	save()
 	return err
 }

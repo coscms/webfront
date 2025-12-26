@@ -13,16 +13,16 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
-func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateChildPageItems bool, subDir ...string) error {
+func GenerateIndex(ctx echo.Context, rootURL string, langCodes []string, generateChildPageItems bool, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
 	var outputPath string
 	if len(subDir) > 0 {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], langCode)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0])
 	} else {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, langCode)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`)
 	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
@@ -34,9 +34,6 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 	smi.SetHostname(rootURL)
 	smi.SetOutputPath(outputPath)
 	serverURI := `/sitemaps/`
-	if len(langCode) > 0 && langCode != config.FromFile().Language.Default {
-		serverURI = `/` + langCode + serverURI
-	}
 	smi.SetServerURI(serverURI)
 
 	var subDirName string
@@ -51,7 +48,7 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 		if !generateChildPageItems {
 			continue
 		}
-		err = item.X.Do(ctx, sm, langCode, subDirName)
+		err = item.X.Run(ctx, sm, langCodes, item.K, subDirName)
 		if err != nil {
 			return fmt.Errorf("unable to add sitemapLoc#%v: %v", item.K, err)
 		}
@@ -66,16 +63,16 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCode string, generateCh
 	return err
 }
 
-func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(echo.Context, *smg.Sitemap, string, string) error, subDir ...string) error {
+func GenerateSingle(ctx echo.Context, rootURL string, langCodes []string, f *echo.KVx[Sitemap, any], subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
 	}
 	now := time.Now().UTC()
 	var outputPath string
 	if len(subDir) > 0 {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0], langCode)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, subDir[0])
 	} else {
-		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`, langCode)
+		outputPath = filepath.Join(echo.Wd(), `public`, `sitemap`)
 	}
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
@@ -92,7 +89,7 @@ func GenerateSingle(ctx echo.Context, rootURL string, langCode string, f func(ec
 	if len(subDir) > 0 {
 		subDirName = subDir[0]
 	}
-	err = f(ctx, sm, langCode, subDirName)
+	err = f.X.Run(ctx, sm, langCodes, f.K, subDirName)
 	if err != nil {
 		return fmt.Errorf("unable to add sitemapLoc: %v", err)
 	}
@@ -116,34 +113,12 @@ func RemoveAll(subDirs ...string) {
 	}
 }
 
-func RemoveLanguage(langCode string, subDirs ...string) {
-	if len(subDirs) == 0 {
-		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, langCode))
-		return
-	}
-	for _, subDir := range subDirs {
-		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`, subDir, langCode))
-	}
-}
-
 func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPageItems bool, subDir ...string) (err error) {
-	for _, lang := range config.FromFile().Language.AllList {
-		lang = echo.NewLangCode(lang).Normalize()
-		err = GenerateIndex(ctx, rootURL, lang, generateChildPageItems, subDir...)
-		if err != nil {
-			return
-		}
-	}
+	err = GenerateIndex(ctx, rootURL, config.FromFile().Language.AllList, generateChildPageItems, subDir...)
 	return
 }
 
-func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f func(echo.Context, *smg.Sitemap, string, string) error, subDir ...string) (err error) {
-	for _, lang := range config.FromFile().Language.AllList {
-		lang = echo.NewLangCode(lang).Normalize()
-		err = GenerateSingle(ctx, rootURL, lang, f, subDir...)
-		if err != nil {
-			return
-		}
-	}
+func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f *echo.KVx[Sitemap, any], subDir ...string) (err error) {
+	err = GenerateSingle(ctx, rootURL, config.FromFile().Language.AllList, f, subDir...)
 	return
 }

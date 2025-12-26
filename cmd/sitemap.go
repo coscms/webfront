@@ -17,8 +17,7 @@ var sitemapCmd = &cobra.Command{
 	Short: "sitemap generate",
 	Long: `Usage ` + executable + ` sitemap <rootURL> [languageCode...]
 删除所有: ` + executable + ` sitemap --mode=clear
-删除指定域名或者指定语言: ` + executable + ` sitemap --mode=clear <rootURL> en,zh-CN
-删除所有域名下指定语言: ` + executable + ` sitemap --mode=clear all en,zh-CN`,
+删除指定域名: ` + executable + ` sitemap --mode=clear <rootURL>`,
 	Example: executable + ` sitemap https://mysite en,zh-CN`,
 	RunE:    sitemapRunE,
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory/pagination"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/httpserver"
@@ -21,11 +22,24 @@ func Register(k, v string, x Sitemap) {
 	Registry.Add(k, v, echo.KVxOptX[Sitemap, any](x))
 }
 
+type LocGenerator func(ctx echo.Context, sm *smg.Sitemap, langCodes []string, lastID string) (newLastID string, err error)
+
 type Sitemap struct {
-	Do func(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirName string) error
+	Do LocGenerator
 }
 
-func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirName string) error {
+func (a Sitemap) Run(ctx echo.Context, sm *smg.Sitemap, langCodes []string, name string, subDirName string) error {
+	inkey := `sitemapGen.` + subDirName + `.` + name + `LastID`
+	lastID := ctx.Internal().String(inkey)
+	var err error
+	lastID, err = a.Do(ctx, sm, langCodes, lastID)
+	if len(lastID) > 0 {
+		ctx.Internal().Set(inkey, lastID)
+	}
+	return err
+}
+
+func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCodes []string, lastID string) (string, error) {
 	source := ctx.Form(`source`)
 	articleM := modelArticle.NewArticle(ctx)
 	cond := db.NewCompounds()
@@ -36,8 +50,7 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirNa
 	mw := func(r db.Result) db.Result {
 		return r.Select(`id`, `created`, `updated`, `image`).OrderBy(`id`)
 	}
-	inkey := subDirName + `.` + langCode + `.articleLastID`
-	articleLastID := ctx.Internal().Uint64(inkey)
+	articleLastID := param.AsUint64(lastID)
 	if articleLastID > 0 {
 		cond.AddKV(`id`, db.Gt(articleLastID))
 	}
@@ -58,6 +71,22 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirNa
 				ChangeFreq: smg.Weekly,
 				Priority:   PriorityDetail,
 			}
+			if len(langCodes) > 1 {
+				item.Alternate = make([]*smg.SitemapAlternateLoc, 0, len(langCodes)+1)
+				item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
+					Hreflang: `x-default`,
+					Href:     link,
+					Rel:      `alternate`,
+				})
+				relativeLink := ctx.RelativeURLByName(`article.detail`, row.Id)
+				for _, langCode := range langCodes {
+					item.Alternate = append(item.Alternate, &smg.SitemapAlternateLoc{
+						Hreflang: langCode,
+						Href:     ctx.SiteRoot() + `/` + langCode + relativeLink,
+						Rel:      `alternate`,
+					})
+				}
+			}
 			if len(row.Image) > 0 {
 				item.Images = append(item.Images, &smg.SitemapImage{
 					ImageLoc: row.Image,
@@ -72,8 +101,8 @@ func articleSitemap(ctx echo.Context, sm *smg.Sitemap, langCode string, subDirNa
 		return
 	}, 100, 0)
 
-	ctx.Internal().Set(inkey, articleLastID)
-	return err
+	lastID = param.AsString(articleLastID)
+	return lastID, err
 }
 
 func RegisterRoute(r echo.RouteRegister, getSubDirName func(echo.Context) string) {
