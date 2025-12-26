@@ -125,7 +125,7 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 					return err
 				}
 				if len(b) > 0 {
-					lastID := param.AsUint64(string(b))
+					lastID := string(b)
 					eCtx.Internal().Set(`sitemapGen.`+subDir+`.`+v.K+`LastID`, lastID) // sitemapGen.<Hostname>.articleLastID
 				}
 			}
@@ -138,11 +138,11 @@ func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	save := func() {
 		var err error
 		for _, v := range groupItems {
-			lastID := eCtx.Internal().Uint64(`sitemapGen.` + subDir + `.` + v.K + `LastID`) // sitemapGen.<Hostname>.articleLastID
-			if lastID <= 0 {
+			lastID := eCtx.Internal().String(`sitemapGen.` + subDir + `.` + v.K + `LastID`) // sitemapGen.<Hostname>.articleLastID
+			if len(lastID) == 0 {
 				continue
 			}
-			err = filecache.WriteCache(`sitemap`, v.K+`_`+subDir+`.txt`, []byte(param.AsString(lastID)))
+			err = filecache.WriteCache(`sitemap`, v.K+`_`+subDir+`.txt`, []byte(lastID))
 			if err != nil {
 				log.Error(err.Error())
 			}
