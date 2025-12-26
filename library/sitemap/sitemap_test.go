@@ -61,3 +61,10 @@ func TestGenerate(t *testing.T) {
 	err = GenerateSingle(eCtx, `https://www.webx.top`, []string{`zh-CN`}, Registry.GetItem(`test`))
 	assert.NoError(t, err)
 }
+
+func TestVerifyHost(t *testing.T) {
+	assert.True(t, VerifyHost(`www.coscms.com`))
+	assert.True(t, VerifyHost(`localhost`))
+	assert.True(t, VerifyHost(`127.0.0.1`))
+	assert.False(t, VerifyHost(`..www.coscms.com`))
+}
