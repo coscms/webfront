@@ -8,6 +8,7 @@ import (
 	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver/httpserverutils"
 	"github.com/coscms/webcore/library/perm"
 	"github.com/coscms/webcore/model"
 	multidevicesignin "github.com/coscms/webfront/library/multidevicesignin"
@@ -167,6 +168,7 @@ func (f *Customer) FireSignInSuccess(co *CustomerOptions, authType string) (err 
 		}
 	}
 
+	httpserverutils.RememberSession(f.Context())
 	f.SetSession()
 	if !f.disabledSession {
 		co.SetSession(f.Context())
