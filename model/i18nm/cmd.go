@@ -81,39 +81,45 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 			}),
 		)
 	}
+	queryDefault := `SELECT AA.id,` + strings.Join(columns, `,`) + ` FROM ` + dbschema.WithPrefix(table) + ` AS AA`
+	var whereDefault string
+	if !queryAll {
+		whereDefault = `NOT EXISTS ( SELECT 1 FROM ` + dbschema.WithPrefix(`official_i18n_translation`) + ` AS TT WHERE TT.row_id=AA.id AND TT.resource_id IN (` + com.JoinNumbers(rIDs, `,`) + `) )`
+	}
+	sb := strings.Builder{}
 	f := func() error {
 		var err error
-		var where []string
+		where := make([]string, 0, 3)
 		if eqID > 0 {
 			where = append(where, `AA.id = `+strconv.FormatUint(eqID, 10))
 		}
 		if gtID > 0 {
 			where = append(where, `AA.id > `+strconv.FormatUint(gtID, 10))
 		}
-		if !queryAll {
-			where = append(where, `NOT EXISTS(
-	SELECT 1 FROM `+dbschema.WithPrefix(`official_i18n_translation`)+` AS TT WHERE TT.row_id=AA.id AND TT.resource_id IN (`+com.JoinNumbers(rIDs, `,`)+`)
-	)`)
+		if len(whereDefault) > 0 {
+			where = append(where, whereDefault)
 		}
-		query := `SELECT AA.id,` + strings.Join(columns, `,`) + ` FROM ` + dbschema.WithPrefix(table) + ` AS AA`
+		sb.WriteString(queryDefault)
 		if len(where) > 0 {
-			query += ` WHERE ` + strings.Join(where, ` AND `)
+			sb.WriteString(` WHERE ` + strings.Join(where, ` AND `))
 		}
-		query += ` ORDER BY AA.id ASC`
-		query += ` LIMIT ` + strconv.Itoa(chunks)
+		sb.WriteString(` ORDER BY AA.id ASC`)
+		sb.WriteString(` LIMIT ` + strconv.Itoa(chunks))
 		p := factory.ParamPoolGet()
 		defer p.Release()
-		rows, err := p.SetCollection(query).Query()
+		rows, err := p.SetCollection(sb.String()).Query()
+		sb.Reset()
 		if err != nil {
 			return err
 		}
 		defer rows.Close()
-		columns, err = rows.Columns()
+		var qColumns []string
+		qColumns, err = rows.Columns()
 		if err != nil {
 			return err
 		}
 		for rows.Next() {
-			row := make([]interface{}, len(columns))
+			row := make([]interface{}, len(qColumns))
 			for i := range row {
 				row[i] = new(interface{})
 			}
@@ -123,7 +129,7 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 			}
 			data := map[string]interface{}{}
 			for i, v := range row {
-				field := columns[i]
+				field := qColumns[i]
 				data[field] = v
 			}
 			mdl.FromRow(data)
