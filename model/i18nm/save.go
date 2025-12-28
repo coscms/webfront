@@ -8,7 +8,6 @@ import (
 	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webcore/library/formbuilder"
 	"github.com/coscms/webfront/dbschema"
-	"github.com/coscms/webfront/library/top"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -110,9 +109,9 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		formNameU := com.UpperCaseFirst(formNameL)
 		langDefault := langCfg.Default
 		originalText, _ := mdl.GetField(formNameU).(string)
-		var picks []string
-		if field == `content` {
-			picks, originalText = top.PickoutHideTag(originalText)
+		var restoreFunc func(translatedText string) string
+		if cfg.originalTextPickout != nil {
+			originalText, restoreFunc = cfg.originalTextPickout(table, field, originalText)
 		}
 		for _, langCode := range langCfg.AllList {
 			if langDefault == langCode {
@@ -136,16 +135,16 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				if err != nil {
 					return err
 				}
-				if len(picks) > 0 {
-					translatedText = top.RestorePickoutedHideTag(translatedText, picks)
+				if restoreFunc != nil {
+					translatedText = restoreFunc(translatedText)
 				}
 			} else if len(translatedText) == 0 && autoTranslate {
 				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
 				}
-				if len(picks) > 0 {
-					translatedText = top.RestorePickoutedHideTag(translatedText, picks)
+				if restoreFunc != nil {
+					translatedText = restoreFunc(translatedText)
 				}
 			}
 			if len(translatedText) == 0 {

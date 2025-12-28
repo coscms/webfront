@@ -9,13 +9,17 @@ import (
 
 // DefaultSaveModelTranslationsOptions is the default options for SaveModelTranslations.
 var DefaultSaveModelTranslationsOptions = SaveModelTranslationsOptions{
-	FormNamePrefix: formbuilder.FormInputNamePrefixDefault,
-	ContentType:    map[string]string{},
-	Project:        "",
+	FormNamePrefix:      formbuilder.FormInputNamePrefixDefault,
+	ContentType:         map[string]string{},
+	Project:             "",
+	originalTextPickout: DefaultOriginalTextPickout,
 }
 
 // Translator is a function that translates a field value to the specified language code.
 type Translator = func(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error)
+
+// OriginalTextPicker is a function that picks out the original text from the content.
+type OriginalTextPicker = func(table string, fieldName string, originalValue string) (string, func(translatedText string) string)
 
 // SaveModelTranslationsOptions is a struct that holds options for saving model translations.
 type SaveModelTranslationsOptions struct {
@@ -28,6 +32,7 @@ type SaveModelTranslationsOptions struct {
 	AllowForceTranslate func(echo.Context) bool
 	translator          Translator
 	resourceIDsByField  map[string]uint
+	originalTextPickout OriginalTextPicker
 }
 
 // SetDefaults sets default values for SaveModelTranslationsOptions fields
@@ -61,6 +66,9 @@ func (o *SaveModelTranslationsOptions) SetDefaults() {
 		for fieldName, contentType := range d.ContentType {
 			o.ContentType[fieldName] = contentType
 		}
+	}
+	if o.originalTextPickout == nil && d.originalTextPickout != nil {
+		o.originalTextPickout = d.originalTextPickout
 	}
 }
 
@@ -120,6 +128,11 @@ func (o *SaveModelTranslationsOptions) SetAllowForceTranslate(allowForceTranslat
 // SetResourceIDsByField sets the resource IDs for each field
 func (o *SaveModelTranslationsOptions) SetResourceIDsByField(resourceIDsByField map[string]uint) {
 	o.resourceIDsByField = resourceIDsByField
+}
+
+// SetOriginalTextPickout sets the function for picking out the original text
+func (o *SaveModelTranslationsOptions) SetOriginalTextPickout(originalTextPickout OriginalTextPicker) {
+	o.originalTextPickout = originalTextPickout
 }
 
 // OptionContentType returns a function that sets the content type for the specified field
@@ -198,5 +211,13 @@ func OptionTranslator(translator Translator) func(*SaveModelTranslationsOptions)
 func OptionResourceIDsByField(resourceIDsByField map[string]uint) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetResourceIDsByField(resourceIDsByField)
+	}
+}
+
+// OptionOriginalTextPickout returns a function option that sets the function for picking out the original text.
+// The input function is used to determine the original text for a translation.
+func OptionOriginalTextPickout(originalTextPickout OriginalTextPicker) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetOriginalTextPickout(originalTextPickout)
 	}
 }
