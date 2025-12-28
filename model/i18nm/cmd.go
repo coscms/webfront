@@ -88,6 +88,25 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 		whereDefault = `NOT EXISTS ( SELECT 1 FROM ` + dbschema.WithPrefix(`official_i18n_translation`) + ` AS TT WHERE TT.row_id=AA.id AND TT.resource_id IN (` + com.JoinNumbers(rIDs, `,`) + `) )`
 	}
 	sb := strings.Builder{}
+	cachedOptions := make(map[string][]func(*SaveModelTranslationsOptions))
+	getOptions := func(contentField string, contype string) []func(*SaveModelTranslationsOptions) {
+		if contype == `` || contype == `text` {
+			return options
+		}
+		if clonedOptions, ok := cachedOptions[contype]; ok {
+			return clonedOptions
+		}
+		clonedContentTypes := map[string]string{}
+		for k, v := range contentTypes {
+			clonedContentTypes[k] = v
+		}
+		clonedContentTypes[contentField] = contype
+		clonedOptions := make([]func(*SaveModelTranslationsOptions), len(options))
+		copy(clonedOptions, options)
+		clonedOptions = append(clonedOptions, OptionContentTypes(clonedContentTypes))
+		cachedOptions[contype] = clonedOptions
+		return clonedOptions
+	}
 	f := func() error {
 		var err error
 		where := make([]string, 0, 3)
@@ -149,7 +168,7 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 				if hasContype {
 					contype, ok := mdl.GetField(`Contype`).(string)
 					if ok && contentField != `` && contype != `` {
-						err = SaveModelTranslations(ctx, mdl, id, append([]func(*SaveModelTranslationsOptions){OptionContentType(contentField, contype)}, options...)...)
+						err = SaveModelTranslations(ctx, mdl, id, getOptions(contentField, contype)...)
 						if err != nil {
 							return err
 						}
