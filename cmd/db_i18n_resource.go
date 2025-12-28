@@ -51,9 +51,9 @@ func dbI18nResourceRunE(cmd *cobra.Command, args []string) error {
 		err = i18nm.Initialize(defaults.NewMockContext())
 	case `translate`:
 		cfg := dbI18nResourceTranslateCfg
-		if len(args) > 0 {
+		if len(args) > 1 {
 			var chunksNum string
-			com.SliceExtract(args, &cfg.table, &chunksNum)
+			com.SliceExtract(args[1:], &cfg.table, &chunksNum)
 			if len(chunksNum) > 0 {
 				cfg.chunks, err = strconv.Atoi(chunksNum)
 				if err != nil {
