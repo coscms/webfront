@@ -107,6 +107,15 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 		cachedOptions[contype] = clonedOptions
 		return clonedOptions
 	}
+	saveTranslations := func(mdl factory.Model, id uint64) error {
+		if hasContype {
+			contype, ok := mdl.GetField(`Contype`).(string)
+			if ok && contentField != `` && contype != `` {
+				return SaveModelTranslations(ctx, mdl, id, getOptions(contentField, contype)...)
+			}
+		}
+		return SaveModelTranslations(ctx, mdl, id, options...)
+	}
 	f := func() error {
 		var err error
 		where := make([]string, 0, 3)
@@ -163,22 +172,16 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 			}
 			mdl.FromRow(data)
 			id := GetRowID(mdl)
-			if id > 0 {
-				gtID = id
-				if hasContype {
-					contype, ok := mdl.GetField(`Contype`).(string)
-					if ok && contentField != `` && contype != `` {
-						err = SaveModelTranslations(ctx, mdl, id, getOptions(contentField, contype)...)
-						if err != nil {
-							return err
-						}
-					}
-				}
-				err = SaveModelTranslations(ctx, mdl, id, options...)
-				if err != nil {
-					return err
-				}
+			if id == 0 {
+				return fmt.Errorf(`failed to get row ID for table %s`, table)
 			}
+
+			gtID = id
+			err = saveTranslations(mdl, id)
+			if err != nil {
+				return err
+			}
+
 			// Reset the data to avoid re-saving the same data
 			for field := range data {
 				data[field] = nil
