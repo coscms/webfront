@@ -130,7 +130,7 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 			data := map[string]interface{}{}
 			for i, v := range row {
 				field := qColumns[i]
-				rawV := v.(*interface{})
+				rawV, _ := v.(*interface{})
 				if rawV == nil {
 					data[field] = nil
 					continue
