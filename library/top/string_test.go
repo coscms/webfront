@@ -68,3 +68,11 @@ func TestTrimOverflowText(t *testing.T) {
 	v = TrimOverflowText(`1哈哈345`, 5)
 	assert.Equal(t, `1哈`, v)
 }
+
+func TestPickoutHideTag(t *testing.T) {
+	content := `[hide]123[/hide][hide:vip]svip[/hide]`
+	picks, v := PickoutHideTag(content)
+	assert.Equal(t, `[@0@][@1@]`, v)
+
+	assert.Equal(t, content, RestorePickoutedHideTag(v, picks))
+}

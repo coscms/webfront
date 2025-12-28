@@ -8,6 +8,7 @@ import (
 	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webcore/library/formbuilder"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/top"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -109,6 +110,10 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		formNameU := com.UpperCaseFirst(formNameL)
 		langDefault := langCfg.Default
 		originalText, _ := mdl.GetField(formNameU).(string)
+		var picks []string
+		if field == `content` {
+			picks, originalText = top.PickoutHideTag(originalText)
+		}
 		for _, langCode := range langCfg.AllList {
 			if langDefault == langCode {
 				continue
@@ -131,10 +136,16 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				if err != nil {
 					return err
 				}
+				if len(picks) > 0 {
+					translatedText = top.RestorePickoutedHideTag(translatedText, picks)
+				}
 			} else if len(translatedText) == 0 && autoTranslate {
 				translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
 				if err != nil {
 					return err
+				}
+				if len(picks) > 0 {
+					translatedText = top.RestorePickoutedHideTag(translatedText, picks)
 				}
 			}
 			if len(translatedText) == 0 {

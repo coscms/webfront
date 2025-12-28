@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -178,6 +179,26 @@ func parseExpiryContent(content string) string {
 			return fmt.Sprint(r)
 		}
 	})
+}
+
+func PickoutHideTag(content string) ([]string, string) {
+	picks := []string{}
+	result := hideTagRegex.ReplaceAllStringFunc(content, func(v string) string {
+		if len(v) <= 13 { // [hide][/hide]
+			return ``
+		}
+		index := len(picks)
+		picks = append(picks, v)
+		return `[@` + strconv.Itoa(index) + `@]`
+	})
+	return picks, result
+}
+
+func RestorePickoutedHideTag(content string, picks []string) string {
+	for i, v := range picks {
+		content = strings.Replace(content, `[@`+strconv.Itoa(i)+`@]`, v, 1)
+	}
+	return content
 }
 
 func HideContent(content string, contype string, hide HideDetector, funcMap map[string]interface{}) (result string) {
