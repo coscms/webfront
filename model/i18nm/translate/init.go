@@ -5,6 +5,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/translate"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/config/extend"
@@ -51,6 +52,9 @@ func initTranslateConfig() interface{} {
 //   - translated string
 //   - error if translation fails
 func Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
+	if com.StrIsNumeric(value) {
+		return value, nil
+	}
 	cfg := GetConfig()
 	if !cfg.On || len(cfg.Providers) == 0 {
 		return value, nil

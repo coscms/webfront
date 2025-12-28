@@ -27,6 +27,7 @@ type SaveModelTranslationsOptions struct {
 	TrimOverflowText    *bool
 	AllowForceTranslate func(echo.Context) bool
 	translator          Translator
+	resourceIDsByField  map[string]uint
 }
 
 // SetDefaults sets default values for SaveModelTranslationsOptions fields
@@ -116,6 +117,11 @@ func (o *SaveModelTranslationsOptions) SetAllowForceTranslate(allowForceTranslat
 	o.AllowForceTranslate = allowForceTranslate
 }
 
+// SetResourceIDsByField sets the resource IDs for each field
+func (o *SaveModelTranslationsOptions) SetResourceIDsByField(resourceIDsByField map[string]uint) {
+	o.resourceIDsByField = resourceIDsByField
+}
+
 // OptionContentType returns a function that sets the content type for the specified field
 // in SaveModelTranslationsOptions. The returned function can be used as an option when saving
 // model translations.
@@ -183,5 +189,14 @@ func OptionTrimOverflowText(trimOverflowText bool) func(*SaveModelTranslationsOp
 func OptionTranslator(translator Translator) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetTranslator(translator)
+	}
+}
+
+// OptionResourceIDsByField returns a function option that sets the resource IDs for each field.
+// The input map associates field names with their corresponding resource IDs.
+// The resource IDs are used to retrieve translations for the associated fields.
+func OptionResourceIDsByField(resourceIDsByField map[string]uint) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetResourceIDsByField(resourceIDsByField)
 	}
 }

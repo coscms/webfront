@@ -118,6 +118,23 @@ func getResources(ctx echo.Context, table string, columns ...string) ([]*dbschem
 	return rM.Objects(), err
 }
 
+// getResourceIDs retrieves a list of resource IDs and a map of resource IDs to column names for the specified table and columns.
+// It returns a slice of uint64 resource IDs and a map where the key is the resource ID and the value is the column name
+// If an error occurs during the query, it returns an empty list and map and the error.
+func getResourceIDs(ctx echo.Context, table string, columns ...string) ([]uint, map[uint]string, error) {
+	rows, err := getResources(ctx, table, columns...)
+	if err != nil {
+		return nil, nil, err
+	}
+	rIDs := make([]uint, len(rows))
+	rKeys := map[uint]string{}
+	for i, v := range rows {
+		rIDs[i] = v.Id
+		rKeys[v.Id] = strings.SplitN(v.Code, `.`, 2)[1]
+	}
+	return rIDs, rKeys, err
+}
+
 // getTranslations retrieves translations for specified table rows and columns
 // Returns a nested map where outer key is row ID and inner map contains column-value pairs
 // Parameters:
@@ -142,15 +159,9 @@ func getTranslations(ctx echo.Context, table string, ids []uint64, columns ...st
 	if len(ids) == 0 {
 		return m
 	}
-	rows, err := getResources(ctx, table, columns...)
-	if err != nil || len(rows) == 0 {
+	rIDs, rKeys, err := getResourceIDs(ctx, table, columns...)
+	if err != nil || len(rIDs) == 0 {
 		return m
-	}
-	rIDs := make([]uint, len(rows))
-	rKeys := map[uint]string{}
-	for i, v := range rows {
-		rIDs[i] = v.Id
-		rKeys[v.Id] = strings.SplitN(v.Code, `.`, 2)[1]
 	}
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	tM.ListByOffset(nil, nil, 0, -1, db.And(
@@ -176,15 +187,9 @@ func getAllTranslations(ctx echo.Context, table string, ids []uint64, columns ..
 	if len(ids) == 0 {
 		return m
 	}
-	rows, err := getResources(ctx, table, columns...)
-	if err != nil || len(rows) == 0 {
+	rIDs, rKeys, err := getResourceIDs(ctx, table, columns...)
+	if err != nil || len(rIDs) == 0 {
 		return m
-	}
-	rIDs := make([]uint, len(rows))
-	rKeys := map[uint]string{}
-	for i, v := range rows {
-		rIDs[i] = v.Id
-		rKeys[v.Id] = strings.SplitN(v.Code, `.`, 2)[1]
 	}
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	tM.ListByOffset(nil, nil, 0, -1, db.And(

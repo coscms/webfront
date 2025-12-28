@@ -82,20 +82,29 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		if !info.Multilingual {
 			continue
 		}
-		err = rM.Get(nil, `code`, table+`.`+field)
-		if err != nil {
-			if err != db.ErrNoMoreRows {
-				return err
+		var resourceID uint
+		if cfg.resourceIDsByField != nil {
+			var ok bool
+			resourceID, ok = cfg.resourceIDsByField[field]
+			if !ok {
+				continue
 			}
-			rM.Code = table + `.` + field
-			_, err = rM.Insert()
+		} else {
+			err = rM.Get(nil, `code`, table+`.`+field)
 			if err != nil {
-				return err
+				if err != db.ErrNoMoreRows {
+					return err
+				}
+				rM.Code = table + `.` + field
+				_, err = rM.Insert()
+				if err != nil {
+					return err
+				}
 			}
+			resourceID = rM.Id
+			tM.Reset()
 		}
 		ctx.Internal().Set(`i18n_translation_resource_field`, field)
-		resourceID := rM.Id
-		tM.Reset()
 		formNameL := com.CamelCase(field)
 		formNameU := com.UpperCaseFirst(formNameL)
 		langDefault := langCfg.Default
