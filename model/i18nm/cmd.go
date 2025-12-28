@@ -7,6 +7,7 @@ import (
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
+	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 )
@@ -118,7 +119,11 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 		if err != nil {
 			return err
 		}
-		for rows.Next() {
+		hasNext := rows.Next()
+		if !hasNext {
+			return db.ErrNoMoreRows
+		}
+		for hasNext {
 			row := make([]interface{}, len(qColumns))
 			for i := range row {
 				row[i] = new(interface{})
@@ -160,12 +165,16 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 				data[field] = nil
 			}
 			mdl.FromRow(data)
+			hasNext = rows.Next()
 		}
 		return err
 	}
 	for {
 		err = f()
 		if err != nil {
+			if err == db.ErrNoMoreRows {
+				err = nil
+			}
 			break
 		}
 	}
