@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/coscms/webcore/cmd"
 	"github.com/coscms/webcore/library/config"
@@ -67,21 +68,23 @@ func dbI18nResourceRunE(cmd *cobra.Command, args []string) error {
 		if cfg.chunks < 1 {
 			cfg.chunks = 100
 		}
-		if cfg.continueLast {
-			b, err := filecache.ReadCache(`dbI18nResource`, `translate_`+cfg.table+`.txt`)
-			if err != nil && !os.IsNotExist(err) {
+		for _, table := range strings.Split(cfg.table, ",") {
+			if cfg.continueLast {
+				b, err := filecache.ReadCache(`dbI18nResource`, `translate_`+table+`.txt`)
+				if err != nil && !os.IsNotExist(err) {
+					return err
+				}
+				cfg.gtID = com.Uint64(b)
+			}
+			cfg.gtID, err = i18nm.AutoTranslate(defaults.NewMockContext(), table, cfg.queryAll, cfg.translateAll, cfg.eqID, cfg.gtID, cfg.chunks)
+			err = errorslice.New(
+				err,
+				filecache.WriteCache(`dbI18nResource`, `translate_`+table+`.txt`, []byte(com.String(cfg.gtID))),
+			).ToError()
+			if err != nil {
 				return err
 			}
-			cfg.gtID = com.Uint64(b)
-			if cfg.gtID < 1 {
-				return fmt.Errorf("last gtID is not found")
-			}
 		}
-		cfg.gtID, err = i18nm.AutoTranslate(defaults.NewMockContext(), cfg.table, cfg.queryAll, cfg.translateAll, cfg.eqID, cfg.gtID, cfg.chunks)
-		err = errorslice.New(
-			err,
-			filecache.WriteCache(`dbI18nResource`, `translate_`+cfg.table+`.txt`, []byte(com.String(cfg.gtID))),
-		).ToError()
 	default:
 		err = fmt.Errorf(`unsupported operation: %v`, operation)
 	}
