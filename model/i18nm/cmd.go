@@ -114,6 +114,9 @@ func AutoTranslate(ctx echo.Context, table string, queryAll bool, translateAll b
 		}
 		for rows.Next() {
 			row := make([]interface{}, len(columns))
+			for i := range row {
+				row[i] = new(interface{})
+			}
 			err = rows.Scan(row...)
 			if err != nil {
 				return err
