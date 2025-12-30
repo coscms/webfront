@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/formbuilder"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/coscms/webfront/middleware/sessdata"
@@ -404,4 +405,36 @@ func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...
 		}
 	}
 	return result
+}
+
+// TranslationsToMapByIndex converts a slice of language sets to a map.
+// It takes a slice of language sets and an index as input and returns a map where each key is a field name
+// and the value is the translated text for the given index.
+// The map keys are in the format: "Language[lang][field]" where lang is the language code and field is the field name.
+func TranslationsToMapByIndex(langsets []map[string]echo.H, index int) echo.H {
+	result := echo.H{}
+	for lang, langset := range langsets[index] {
+		for key, val := range langset {
+			result[formbuilder.FormInputNamePrefixDefault+`[`+lang+`][`+key+`]`] = val
+		}
+	}
+	return result
+}
+
+// TranslationsToMaps converts a slice of language sets to a slice of maps.
+// Each map in the output slice contains translations for a single language set.
+// The map keys are in the format: "Language[lang][field]" where lang is the language code
+// and field is the field name.
+func TranslationsToMaps(langsets []map[string]echo.H) []echo.H {
+	results := make([]echo.H, 0, len(langsets))
+	for _, items := range langsets {
+		result := echo.H{}
+		for lang, langset := range items {
+			for key, val := range langset {
+				result[formbuilder.FormInputNamePrefixDefault+`[`+lang+`][`+key+`]`] = val
+			}
+		}
+		results = append(results, result)
+	}
+	return results
 }
