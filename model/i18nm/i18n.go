@@ -412,6 +412,9 @@ func GetModelsAllTranslations[T Model](ctx echo.Context, models []T, columns ...
 // and the value is the translated text for the given index.
 // The map keys are in the format: "Language[lang][field]" where lang is the language code and field is the field name.
 func TranslationsToMapByIndex(langsets []map[string]echo.H, index int) echo.H {
+	if index < 0 || index >= len(langsets) {
+		return nil
+	}
 	result := echo.H{}
 	for lang, langset := range langsets[index] {
 		for key, val := range langset {
