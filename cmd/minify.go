@@ -30,12 +30,13 @@ func minifyRunE(cmd *cobra.Command, args []string) error {
 	if len(args) < 2 {
 		return cmd.Usage()
 	}
-	src, err := os.ReadFile(args[0])
+	file := args[0]
+	src, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
 	var res []byte
-	ext := filepath.Ext(args[0])
+	ext := filepath.Ext(file)
 	ext = strings.ToLower(ext)
 	switch ext {
 	case `.css`:
@@ -49,7 +50,7 @@ func minifyRunE(cmd *cobra.Command, args []string) error {
 	case `.jpeg`, `.webp`, `.bmp`, `.gif`, `.png`, `.tiff`:
 		res, err = imageproxy.Transform(src, minifyIMGOptions)
 	default:
-		err = fmt.Errorf(`unsupported file: %v`, filepath.Base(args[0]))
+		err = fmt.Errorf(`unsupported file: %v`, filepath.Base(file))
 	}
 	if err != nil {
 		return err
