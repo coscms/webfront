@@ -47,7 +47,7 @@ func minifyRunE(cmd *cobra.Command, args []string) error {
 		m := minify.New()
 		m.AddFunc("application/javascript", js.Minify)
 		res, err = m.Bytes("application/javascript", src)
-	case `.jpeg`, `.webp`, `.bmp`, `.gif`, `.png`, `.tiff`:
+	case `.jpeg`, `.jpg`, `.webp`, `.bmp`, `.gif`, `.png`, `.tiff`:
 		res, err = imageproxy.Transform(src, minifyIMGOptions)
 	default:
 		err = fmt.Errorf(`unsupported file: %v`, filepath.Base(file))
