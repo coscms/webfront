@@ -64,14 +64,15 @@ func (c cacheQRSignIn) Decode(ctx echo.Context, key string) (QRSignIn, error) {
 		return signInData, ctx.NewError(code.InvalidParameter, `二维码包含无效字符`).SetZone(`data`)
 	}
 	err := cache.Get(ctx, c.Prefix+key, &signInData)
-	if err == nil {
+	switch err {
+	case cached.ErrNotFound:
+		err = ctx.NewError(code.DataHasExpired, `二维码已经失效`).SetZone(`data`)
+	case cached.ErrExpired:
+		err = ctx.NewError(code.DataHasExpired, `二维码已经过期`).SetZone(`data`)
+	case nil:
 		if err := cache.Delete(ctx, c.Prefix+key); err == nil {
 			cache.Delete(ctx, c.KeyPrefix+signInData.SessionID)
 		}
-	} else if err == cached.ErrNotFound {
-		err = ctx.NewError(code.DataHasExpired, `二维码已经失效`).SetZone(`data`)
-	} else if err == cached.ErrExpired {
-		err = ctx.NewError(code.DataHasExpired, `二维码已经过期`).SetZone(`data`)
 	}
 	return signInData, err
 }
