@@ -33,6 +33,7 @@ type SaveModelTranslationsOptions struct {
 	translator          Translator
 	resourceIDsByField  map[string]uint
 	originalTextPickout OriginalTextPicker
+	debugFormValue      bool
 }
 
 // SetDefaults sets default values for SaveModelTranslationsOptions fields
@@ -135,6 +136,10 @@ func (o *SaveModelTranslationsOptions) SetOriginalTextPickout(originalTextPickou
 	o.originalTextPickout = originalTextPickout
 }
 
+func (o *SaveModelTranslationsOptions) SetDebugFormValue(debugFormValue bool) {
+	o.debugFormValue = debugFormValue
+}
+
 // OptionContentType returns a function that sets the content type for the specified field
 // in SaveModelTranslationsOptions. The returned function can be used as an option when saving
 // model translations.
@@ -219,5 +224,14 @@ func OptionResourceIDsByField(resourceIDsByField map[string]uint) func(*SaveMode
 func OptionOriginalTextPickout(originalTextPickout OriginalTextPicker) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetOriginalTextPickout(originalTextPickout)
+	}
+}
+
+// OptionDebugFormValue returns a function option that sets whether to store debug form values in the form context.
+// If true, will store the form values in the form context after saving model translations.
+// This is useful for debugging purposes, especially when the form value is not visible in the request body.
+func OptionDebugFormValue(debugFormValue bool) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetDebugFormValue(debugFormValue)
 	}
 }

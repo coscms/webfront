@@ -118,6 +118,15 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 				continue
 			}
 			translatedText := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formNameL+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formNameU+`]`)
+			if cfg.debugFormValue {
+				com.Dump(echo.H{
+					`field`:          field,
+					`langCode`:       langCode,
+					`originalText`:   originalText,
+					`translatedText`: translatedText,
+					`formFields`:     []string{cfg.FormNamePrefix + `[` + langCode + `][` + formNameL + `]`, cfg.FormNamePrefix + `[` + langCode + `][` + formNameU + `]`},
+				})
+			}
 			cond := db.And(
 				db.Cond{`lang`: langCode},
 				db.Cond{`row_id`: id},
