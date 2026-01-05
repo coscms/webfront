@@ -54,7 +54,7 @@ func SortCategoryByParent[idT com.Number, vT factory.Model](list []vT) []vT {
 // The function will return a list of categories sorted by their parent_id, sort and id.
 // The root node of the tree is the category with parent_id of 0.
 func ListAllParentByType[idT com.Number, T factory.Model](f T, objects func() []T, typ string, excludeId idT, maxLevel uint, extraConds ...db.Compound) []T {
-	return ListAllParentBy[idT, T](f, objects, `type`, typ, excludeId, maxLevel, extraConds...)
+	return ListAllParentBy(f, objects, `type`, typ, excludeId, maxLevel, extraConds...)
 }
 
 // ListAllParentBy returns a list of categories that match the given conditions.
