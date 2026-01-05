@@ -81,31 +81,7 @@ func (f *Category) ListAllParent(typ string, excludeId uint, maxLevels ...uint) 
 }
 
 func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
-	var queryMW func(r db.Result) db.Result
-	if maxLevel == 0 {
-		queryMW = func(r db.Result) db.Result {
-			return r.OrderBy(`sort`, `id`)
-		}
-	} else {
-		queryMW = func(r db.Result) db.Result {
-			return r.OrderBy(`level`, `parent_id`, `sort`, `id`)
-		}
-	}
-	cond := db.NewCompounds()
-	cond.AddKV(`type`, typ)
-	cond.AddKV(`disabled`, common.BoolN)
-	cond.AddKV(`level`, db.Lte(maxLevel))
-	if excludeId > 0 {
-		cond.AddKV(`id`, db.NotEq(excludeId))
-	}
-	if len(extraConds) > 0 {
-		cond.Add(extraConds...)
-	}
-	f.ListByOffset(nil, queryMW, 0, -1, cond.And())
-	if maxLevel > 0 {
-		return SortCategoryByParent(f.Objects())
-	}
-	return f.Objects()
+	return ListAllParentBy(f.OfficialCommonCategory, f.Objects, typ, excludeId, maxLevel, extraConds...)
 }
 
 func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
@@ -163,26 +139,6 @@ func (f *Category) ListForSelected(typ string, id uint, extraConds ...db.Compoun
 		categories = append(categories, sc)
 	}
 	return categories
-}
-
-func SortCategoryByParent(list []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
-	mp := map[uint][]*dbschema.OfficialCommonCategory{} // {parent_id:[]}
-	for _, row := range list {
-		if _, ok := mp[row.ParentId]; !ok {
-			mp[row.ParentId] = []*dbschema.OfficialCommonCategory{}
-		}
-		mp[row.ParentId] = append(mp[row.ParentId], row)
-	}
-	rows := make([]*dbschema.OfficialCommonCategory, 0, len(list))
-	var appendFn func(children []*dbschema.OfficialCommonCategory)
-	appendFn = func(children []*dbschema.OfficialCommonCategory) {
-		for _, row := range children {
-			rows = append(rows, row)
-			appendFn(mp[row.Id])
-		}
-	}
-	appendFn(mp[0])
-	return rows
 }
 
 func (f *Category) ListIndent(categoryList []*dbschema.OfficialCommonCategory) []*dbschema.OfficialCommonCategory {
@@ -517,16 +473,4 @@ func (f *Category) FillTo(tg []ICategory) error {
 		}
 	}
 	return nil
-}
-
-func CollectionCategoryIDs() func(...uint) []uint {
-	categoryIds := []uint{}
-	return func(cIds ...uint) []uint {
-		for _, cID := range cIds {
-			if !com.InUintSlice(cID, categoryIds) {
-				categoryIds = append(categoryIds, cID)
-			}
-		}
-		return categoryIds
-	}
 }

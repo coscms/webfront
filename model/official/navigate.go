@@ -80,18 +80,11 @@ func (f *Navigate) ListAllParent(typ string, excludeId uint, maxLevels ...uint) 
 	if len(maxLevels) > 0 {
 		maxLevel = maxLevels[0]
 	}
-	queryMW := func(r db.Result) db.Result {
-		return r.OrderBy(`level`, `sort`, `id`)
-	}
-	cond := db.Compounds{}
-	cond.AddKV(`type`, typ)
-	cond.AddKV(`disabled`, `N`)
-	cond.AddKV(`level`, db.Lte(maxLevel))
-	if excludeId > 0 {
-		cond.AddKV(`id`, db.NotEq(excludeId))
-	}
-	f.ListByOffset(nil, queryMW, 0, -1, cond.And())
-	return f.Objects()
+	return f.ListAllParentBy(typ, excludeId, maxLevel)
+}
+
+func (f *Navigate) ListAllParentBy(typ string, excludeId uint, maxLevel uint, extraConds ...db.Compound) []*dbschema.OfficialCommonNavigate {
+	return ListAllParentBy(f.OfficialCommonNavigate, f.Objects, typ, excludeId, maxLevel, extraConds...)
 }
 
 func (f *Navigate) ListIndent(categoryList []*dbschema.OfficialCommonNavigate) []*dbschema.OfficialCommonNavigate {
