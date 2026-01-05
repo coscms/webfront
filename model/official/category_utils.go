@@ -45,13 +45,27 @@ func SortCategoryByParent[idT com.Number, vT factory.Model](list []vT) []vT {
 	return rows
 }
 
-// ListAllParentBy returns all parent categories by type and max level.
-// If maxLevel is 0, it will return all parent categories sorted by sort and id.
-// If maxLevel is greater than 0, it will return all parent categories sorted by level, parent_id, sort and id.
-// If excludeId is greater than 0, it will exclude the category with the given id.
-// If extraConds is not nil, it will add the extra conditions to the query.
-// If maxLevel is greater than 0, it will sort the result by parent_id.
-func ListAllParentBy[idT com.Number, T factory.Model](f T, objects func() []T, typ string, excludeId idT, maxLevel uint, extraConds ...db.Compound) []T {
+// ListAllParentByType returns a list of categories that match the given conditions.
+// The conditions are: type = typ, disabled = N, level <= max_level.
+// If exclude_id is not zero, it will also exclude the category with id equal to exclude_id.
+// If extraConds is not empty, it will also add the conditions to the query.
+// If max_level is zero, the categories will be sorted by sort and id.
+// Otherwise, the categories will be sorted by level, parent_id, sort and id.
+// The function will return a list of categories sorted by their parent_id, sort and id.
+// The root node of the tree is the category with parent_id of 0.
+func ListAllParentByType[idT com.Number, T factory.Model](f T, objects func() []T, typ string, excludeId idT, maxLevel uint, extraConds ...db.Compound) []T {
+	return ListAllParentBy[idT, T](f, objects, `type`, typ, excludeId, maxLevel, extraConds...)
+}
+
+// ListAllParentBy returns a list of categories that match the given conditions.
+// The conditions are: column_name = column_value, disabled = N, level <= max_level.
+// If exclude_id is not zero, it will also exclude the category with id equal to exclude_id.
+// If extraConds is not empty, it will also add the conditions to the query.
+// If max_level is zero, the categories will be sorted by sort and id.
+// Otherwise, the categories will be sorted by level, parent_id, sort and id.
+// The function will return a list of categories sorted by their parent_id, sort and id.
+// The root node of the tree is the category with parent_id of 0.
+func ListAllParentBy[idT com.Number, T factory.Model](f T, objects func() []T, columnName string, columnValue interface{}, excludeId idT, maxLevel uint, extraConds ...db.Compound) []T {
 	var queryMW func(r db.Result) db.Result
 	if maxLevel == 0 {
 		queryMW = func(r db.Result) db.Result {
@@ -63,7 +77,9 @@ func ListAllParentBy[idT com.Number, T factory.Model](f T, objects func() []T, t
 		}
 	}
 	cond := db.NewCompounds()
-	cond.AddKV(`type`, typ)
+	if len(columnName) > 0 && columnValue != nil {
+		cond.AddKV(columnName, columnValue)
+	}
 	cond.AddKV(`disabled`, common.BoolN)
 	cond.AddKV(`level`, db.Lte(maxLevel))
 	if excludeId > 0 {

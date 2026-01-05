@@ -77,11 +77,11 @@ func (f *Category) ListAllParent(typ string, excludeId uint, maxLevels ...uint) 
 	if len(maxLevels) > 0 {
 		maxLevel = maxLevels[0]
 	}
-	return f.ListAllParentBy(typ, excludeId, maxLevel)
+	return f.ListAllParentByType(typ, excludeId, maxLevel)
 }
 
-func (f *Category) ListAllParentBy(typ string, excludeId uint, maxLevel uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
-	return ListAllParentBy(f.OfficialCommonCategory, f.Objects, typ, excludeId, maxLevel, extraConds...)
+func (f *Category) ListAllParentByType(typ string, excludeId uint, maxLevel uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
+	return ListAllParentByType(f.OfficialCommonCategory, f.Objects, typ, excludeId, maxLevel, extraConds...)
 }
 
 func (f *Category) ListByParentID(typ string, parentID uint, extraConds ...db.Compound) []*dbschema.OfficialCommonCategory {
