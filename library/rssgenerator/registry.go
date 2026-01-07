@@ -19,6 +19,9 @@ import (
 var Registry = echo.NewKVxData[RSS, any]().
 	Add(`article`, echo.T(`文章`), echo.KVxOptX[RSS, any](RSS{Do: articleRSS}))
 
+// Register registers a rss generator with the given key and value.
+// The value is a RSS struct which contains a Do function that is used to generate the RSS feed.
+// The key is used to identify the RSS generator and the value is used to generate the RSS feed.
 func Register(k, v string, x RSS) {
 	Registry.Add(k, v, echo.KVxOptX[RSS, any](x))
 }
@@ -27,6 +30,7 @@ type RSS struct {
 	Do func(ctx echo.Context, feed *feeds.RssFeed) error
 }
 
+// T2s converts a time.Time into a string in RFC1123Z format (e.g. "2006-01-02T15:04:05Z07:00").
 func T2s(t time.Time) string {
 	return t.Format(time.RFC1123Z)
 }
@@ -76,6 +80,7 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 				item.Description = row.Content
 			}
 		}
+		item.Description = CDATA(item.Description)
 		if len(row.Image) > 0 {
 			mtype := mime.TypeByExtension(path.Ext(row.Image))
 			row.Image = com.AbsURL(ctx.Site()+`rss`, row.Image)
@@ -97,6 +102,10 @@ func articleRSS(ctx echo.Context, feed *feeds.RssFeed) error {
 	return err
 }
 
+// RegisterRoute registers RSS endpoints to the given router.
+// It registers endpoints for fetching RSS feeds of all articles
+// and for fetching RSS feeds of articles in a group.
+// The endpoints are `/rss` and `/rss/:group` respectively.
 func RegisterRoute(r echo.RouteRegister) {
 	r.Get(`/rss`, Handle).SetMetaKV(httpserver.PermGuestKV())
 	r.Get(`/rss/:group`, Handle).SetMetaKV(httpserver.PermGuestKV())

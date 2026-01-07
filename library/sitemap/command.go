@@ -59,6 +59,31 @@ func validateLangCode(langCodes []string) error {
 	return nil
 }
 
+// CmdGenerate 生成sitemap
+//
+//   - rootURL: 网站根URL
+//
+//   - langCode: 语言代码,多个语言代码用逗号分隔
+//
+//   - sitemapCfg: sitemap配置
+//
+//     sitemapCfg.Mode:
+//
+//   - full: 全量生成sitemap
+//
+//   - incr: 增量生成sitemap
+//
+//   - clear: 删除sitemap
+//
+//     sitemapCfg.Group:
+//
+//   - 如果为空,那么将生成所有组的sitemap
+//
+//   - 否wise将生成指定组的sitemap
+//
+//     sitemapCfg.AllChild:
+//
+//   - 是否同时生成所有子页面中的网址
 func CmdGenerate(rootURL, langCode string, sitemapCfg Config) error {
 	if sitemapCfg.Mode == `clear` {
 		switch rootURL {

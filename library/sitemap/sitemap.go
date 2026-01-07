@@ -1,3 +1,4 @@
+// Package sitemap contains functions for generating sitemap files.
 package sitemap
 
 import (
@@ -13,6 +14,19 @@ import (
 	"github.com/webx-top/echo/defaults"
 )
 
+// GenerateIndex 生成sitemap索引文件
+//
+//   - ctx: Context对象
+//
+//   - rootURL: 网站根URL
+//
+//   - langCodes: 语言代码,多个语言代码用逗号分隔
+//
+//   - generateChildPageItems: 是否生成所有子页面中的网址
+//
+//   - subDir: 生成sitemap文件的子目录,可选
+//
+//     生成的sitemap文件将被保存在public/sitemap/目录下
 func GenerateIndex(ctx echo.Context, rootURL string, langCodes []string, generateChildPageItems bool, subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
@@ -63,6 +77,19 @@ func GenerateIndex(ctx echo.Context, rootURL string, langCodes []string, generat
 	return err
 }
 
+// GenerateSingle 生成sitemap单个文件
+//
+//   - ctx: Context对象
+//
+//   - rootURL: 网站根URL
+//
+//   - langCodes: 语言代码,多个语言代码用逗号分隔
+//
+//   - f: 需要生成sitemap的函数
+//
+//   - subDir: 生成sitemap文件的子目录,可选
+//
+//     生成的sitemap文件将被保存在public/sitemap/目录下
 func GenerateSingle(ctx echo.Context, rootURL string, langCodes []string, f *echo.KVx[Sitemap, any], subDir ...string) error {
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
@@ -103,6 +130,15 @@ func GenerateSingle(ctx echo.Context, rootURL string, langCodes []string, f *ech
 	return err
 }
 
+// RemoveAll removes all sitemap files from the public/sitemap/ directory.
+//
+// If subDirs is empty, it will remove the entire public/sitemap/ directory.
+//
+// Otherwise, it will remove the specified subdirectories from the public/sitemap/ directory.
+//
+// For example, if subDirs is ["zh-CN", "en-US"], it will remove the public/sitemap/zh-CN/ and public/sitemap/en-US/ directories.
+//
+// Note that this function will not return an error even if the directory does not exist.
 func RemoveAll(subDirs ...string) {
 	if len(subDirs) == 0 {
 		os.RemoveAll(filepath.Join(echo.Wd(), `public`, `sitemap`))
@@ -113,11 +149,21 @@ func RemoveAll(subDirs ...string) {
 	}
 }
 
+// GenerateIndexAllLanguage generates the sitemap index file for all languages.
+//
+// It is a shorthand for calling GenerateIndex with config.FromFile().Language.AllList.
+//
+// See GenerateIndex for more information.
 func GenerateIndexAllLanguage(ctx echo.Context, rootURL string, generateChildPageItems bool, subDir ...string) (err error) {
 	err = GenerateIndex(ctx, rootURL, config.FromFile().Language.AllList, generateChildPageItems, subDir...)
 	return
 }
 
+// GenerateSingleAllLanguage generates the sitemap index file for a single sitemap generator.
+//
+// It is a shorthand for calling GenerateSingle with config.FromFile().Language.AllList.
+//
+// See GenerateSingle for more information.
 func GenerateSingleAllLanguage(ctx echo.Context, rootURL string, f *echo.KVx[Sitemap, any], subDir ...string) (err error) {
 	err = GenerateSingle(ctx, rootURL, config.FromFile().Language.AllList, f, subDir...)
 	return

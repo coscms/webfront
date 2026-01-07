@@ -114,6 +114,17 @@ func articleSitemap(ctx echo.Context, lastID string, receiver LocReceiver) (stri
 	return lastID, err
 }
 
+// RegisterRoute registers the following endpoints to the given router:
+//   - `/sitemap.xml`: Sitemap XML file
+//   - `/sitemap_index.xml`: Sitemap index XML file
+//   - `/sitemaps/*`: Static Sitemap files
+//
+// The endpoints are registered with the permGuest meta, which means
+// that they are accessible to all users.
+//
+// The getSubDirName parameter is a function that takes a context and
+// returns a string representing the subdirectory name for the Sitemap
+// files.
 func RegisterRoute(r echo.RouteRegister, getSubDirName func(echo.Context) string) {
 	sitemapDir := filepath.Join(echo.Wd(), `public`, `sitemap`)
 	r.Get(`/sitemap.xml`, func(c echo.Context) error {
