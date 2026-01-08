@@ -35,11 +35,14 @@ func (f *Relation) ListByCustomerID(customerID uint64) ([]*dbschema.OfficialCust
 	return f.Objects(), nil
 }
 
-func (f *Relation) GetLevelIDs(customerID uint64) ([]uint, error) {
+func (f *Relation) GetLevelIDs(customer *dbschema.OfficialCustomer) ([]uint, error) {
+	if customer == nil {
+		return nil, nil
+	}
 	_, err := f.ListByOffset(nil, func(r db.Result) db.Result {
 		return r.Select(`level_id`)
 	}, 0, -1, db.And(
-		db.Cond{`customer_id`: customerID},
+		db.Cond{`customer_id`: customer.Id},
 		db.Cond{`status`: LevelStatusActived},
 		db.Or(
 			db.Cond{`expired`: 0},
@@ -52,6 +55,10 @@ func (f *Relation) GetLevelIDs(customerID uint64) ([]uint, error) {
 	rows := f.Objects()
 	levelIDs := make([]uint, 0, len(rows))
 	levelIDHash := map[uint]struct{}{}
+	if customer.LevelId > 0 {
+		levelIDHash[customer.LevelId] = struct{}{}
+		levelIDs = append(levelIDs, customer.LevelId)
+	}
 	for _, row := range rows {
 		if _, ok := levelIDHash[row.LevelId]; ok {
 			continue
