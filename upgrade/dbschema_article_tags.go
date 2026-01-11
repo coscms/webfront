@@ -19,7 +19,7 @@ func init() {
 	}
 	echo.OnCallback(`nging.upgrade.db.before`, func(data echo.Event) error {
 		installedSchemaVer := data.Context.Float64(`installedSchemaVer`)
-		if installedSchemaVer >= 8.6 {
+		if installedSchemaVer > 8.6 {
 			return nil
 		}
 		return upgradeArticleTagsData()
