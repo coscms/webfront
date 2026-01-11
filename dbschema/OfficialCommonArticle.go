@@ -374,6 +374,9 @@ func (a *OfficialCommonArticle) Insert() (pk interface{}, err error) {
 	if len(a.CommentAllowUser) == 0 {
 		a.CommentAllowUser = "all"
 	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
+	}
 	if a.base.Eventable() {
 		err = DBI.Fire("creating", a, nil)
 		if err != nil {
@@ -414,6 +417,9 @@ func (a *OfficialCommonArticle) Update(mw func(db.Result) db.Result, args ...int
 	if len(a.CommentAllowUser) == 0 {
 		a.CommentAllowUser = "all"
 	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
+	}
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
@@ -445,6 +451,9 @@ func (a *OfficialCommonArticle) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	if len(a.CommentAllowUser) == 0 {
 		a.CommentAllowUser = "all"
+	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
 	}
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
@@ -478,6 +487,9 @@ func (a *OfficialCommonArticle) UpdateByFields(mw func(db.Result) db.Result, fie
 	}
 	if len(a.CommentAllowUser) == 0 {
 		a.CommentAllowUser = "all"
+	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
 	}
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).UpdateByStruct(a, fields...)
@@ -515,6 +527,9 @@ func (a *OfficialCommonArticle) UpdatexByFields(mw func(db.Result) db.Result, fi
 	}
 	if len(a.CommentAllowUser) == 0 {
 		a.CommentAllowUser = "all"
+	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
 	}
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).UpdatexByStruct(a, fields...)
@@ -577,6 +592,11 @@ func (a *OfficialCommonArticle) UpdateFields(mw func(db.Result) db.Result, kvset
 			kvset["comment_allow_user"] = "all"
 		}
 	}
+	if val, ok := kvset["tags"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["tags"] = "[]"
+		}
+	}
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(kvset).Update()
 	}
@@ -625,6 +645,11 @@ func (a *OfficialCommonArticle) UpdatexFields(mw func(db.Result) db.Result, kvse
 	if val, ok := kvset["comment_allow_user"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["comment_allow_user"] = "all"
+		}
+	}
+	if val, ok := kvset["tags"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["tags"] = "[]"
 		}
 	}
 	if !a.base.Eventable() {
@@ -682,6 +707,9 @@ func (a *OfficialCommonArticle) Upsert(mw func(db.Result) db.Result, args ...int
 		if len(a.CommentAllowUser) == 0 {
 			a.CommentAllowUser = "all"
 		}
+		if len(a.Tags) == 0 {
+			a.Tags = "[]"
+		}
 		if !a.base.Eventable() {
 			return nil
 		}
@@ -706,6 +734,9 @@ func (a *OfficialCommonArticle) Upsert(mw func(db.Result) db.Result, args ...int
 		}
 		if len(a.CommentAllowUser) == 0 {
 			a.CommentAllowUser = "all"
+		}
+		if len(a.Tags) == 0 {
+			a.Tags = "[]"
 		}
 		if !a.base.Eventable() {
 			return nil

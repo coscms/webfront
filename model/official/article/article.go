@@ -2,8 +2,8 @@ package article
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
@@ -80,15 +80,26 @@ func (f *Article) check(old *dbschema.OfficialCommonArticle) error {
 	}
 	var err error
 	var oldTags []string
-	if old != nil && len(old.Tags) > 0 {
-		oldTags = strings.Split(old.Tags, `,`)
+	if old != nil {
+		oldTags, err = top.ParseTags(old.Tags)
+		if err != nil {
+			return err
+		}
 	}
 	tagsM := official.NewTags(f.Context())
-	tags, err := tagsM.UpdateTags(GroupName, oldTags, strings.Split(f.Tags, `,`), f.DisallowCreateTags)
+	var postTags []string
+	postTags, err = top.ParseTags(f.Tags)
 	if err != nil {
 		return err
 	}
-	f.Tags = strings.Join(tags, `,`)
+	tags, err := tagsM.UpdateTags(GroupName, oldTags, postTags, f.DisallowCreateTags)
+	if err != nil {
+		return err
+	}
+	f.Tags, err = com.JSONEncodeToString(tags)
+	if err != nil {
+		return err
+	}
 
 	if len(f.Contype) == 0 || !Contype.Has(f.Contype) {
 		f.Contype = `text`

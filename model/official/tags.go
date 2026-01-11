@@ -5,6 +5,7 @@ import (
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory/mysql"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/param"
@@ -199,6 +200,9 @@ func (f *Tags) UpdateTags(group string, oldTags []string, postTags []string, dis
 	return tags, err
 }
 
-func TagCond(tag string) db.Compound {
-	return top.CondFindInSet(`tags`, tag)
+func TagCond(tag string, inSet ...bool) db.Compound {
+	if len(inSet) > 0 && inSet[0] {
+		return top.CondFindInSet(`tags`, tag)
+	}
+	return mysql.FindInJSON(`tags`, tag, `*`)
 }

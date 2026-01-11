@@ -221,7 +221,7 @@ CREATE TABLE `official_common_article` (
   `likes` bigint unsigned NOT NULL DEFAULT '0' COMMENT '好评数量',
   `hates` bigint unsigned NOT NULL DEFAULT '0' COMMENT '差评数量',
   `views` bigint unsigned NOT NULL DEFAULT '0' COMMENT '浏览次数',
-  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
+  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '[]' COMMENT '标签',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '价格',
   `slugify` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'SEO-friendly URLs with Slugify',
   PRIMARY KEY (`id`),
@@ -236,6 +236,7 @@ CREATE TABLE `official_common_article` (
   KEY `common_article_likes` (`likes` DESC),
   KEY `common_article_comments` (`comments` DESC),
   KEY `common_article_updated` (`updated` DESC),
+  KEY `common_article_tags` ((cast(json_extract(`tags`,_utf8mb4'$[*]') as char(30) array))),
   FULLTEXT KEY `common_article_title` (`title`) /*!50100 WITH PARSER `ngram` */ 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='官方新闻';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1223,4 +1224,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-11  5:26:00
+-- Dump completed on 2026-01-11  6:20:48
