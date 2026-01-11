@@ -2,7 +2,6 @@ package article
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -10,6 +9,7 @@ import (
 	"github.com/coscms/webcore/library/fileupdater/listener"
 	"github.com/coscms/webcore/registry/upload/thumb"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/top"
 	"github.com/coscms/webfront/model/official"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 )
@@ -41,7 +41,8 @@ func init() {
 		var err error
 		if len(fm.Tags) > 0 {
 			tagsM := official.NewTags(m.Context())
-			err = tagsM.DecrNum(modelArticle.GroupName, strings.Split(fm.Tags, `,`))
+			tags, _ := top.ParseTags(fm.Tags)
+			err = tagsM.DecrNum(modelArticle.GroupName, tags)
 			if err != nil {
 				return err
 			}
