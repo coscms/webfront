@@ -3,7 +3,9 @@ package upgrade
 import (
 	"strings"
 
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/version"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -12,8 +14,8 @@ import (
 
 func init() {
 	echo.OnCallback(`nging.upgrade.db.before`, func(data echo.Event) error {
-		installedSchemaVer := data.Context.Float64(`installedSchemaVer`)
-		if installedSchemaVer > 8.6 {
+		installedPkgSchemaVer := config.GetInstalledPkgSchemaVer(version.PkgName)
+		if installedPkgSchemaVer >= 2.0 {
 			return nil
 		}
 		return upgradeArticleTagsData()
@@ -23,12 +25,13 @@ func init() {
 func upgradeArticleTagsData() error {
 	ctx := defaults.NewMockContext()
 	m := dbschema.NewOfficialCommonArticle(ctx)
+	qmw := func(r db.Result) db.Result {
+		return r.Select(`id`, `tags`)
+	}
+	cond := db.Raw("NOT JSON_VALID(`tags`)")
 	var err error
-
 	for {
-		_, err = m.ListByOffset(nil, func(r db.Result) db.Result {
-			return r.Select(`id`, `tags`)
-		}, 0, 200, db.Raw("NOT JSON_VALID(`tags`)"))
+		_, err = m.ListByOffset(nil, qmw, 0, 200, cond)
 		if err != nil {
 			return err
 		}
