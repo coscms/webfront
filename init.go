@@ -5,4 +5,5 @@ import (
 	_ "github.com/coscms/webfront/initialize"
 	_ "github.com/coscms/webfront/listener"
 	_ "github.com/coscms/webfront/registry"
+	_ "github.com/coscms/webfront/upgrade"
 )
