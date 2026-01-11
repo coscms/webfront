@@ -40,11 +40,13 @@ func init() {
 		fm := m.(*dbschema.OfficialCommonArticle)
 		var err error
 		if len(fm.Tags) > 0 {
-			tagsM := official.NewTags(m.Context())
 			tags, _ := top.ParseTags(fm.Tags)
-			err = tagsM.DecrNum(modelArticle.GroupName, tags)
-			if err != nil {
-				return err
+			if len(tags) > 0 {
+				tagsM := official.NewTags(m.Context())
+				err = tagsM.DecrNum(modelArticle.GroupName, tags)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		return err
