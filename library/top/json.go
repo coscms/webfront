@@ -16,7 +16,7 @@ func ParseTags(tags string) ([]string, error) {
 	)
 
 	if len(tags) > 0 {
-		if strings.HasPrefix(tags, `[`) {
+		if tags[0] == '[' && tags[len(tags)-1] == ']' {
 			b := com.Str2bytes(tags)
 			err = com.JSONDecode(b, &r)
 			if err != nil {
