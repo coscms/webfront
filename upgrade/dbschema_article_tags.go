@@ -11,12 +11,6 @@ import (
 )
 
 func init() {
-	type Role struct {
-		Id           uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-		PermCmd      string `db:"perm_cmd" bson:"perm_cmd" comment:"快捷命令权限(多个用“,”隔开)" json:"perm_cmd" xml:"perm_cmd"`
-		PermAction   string `db:"perm_action" bson:"perm_action" comment:"操作权限(多个用“,”隔开)" json:"perm_action" xml:"perm_action"`
-		PermBehavior string `db:"perm_behavior" bson:"perm_behavior" comment:"行为权限(多个用“,”隔开)" json:"perm_behavior" xml:"perm_behavior"`
-	}
 	echo.OnCallback(`nging.upgrade.db.before`, func(data echo.Event) error {
 		installedSchemaVer := data.Context.Float64(`installedSchemaVer`)
 		if installedSchemaVer > 8.6 {
