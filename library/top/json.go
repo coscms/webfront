@@ -6,9 +6,9 @@ import (
 	"github.com/webx-top/com"
 )
 
-// ParseTags 将字符串解析为字符串切片
-// 如果字符串以 `[` 开头，则认为是 JSON 字符串，否则认为是逗号分隔的字符串
-// 例如 `["a","b","c"]` 或 `a,b,c`
+// ParseTags 将字符串解析为多个标签
+// tags: string类型,可传入null、空字符串、以逗号分隔的多个标签字符串、或者以JSON格式的字符串
+// 返回多个标签字符串的切片,或者错误
 func ParseTags(tags string) ([]string, error) {
 	var (
 		r   []string
@@ -23,6 +23,9 @@ func ParseTags(tags string) ([]string, error) {
 				return r, err
 			}
 		} else {
+			if tags == `null` {
+				return r, nil
+			}
 			r = strings.Split(tags, `,`)
 		}
 	}
