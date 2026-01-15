@@ -9,6 +9,7 @@ import (
 	"github.com/coscms/webfront/library/cache"
 	"github.com/coscms/webfront/library/xrole"
 	"github.com/coscms/webfront/middleware/sessdata"
+	modelLevel "github.com/coscms/webfront/model/official/level"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
@@ -75,6 +76,27 @@ func CustomerRoles(c echo.Context, customers ...*dbschema.OfficialCustomer) (rol
 	}
 	c.Internal().Set(`customerRoles`, roleList)
 	return roleList
+}
+
+func CustomerLevelIDs(c echo.Context, customers ...*dbschema.OfficialCustomer) ([]uint, error) {
+	levelIDs, ok := c.Internal().Get(`customerLevelIDs`).([]uint)
+	if ok {
+		return levelIDs, nil
+	}
+	var customer *dbschema.OfficialCustomer
+	if len(customers) > 0 && customers[0] != nil {
+		customer = customers[0]
+	} else {
+		customer = sessdata.Customer(c)
+	}
+	if customer == nil {
+		return nil, nil
+	}
+	levelRelM := modelLevel.NewRelation(c)
+	var err error
+	levelIDs, err = levelRelM.GetLevelIDs(customer)
+	c.Internal().Set(`customerLevelIDs`, levelIDs)
+	return levelIDs, err
 }
 
 func CustomerRolePermissionForBehavior(c echo.Context, behaviorName string, customer ...*dbschema.OfficialCustomer) interface{} {

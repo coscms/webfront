@@ -11,6 +11,7 @@ var (
 	CustomerPermTTL    = modelCustomer.CustomerPermTTL
 	CustomerPermission = modelCustomer.CustomerPermission
 	CustomerRoles      = modelCustomer.CustomerRoles
+	CustomerLevelIDs   = modelCustomer.CustomerLevelIDs
 )
 
 func AllowedByRouteName(ctx echo.Context, name string) bool {
