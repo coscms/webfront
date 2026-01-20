@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_OfficialCommonRouteRewrite []*OfficialCommonRouteRewrite
-
-func (s Slice_OfficialCommonRouteRewrite) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCommonRouteRewrite) RangeRaw(fn func(m *OfficialCommonRouteRewrite) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCommonRouteRewrite) GroupBy(keyField string) map[string][]*OfficialCommonRouteRewrite {
-	r := map[string][]*OfficialCommonRouteRewrite{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*OfficialCommonRouteRewrite{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonRouteRewrite) KeyBy(keyField string) map[string]*OfficialCommonRouteRewrite {
-	r := map[string]*OfficialCommonRouteRewrite{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonRouteRewrite) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonRouteRewrite) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonRouteRewrite) FromList(data interface{}) Slice_OfficialCommonRouteRewrite {
-	values, ok := data.([]*OfficialCommonRouteRewrite)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &OfficialCommonRouteRewrite{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_OfficialCommonRouteRewrite = factory.Slicex[*OfficialCommonRouteRewrite]
 
 func NewOfficialCommonRouteRewrite(ctx echo.Context) *OfficialCommonRouteRewrite {
 	m := &OfficialCommonRouteRewrite{}
@@ -224,10 +150,13 @@ func (a *OfficialCommonRouteRewrite) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *OfficialCommonRouteRewrite) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *OfficialCommonRouteRewrite) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -239,13 +168,13 @@ func (a *OfficialCommonRouteRewrite) Get(mw func(db.Result) db.Result, args ...i
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -258,18 +187,18 @@ func (a *OfficialCommonRouteRewrite) List(recv interface{}, mw func(db.Result) d
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCommonRouteRewrite:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(*v))
 		case []*OfficialCommonRouteRewrite:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -313,18 +242,18 @@ func (a *OfficialCommonRouteRewrite) ListByOffset(recv interface{}, mw func(db.R
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCommonRouteRewrite:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(*v))
 		case []*OfficialCommonRouteRewrite:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonRouteRewrite(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -337,7 +266,7 @@ func (a *OfficialCommonRouteRewrite) Insert() (pk interface{}, err error) {
 		a.Disabled = "N"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -351,7 +280,7 @@ func (a *OfficialCommonRouteRewrite) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -364,13 +293,13 @@ func (a *OfficialCommonRouteRewrite) Update(mw func(db.Result) db.Result, args .
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *OfficialCommonRouteRewrite) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -381,13 +310,13 @@ func (a *OfficialCommonRouteRewrite) Updatex(mw func(db.Result) db.Result, args 
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -403,13 +332,13 @@ func (a *OfficialCommonRouteRewrite) UpdateByFields(mw func(db.Result) db.Result
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -425,13 +354,13 @@ func (a *OfficialCommonRouteRewrite) UpdatexByFields(mw func(db.Result) db.Resul
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -463,13 +392,13 @@ func (a *OfficialCommonRouteRewrite) UpdateFields(mw func(db.Result) db.Result, 
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *OfficialCommonRouteRewrite) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -488,13 +417,13 @@ func (a *OfficialCommonRouteRewrite) UpdatexFields(mw func(db.Result) db.Result,
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -504,13 +433,13 @@ func (a *OfficialCommonRouteRewrite) UpdateValues(mw func(db.Result) db.Result, 
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *OfficialCommonRouteRewrite) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -522,7 +451,7 @@ func (a *OfficialCommonRouteRewrite) Upsert(mw func(db.Result) db.Result, args .
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -532,7 +461,7 @@ func (a *OfficialCommonRouteRewrite) Upsert(mw func(db.Result) db.Result, args .
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint); y {
@@ -543,9 +472,9 @@ func (a *OfficialCommonRouteRewrite) Upsert(mw func(db.Result) db.Result, args .
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -556,13 +485,13 @@ func (a *OfficialCommonRouteRewrite) Delete(mw func(db.Result) db.Result, args .
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *OfficialCommonRouteRewrite) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -570,13 +499,13 @@ func (a *OfficialCommonRouteRewrite) Deletex(mw func(db.Result) db.Result, args 
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -630,6 +559,12 @@ func (a *OfficialCommonRouteRewrite) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *OfficialCommonRouteRewrite) Clone() *OfficialCommonRouteRewrite {
+	cloned := OfficialCommonRouteRewrite{Id: a.Id, Route: a.Route, RewriteTo: a.RewriteTo, Name: a.Name, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *OfficialCommonRouteRewrite) FromRow(row map[string]interface{}) {
@@ -798,12 +733,13 @@ func (a *OfficialCommonRouteRewrite) ListPageByOffsetAs(recv interface{}, cond *
 }
 
 func (a *OfficialCommonRouteRewrite) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *OfficialCommonRouteRewrite) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *OfficialCommonRouteRewrite) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *OfficialCommonRouteRewrite) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }

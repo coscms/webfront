@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_OfficialCustomerLevelRelation []*OfficialCustomerLevelRelation
-
-func (s Slice_OfficialCustomerLevelRelation) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCustomerLevelRelation) RangeRaw(fn func(m *OfficialCustomerLevelRelation) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCustomerLevelRelation) GroupBy(keyField string) map[string][]*OfficialCustomerLevelRelation {
-	r := map[string][]*OfficialCustomerLevelRelation{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*OfficialCustomerLevelRelation{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_OfficialCustomerLevelRelation) KeyBy(keyField string) map[string]*OfficialCustomerLevelRelation {
-	r := map[string]*OfficialCustomerLevelRelation{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_OfficialCustomerLevelRelation) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_OfficialCustomerLevelRelation) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_OfficialCustomerLevelRelation) FromList(data interface{}) Slice_OfficialCustomerLevelRelation {
-	values, ok := data.([]*OfficialCustomerLevelRelation)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &OfficialCustomerLevelRelation{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_OfficialCustomerLevelRelation = factory.Slicex[*OfficialCustomerLevelRelation]
 
 func NewOfficialCustomerLevelRelation(ctx echo.Context) *OfficialCustomerLevelRelation {
 	m := &OfficialCustomerLevelRelation{}
@@ -226,10 +152,13 @@ func (a *OfficialCustomerLevelRelation) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *OfficialCustomerLevelRelation) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *OfficialCustomerLevelRelation) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -241,13 +170,13 @@ func (a *OfficialCustomerLevelRelation) Get(mw func(db.Result) db.Result, args .
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -260,18 +189,18 @@ func (a *OfficialCustomerLevelRelation) List(recv interface{}, mw func(db.Result
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCustomerLevelRelation:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(*v))
 		case []*OfficialCustomerLevelRelation:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -315,18 +244,18 @@ func (a *OfficialCustomerLevelRelation) ListByOffset(recv interface{}, mw func(d
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCustomerLevelRelation:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(*v))
 		case []*OfficialCustomerLevelRelation:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCustomerLevelRelation(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -339,7 +268,7 @@ func (a *OfficialCustomerLevelRelation) Insert() (pk interface{}, err error) {
 		a.Status = "actived"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -353,7 +282,7 @@ func (a *OfficialCustomerLevelRelation) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -366,13 +295,13 @@ func (a *OfficialCustomerLevelRelation) Update(mw func(db.Result) db.Result, arg
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *OfficialCustomerLevelRelation) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -383,13 +312,13 @@ func (a *OfficialCustomerLevelRelation) Updatex(mw func(db.Result) db.Result, ar
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -405,13 +334,13 @@ func (a *OfficialCustomerLevelRelation) UpdateByFields(mw func(db.Result) db.Res
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -427,13 +356,13 @@ func (a *OfficialCustomerLevelRelation) UpdatexByFields(mw func(db.Result) db.Re
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -465,13 +394,13 @@ func (a *OfficialCustomerLevelRelation) UpdateFields(mw func(db.Result) db.Resul
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *OfficialCustomerLevelRelation) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -490,13 +419,13 @@ func (a *OfficialCustomerLevelRelation) UpdatexFields(mw func(db.Result) db.Resu
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -506,13 +435,13 @@ func (a *OfficialCustomerLevelRelation) UpdateValues(mw func(db.Result) db.Resul
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *OfficialCustomerLevelRelation) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -524,7 +453,7 @@ func (a *OfficialCustomerLevelRelation) Upsert(mw func(db.Result) db.Result, arg
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -534,7 +463,7 @@ func (a *OfficialCustomerLevelRelation) Upsert(mw func(db.Result) db.Result, arg
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint64); y {
@@ -545,9 +474,9 @@ func (a *OfficialCustomerLevelRelation) Upsert(mw func(db.Result) db.Result, arg
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -558,13 +487,13 @@ func (a *OfficialCustomerLevelRelation) Delete(mw func(db.Result) db.Result, arg
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *OfficialCustomerLevelRelation) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -572,13 +501,13 @@ func (a *OfficialCustomerLevelRelation) Deletex(mw func(db.Result) db.Result, ar
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -640,6 +569,12 @@ func (a *OfficialCustomerLevelRelation) AsMap(onlyFields ...string) param.Store 
 		}
 	}
 	return r
+}
+
+func (a *OfficialCustomerLevelRelation) Clone() *OfficialCustomerLevelRelation {
+	cloned := OfficialCustomerLevelRelation{Id: a.Id, CustomerId: a.CustomerId, LevelId: a.LevelId, Status: a.Status, Expired: a.Expired, AccumulatedDays: a.AccumulatedDays, LastRenewalAt: a.LastRenewalAt, Created: a.Created, Updated: a.Updated}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *OfficialCustomerLevelRelation) FromRow(row map[string]interface{}) {
@@ -832,12 +767,13 @@ func (a *OfficialCustomerLevelRelation) ListPageByOffsetAs(recv interface{}, con
 }
 
 func (a *OfficialCustomerLevelRelation) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *OfficialCustomerLevelRelation) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *OfficialCustomerLevelRelation) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *OfficialCustomerLevelRelation) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }

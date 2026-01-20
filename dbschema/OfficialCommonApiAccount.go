@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_OfficialCommonApiAccount []*OfficialCommonApiAccount
-
-func (s Slice_OfficialCommonApiAccount) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCommonApiAccount) RangeRaw(fn func(m *OfficialCommonApiAccount) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialCommonApiAccount) GroupBy(keyField string) map[string][]*OfficialCommonApiAccount {
-	r := map[string][]*OfficialCommonApiAccount{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*OfficialCommonApiAccount{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonApiAccount) KeyBy(keyField string) map[string]*OfficialCommonApiAccount {
-	r := map[string]*OfficialCommonApiAccount{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonApiAccount) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonApiAccount) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_OfficialCommonApiAccount) FromList(data interface{}) Slice_OfficialCommonApiAccount {
-	values, ok := data.([]*OfficialCommonApiAccount)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &OfficialCommonApiAccount{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_OfficialCommonApiAccount = factory.Slicex[*OfficialCommonApiAccount]
 
 func NewOfficialCommonApiAccount(ctx echo.Context) *OfficialCommonApiAccount {
 	m := &OfficialCommonApiAccount{}
@@ -232,10 +158,13 @@ func (a *OfficialCommonApiAccount) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *OfficialCommonApiAccount) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *OfficialCommonApiAccount) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -247,13 +176,13 @@ func (a *OfficialCommonApiAccount) Get(mw func(db.Result) db.Result, args ...int
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -266,18 +195,18 @@ func (a *OfficialCommonApiAccount) List(recv interface{}, mw func(db.Result) db.
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCommonApiAccount:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(*v))
 		case []*OfficialCommonApiAccount:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -321,18 +250,18 @@ func (a *OfficialCommonApiAccount) ListByOffset(recv interface{}, mw func(db.Res
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialCommonApiAccount:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(*v))
 		case []*OfficialCommonApiAccount:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialCommonApiAccount(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -348,7 +277,7 @@ func (a *OfficialCommonApiAccount) Insert() (pk interface{}, err error) {
 		a.Disabled = "N"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -362,7 +291,7 @@ func (a *OfficialCommonApiAccount) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -378,13 +307,13 @@ func (a *OfficialCommonApiAccount) Update(mw func(db.Result) db.Result, args ...
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *OfficialCommonApiAccount) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -398,13 +327,13 @@ func (a *OfficialCommonApiAccount) Updatex(mw func(db.Result) db.Result, args ..
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -423,13 +352,13 @@ func (a *OfficialCommonApiAccount) UpdateByFields(mw func(db.Result) db.Result, 
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -448,13 +377,13 @@ func (a *OfficialCommonApiAccount) UpdatexByFields(mw func(db.Result) db.Result,
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -491,13 +420,13 @@ func (a *OfficialCommonApiAccount) UpdateFields(mw func(db.Result) db.Result, kv
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *OfficialCommonApiAccount) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -521,13 +450,13 @@ func (a *OfficialCommonApiAccount) UpdatexFields(mw func(db.Result) db.Result, k
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -537,13 +466,13 @@ func (a *OfficialCommonApiAccount) UpdateValues(mw func(db.Result) db.Result, ke
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *OfficialCommonApiAccount) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -558,7 +487,7 @@ func (a *OfficialCommonApiAccount) Upsert(mw func(db.Result) db.Result, args ...
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -571,7 +500,7 @@ func (a *OfficialCommonApiAccount) Upsert(mw func(db.Result) db.Result, args ...
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint64); y {
@@ -582,9 +511,9 @@ func (a *OfficialCommonApiAccount) Upsert(mw func(db.Result) db.Result, args ...
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -595,13 +524,13 @@ func (a *OfficialCommonApiAccount) Delete(mw func(db.Result) db.Result, args ...
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *OfficialCommonApiAccount) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -609,13 +538,13 @@ func (a *OfficialCommonApiAccount) Deletex(mw func(db.Result) db.Result, args ..
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -701,6 +630,12 @@ func (a *OfficialCommonApiAccount) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *OfficialCommonApiAccount) Clone() *OfficialCommonApiAccount {
+	cloned := OfficialCommonApiAccount{Id: a.Id, OwnerType: a.OwnerType, OwnerId: a.OwnerId, GroupId: a.GroupId, Name: a.Name, Url: a.Url, UrlDev: a.UrlDev, AppId: a.AppId, AppSecret: a.AppSecret, PublicKey: a.PublicKey, Encryption: a.Encryption, Extra: a.Extra, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *OfficialCommonApiAccount) FromRow(row map[string]interface{}) {
@@ -965,12 +900,13 @@ func (a *OfficialCommonApiAccount) ListPageByOffsetAs(recv interface{}, cond *db
 }
 
 func (a *OfficialCommonApiAccount) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *OfficialCommonApiAccount) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *OfficialCommonApiAccount) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *OfficialCommonApiAccount) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }

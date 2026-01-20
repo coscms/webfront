@@ -33,7 +33,12 @@ func (m *MeiliSearch) getIndex(index string) meilisearch.IndexManager {
 
 func (m *MeiliSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
-	t, err := indexM.AddDocuments(docs, primaryKey)
+	opts := meilisearch.DocumentOptions{
+		PrimaryKey:         primaryKey,
+		SkipCreation:       false,
+		TaskCustomMetadata: "",
+	}
+	t, err := indexM.AddDocuments(docs, &opts)
 	if err != nil {
 		return err
 	}
@@ -45,7 +50,12 @@ func (m *MeiliSearch) Add(index string, primaryKey *string, docs ...interface{})
 
 func (m *MeiliSearch) Update(index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
-	t, err := indexM.UpdateDocuments(docs, primaryKey)
+	opts := meilisearch.DocumentOptions{
+		PrimaryKey:         primaryKey,
+		SkipCreation:       false,
+		TaskCustomMetadata: "",
+	}
+	t, err := indexM.UpdateDocuments(docs, &opts)
 	if err != nil {
 		return err
 	}
@@ -64,7 +74,12 @@ func (m *MeiliSearch) GetTask(index string, taskUID int64) error {
 
 func (m *MeiliSearch) Delete(index string, ids ...string) error {
 	indexM := m.getIndex(index)
-	_, err := indexM.DeleteDocuments(ids)
+	opts := meilisearch.DocumentOptions{
+		//PrimaryKey:         primaryKey,
+		SkipCreation:       false,
+		TaskCustomMetadata: "",
+	}
+	_, err := indexM.DeleteDocuments(ids, &opts)
 	return err
 }
 

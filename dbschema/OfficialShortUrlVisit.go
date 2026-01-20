@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_OfficialShortUrlVisit []*OfficialShortUrlVisit
-
-func (s Slice_OfficialShortUrlVisit) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialShortUrlVisit) RangeRaw(fn func(m *OfficialShortUrlVisit) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_OfficialShortUrlVisit) GroupBy(keyField string) map[string][]*OfficialShortUrlVisit {
-	r := map[string][]*OfficialShortUrlVisit{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*OfficialShortUrlVisit{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_OfficialShortUrlVisit) KeyBy(keyField string) map[string]*OfficialShortUrlVisit {
-	r := map[string]*OfficialShortUrlVisit{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_OfficialShortUrlVisit) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_OfficialShortUrlVisit) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_OfficialShortUrlVisit) FromList(data interface{}) Slice_OfficialShortUrlVisit {
-	values, ok := data.([]*OfficialShortUrlVisit)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &OfficialShortUrlVisit{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_OfficialShortUrlVisit = factory.Slicex[*OfficialShortUrlVisit]
 
 func NewOfficialShortUrlVisit(ctx echo.Context) *OfficialShortUrlVisit {
 	m := &OfficialShortUrlVisit{}
@@ -238,10 +164,13 @@ func (a *OfficialShortUrlVisit) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *OfficialShortUrlVisit) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *OfficialShortUrlVisit) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -253,13 +182,13 @@ func (a *OfficialShortUrlVisit) Get(mw func(db.Result) db.Result, args ...interf
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -272,18 +201,18 @@ func (a *OfficialShortUrlVisit) List(recv interface{}, mw func(db.Result) db.Res
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialShortUrlVisit:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(*v))
 		case []*OfficialShortUrlVisit:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -327,18 +256,18 @@ func (a *OfficialShortUrlVisit) ListByOffset(recv interface{}, mw func(db.Result
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*OfficialShortUrlVisit:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(*v))
 		case []*OfficialShortUrlVisit:
-			err = DBI.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(v))
+			err = a.base.FireReaded(a, queryParam, Slice_OfficialShortUrlVisit(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -350,7 +279,7 @@ func (a *OfficialShortUrlVisit) Insert() (pk interface{}, err error) {
 		a.OwnerType = "customer"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -358,7 +287,7 @@ func (a *OfficialShortUrlVisit) Insert() (pk interface{}, err error) {
 	pk, err = a.Param(nil).SetSend(a).Insert()
 
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -371,13 +300,13 @@ func (a *OfficialShortUrlVisit) Update(mw func(db.Result) db.Result, args ...int
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *OfficialShortUrlVisit) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -388,13 +317,13 @@ func (a *OfficialShortUrlVisit) Updatex(mw func(db.Result) db.Result, args ...in
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -410,13 +339,13 @@ func (a *OfficialShortUrlVisit) UpdateByFields(mw func(db.Result) db.Result, fie
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -432,13 +361,13 @@ func (a *OfficialShortUrlVisit) UpdatexByFields(mw func(db.Result) db.Result, fi
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -470,13 +399,13 @@ func (a *OfficialShortUrlVisit) UpdateFields(mw func(db.Result) db.Result, kvset
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *OfficialShortUrlVisit) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -495,13 +424,13 @@ func (a *OfficialShortUrlVisit) UpdatexFields(mw func(db.Result) db.Result, kvse
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -511,13 +440,13 @@ func (a *OfficialShortUrlVisit) UpdateValues(mw func(db.Result) db.Result, keysV
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *OfficialShortUrlVisit) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -528,7 +457,7 @@ func (a *OfficialShortUrlVisit) Upsert(mw func(db.Result) db.Result, args ...int
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = int(time.Now().Unix())
 		if len(a.OwnerType) == 0 {
@@ -537,14 +466,14 @@ func (a *OfficialShortUrlVisit) Upsert(mw func(db.Result) db.Result, args ...int
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -555,13 +484,13 @@ func (a *OfficialShortUrlVisit) Delete(mw func(db.Result) db.Result, args ...int
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *OfficialShortUrlVisit) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -569,13 +498,13 @@ func (a *OfficialShortUrlVisit) Deletex(mw func(db.Result) db.Result, args ...in
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -685,6 +614,12 @@ func (a *OfficialShortUrlVisit) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *OfficialShortUrlVisit) Clone() *OfficialShortUrlVisit {
+	cloned := OfficialShortUrlVisit{OwnerId: a.OwnerId, OwnerType: a.OwnerType, UrlId: a.UrlId, DomainId: a.DomainId, Year: a.Year, Month: a.Month, Day: a.Day, Hour: a.Hour, Ip: a.Ip, Referer: a.Referer, Language: a.Language, Country: a.Country, Region: a.Region, Province: a.Province, City: a.City, Isp: a.Isp, Os: a.Os, OsVersion: a.OsVersion, Browser: a.Browser, BrowserVersion: a.BrowserVersion, Created: a.Created}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *OfficialShortUrlVisit) FromRow(row map[string]interface{}) {
@@ -1021,12 +956,13 @@ func (a *OfficialShortUrlVisit) ListPageByOffsetAs(recv interface{}, cond *db.Co
 }
 
 func (a *OfficialShortUrlVisit) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *OfficialShortUrlVisit) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *OfficialShortUrlVisit) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *OfficialShortUrlVisit) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }
