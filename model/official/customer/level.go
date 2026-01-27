@@ -23,10 +23,13 @@ type Level struct {
 	*dbschema.OfficialCustomerLevelRelation
 }
 
-func (f *Level) HasLevel(customerID uint64, levelIds ...interface{}) (bool, error) {
+func (f *Level) HasLevel(customerID uint64, levelIDs ...uint) (bool, error) {
+	if customerID == 0 || len(levelIDs) == 0 {
+		return false, nil
+	}
 	err := f.Get(nil, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`level_id`: db.In(levelIds)},
+		db.Cond{`level_id`: db.In(levelIDs)},
 		db.Cond{`status`: modelLevel.LevelStatusActived},
 	))
 	if err != nil {

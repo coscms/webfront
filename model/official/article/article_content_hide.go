@@ -66,11 +66,7 @@ func init() {
 			return false
 		}
 		levelM := modelCustomer.NewLevel(params.Article.Context())
-		levelIDStrings := param.StringSlice(strings.Split(params.Args[0], `,`)).Filter()
-		levelIDs := make([]interface{}, len(levelIDStrings))
-		for index, levelID := range levelIDStrings {
-			levelIDs[index] = levelID
-		}
+		levelIDs := param.StringSlice(strings.Split(params.Args[0], `,`)).Unique().Uint(param.IsGreaterThanZeroElement)
 		has, _ := levelM.HasLevel(params.Customer.Id, levelIDs...)
 		return !has
 	}, echo.T(`此处内容仅供会员查看`), messageFuncOnHideForLevel)
