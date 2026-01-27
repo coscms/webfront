@@ -2,7 +2,6 @@ package mwapp
 
 import (
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/webx-top/com"
@@ -38,41 +37,30 @@ func (a *AuthConfig) setFormKV(ctx echo.Context, key string, value string) {
 }
 
 func (a *AuthConfig) Prepare(ctx echo.Context, mustWithSign bool) (appID string, sign string, err error) {
-	appID = ctx.Formx(a.FormAppIDKey).String()
+	appID = GetAppID(ctx, a)
 	if len(appID) == 0 {
-		appID = ctx.Header(a.HeaderAppIDKey)
-		appID = strings.TrimSpace(appID)
-		if len(appID) == 0 {
-			err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormAppIDKey, appID)).SetZone(a.FormAppIDKey)
-			return
-		}
-		a.setFormKV(ctx, a.FormAppIDKey, appID)
+		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormAppIDKey, appID)).SetZone(a.FormAppIDKey)
+		return
 	}
-	sign = ctx.Formx(a.FormSignKey).String()
-	if len(sign) == 0 {
-		sign = ctx.Header(a.HeaderSignKey)
-		sign = strings.TrimSpace(sign)
-		if len(sign) == 0 && mustWithSign {
-			err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormSignKey, sign)).SetZone(a.FormSignKey)
-			return
-		}
-		//a.setFormKV(ctx, a.FormSignKey, sign)
+	a.setFormKV(ctx, a.FormAppIDKey, appID)
+	sign = GetSign(ctx, a)
+	if len(sign) == 0 && mustWithSign {
+		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormSignKey, sign)).SetZone(a.FormSignKey)
+		return
 	}
-	timestamp := ctx.Formx(a.FormTimeKey).Int64()
+	//a.setFormKV(ctx, a.FormSignKey, sign)
+	timestamp := GetTimestamp(ctx, a)
 	if timestamp <= 0 {
-		ts := ctx.Header(a.HeaderTimeKey)
-		timestamp = param.AsInt64(ts)
-		if timestamp <= 0 {
-			err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %d`, a.FormTimeKey, timestamp)).SetZone(a.FormTimeKey)
-			return
-		}
-		a.setFormKV(ctx, a.FormTimeKey, ts)
+		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %d`, a.FormTimeKey, timestamp)).SetZone(a.FormTimeKey)
+		return
 	}
+	a.setFormKV(ctx, a.FormTimeKey, param.AsString(timestamp))
 	if len(sign) > 0 && a.LifeSeconds > 0 {
 		if time.Now().Unix()-timestamp > a.LifeSeconds {
 			err = ctx.NewError(xcode.SignatureHasExpired, ctx.T(`页面已经失效，请返回重新提交`)).SetZone(a.FormTimeKey)
 		}
 	}
+	err = VerifyLifetime(ctx, a, timestamp, sign)
 	return
 }
 
