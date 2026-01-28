@@ -18,7 +18,7 @@ type ArticleWithOwner struct {
 	User     *modelAuthor.User              `db:"-,relation=id:owner_id|gtZero|eq(owner_type:user),columns=id&username&avatar" json:",omitempty"`
 	Customer *modelAuthor.Customer          `db:"-,relation=id:owner_id|gtZero|eq(owner_type:customer),columns=id&name&avatar" json:",omitempty"`
 	Category *Category                      `db:"-,relation=id:category_id|gtZero,columns=id&name" json:",omitempty"`
-	TagList  []*dbschema.OfficialCommonTags `db:"-,relation=name:tags|notEmpty|split,where=group:article" json:",omitempty"`
+	TagList  []*dbschema.OfficialCommonTags `db:"-,relation=name:tags|notEmpty|decodeSliceJSON,where=group:article" json:",omitempty"`
 }
 
 func MultilingualArticlesWithOwner(ctx echo.Context, list []*ArticleWithOwner) {
