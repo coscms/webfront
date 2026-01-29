@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/admpub/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
@@ -12,6 +13,7 @@ import (
 )
 
 func TestAuth(t *testing.T) {
+	defer log.Close()
 	cfg := DefaultAuthAppConfig
 	cfg.SetSecretGetter(func(ctx echo.Context, appID string) (string, error) {
 		return `secret`, nil

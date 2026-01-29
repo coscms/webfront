@@ -9,7 +9,7 @@ import (
 	stdCode "github.com/webx-top/echo/code"
 )
 
-func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, err error) {
+func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, data url.Values, err error) {
 	if a.secretGetter == nil {
 		err = ctx.NewError(stdCode.Failure, ctx.T(`不支持获取密钥`))
 		return
@@ -19,7 +19,7 @@ func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, e
 	if err != nil {
 		return
 	}
-	var data url.Values = ctx.Forms()
+	data = ctx.Forms()
 	switch ctx.ResolveContentType() {
 	case echo.MIMEApplicationJSON, echo.MIMEApplicationXML:
 		body := ctx.Request().Body()

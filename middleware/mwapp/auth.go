@@ -27,6 +27,7 @@ type AuthConfig struct {
 	FormTimeKey  string
 	// 有效期
 	LifeSeconds int64
+	Debug       bool
 
 	secretGetter func(ctx echo.Context, appID string) (string, error)
 	signMaker    func(data url.Values, secret string) string
@@ -64,17 +65,24 @@ func (a *AuthConfig) Prepare(ctx echo.Context, mustWithSign bool) (appID string,
 	return
 }
 
+type StringerValues url.Values
+
+func (v StringerValues) String() string {
+	return echo.Dump(v, false)
+}
+
 func (a *AuthConfig) Verify(ctx echo.Context) error {
 	appID, sign, err := a.Prepare(ctx, true)
 	if err != nil {
 		return err
 	}
-	gensign, err := a.SignRequest(ctx, appID)
+	gensign, data, err := a.SignRequest(ctx, appID)
 	if err != nil {
 		return err
 	}
-	//echo.Dump(echo.H{`sign`: sign, `make`: gensign})
+	//ctx.Logger().Debugf(`sign: %s, make: %s, data: %s`, sign, gensign, StringerValues(data))
 	if sign != gensign {
+		ctx.Logger().Debugf(`sign: %s, make: %s, data: %s`, sign, gensign, StringerValues(data))
 		return ctx.NewError(stdCode.InvalidSignature, ctx.T(`签名无效`)).SetZone(a.FormSignKey)
 	}
 	return err
@@ -96,6 +104,11 @@ func (a *AuthConfig) SetSignMaker(signMaker func(data url.Values, secret string)
 
 func (a *AuthConfig) SignMaker() func(data url.Values, secret string) string {
 	return a.signMaker
+}
+
+func (a *AuthConfig) SetDebug(debug bool) *AuthConfig {
+	a.Debug = debug
+	return a
 }
 
 var (
