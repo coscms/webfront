@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260129055157-b3fe32cc52f8
+require github.com/coscms/webcore v0.13.3-0.20260129071438-7a8c4980339d
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -22,7 +22,7 @@ require (
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ipfilter v1.0.6
 	github.com/admpub/license_gen v0.1.2
-	github.com/admpub/log v1.4.0
+	github.com/admpub/log v1.5.2
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5
 	github.com/admpub/null v8.0.5+incompatible
 	github.com/admpub/once v0.0.2
@@ -46,7 +46,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/com v1.4.1
 	github.com/webx-top/db v1.29.5
-	github.com/webx-top/echo v1.22.28
+	github.com/webx-top/echo v1.22.29
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -69,7 +69,7 @@ require (
 	github.com/admpub/translate v0.0.0-20251210091442-a87b3fc63eda
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.35.1
