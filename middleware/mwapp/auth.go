@@ -27,7 +27,6 @@ type AuthConfig struct {
 	FormTimeKey  string
 	// 有效期
 	LifeSeconds int64
-	Debug       bool
 
 	secretGetter func(ctx echo.Context, appID string) (string, error)
 	signMaker    func(data url.Values, secret string) string
@@ -38,24 +37,29 @@ func (a *AuthConfig) setFormKV(ctx echo.Context, key string, value string) {
 }
 
 func (a *AuthConfig) Prepare(ctx echo.Context, mustWithSign bool) (appID string, sign string, err error) {
-	appID = GetAppID(ctx, a)
+	var notForm bool
+	appID, notForm = GetAppID2(ctx, a)
 	if len(appID) == 0 {
 		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormAppIDKey, appID)).SetZone(a.FormAppIDKey)
 		return
 	}
-	a.setFormKV(ctx, a.FormAppIDKey, appID)
+	if notForm {
+		a.setFormKV(ctx, a.FormAppIDKey, appID)
+	}
 	sign = GetSign(ctx, a)
 	if len(sign) == 0 && mustWithSign {
 		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %s`, a.FormSignKey, sign)).SetZone(a.FormSignKey)
 		return
 	}
-	//a.setFormKV(ctx, a.FormSignKey, sign)
-	timestamp := GetTimestamp(ctx, a)
+	var timestamp int64
+	timestamp, notForm = GetTimestamp2(ctx, a)
 	if timestamp <= 0 {
 		err = ctx.NewError(stdCode.InvalidParameter, ctx.T(`无效参数值 %s: %d`, a.FormTimeKey, timestamp)).SetZone(a.FormTimeKey)
 		return
 	}
-	a.setFormKV(ctx, a.FormTimeKey, param.AsString(timestamp))
+	if notForm {
+		a.setFormKV(ctx, a.FormTimeKey, param.AsString(timestamp))
+	}
 	if len(sign) > 0 && a.LifeSeconds > 0 {
 		if time.Now().Unix()-timestamp > a.LifeSeconds {
 			err = ctx.NewError(xcode.SignatureHasExpired, ctx.T(`页面已经失效，请返回重新提交`)).SetZone(a.FormTimeKey)
@@ -104,11 +108,6 @@ func (a *AuthConfig) SetSignMaker(signMaker func(data url.Values, secret string)
 
 func (a *AuthConfig) SignMaker() func(data url.Values, secret string) string {
 	return a.signMaker
-}
-
-func (a *AuthConfig) SetDebug(debug bool) *AuthConfig {
-	a.Debug = debug
-	return a
 }
 
 var (

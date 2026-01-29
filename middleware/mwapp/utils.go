@@ -13,24 +13,42 @@ import (
 // It first checks the form data, and if not found, it checks the header.
 // The AppID is trimmed of whitespace.
 func GetAppID(ctx echo.Context, a *AuthConfig) string {
-	appID := ctx.Formx(a.FormAppIDKey).String()
+	appID, _ := GetAppID2(ctx, a)
+	return appID
+}
+
+func GetAppID2(ctx echo.Context, a *AuthConfig) (appID string, notForm bool) {
+	appID = ctx.Formx(a.FormAppIDKey).String()
 	if len(appID) == 0 {
 		appID = ctx.Header(a.HeaderAppIDKey)
 		appID = strings.TrimSpace(appID)
+		if len(appID) == 0 {
+			return
+		}
+		notForm = true
 	}
-	return appID
+	return
 }
 
 // GetSign returns the sign of the current request.
 // It first checks the form data, and if not found, it checks the header.
 // The sign is trimmed of whitespace.
 func GetSign(ctx echo.Context, a *AuthConfig) string {
-	sign := ctx.Formx(a.FormSignKey).String()
+	sign, _ := GetSign2(ctx, a)
+	return sign
+}
+
+func GetSign2(ctx echo.Context, a *AuthConfig) (sign string, notForm bool) {
+	sign = ctx.Formx(a.FormSignKey).String()
 	if len(sign) == 0 {
 		sign = ctx.Header(a.HeaderSignKey)
 		sign = strings.TrimSpace(sign)
+		if len(sign) == 0 {
+			return
+		}
+		notForm = true
 	}
-	return sign
+	return
 }
 
 // GetTimestamp returns the timestamp of the current request.
@@ -44,12 +62,21 @@ func GetSign(ctx echo.Context, a *AuthConfig) string {
 // If the request is older than the lifetime specified in the AuthConfig,
 // the request is rejected.
 func GetTimestamp(ctx echo.Context, a *AuthConfig) int64 {
-	timestamp := ctx.Formx(a.FormTimeKey).Int64()
+	timestamp, _ := GetTimestamp2(ctx, a)
+	return timestamp
+}
+
+func GetTimestamp2(ctx echo.Context, a *AuthConfig) (timestamp int64, notForm bool) {
+	timestamp = ctx.Formx(a.FormTimeKey).Int64()
 	if timestamp <= 0 {
 		ts := ctx.Header(a.HeaderTimeKey)
 		timestamp = param.AsInt64(ts)
+		if timestamp <= 0 {
+			return
+		}
+		notForm = true
 	}
-	return timestamp
+	return
 }
 
 // VerifyLifetime verifies the lifetime of the current request.
