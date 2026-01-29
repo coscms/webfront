@@ -7,6 +7,7 @@ import (
 
 	"github.com/webx-top/echo"
 	stdCode "github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/engine"
 )
 
 func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, data url.Values, err error) {
@@ -30,7 +31,9 @@ func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, d
 			return
 		}
 		ctx.Request().SetBody(io.NopCloser(bytes.NewBuffer(b)))
-		data.Set(`data`, string(b))
+		if len(b) > 0 {
+			data.Set(`data`, engine.Bytes2str(b))
+		}
 	}
 	data.Del(a.FormSignKey)
 	sign = a.signMaker(data, secret)
