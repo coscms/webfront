@@ -24,7 +24,8 @@ type OriginalTextPicker = func(table string, fieldName string, originalValue str
 // SaveModelTranslationsOptions is a struct that holds options for saving model translations.
 type SaveModelTranslationsOptions struct {
 	FormNamePrefix      string
-	ContentType         map[string]string // map[fieldName]contentType
+	ContentType         map[string]string             // map[fieldName]contentType
+	LanguageValues      *map[string]map[string]string // map[langCode]map[fieldName]value
 	Project             string
 	AutoTranslate       *bool
 	ForceTranslate      *bool
@@ -136,8 +137,15 @@ func (o *SaveModelTranslationsOptions) SetOriginalTextPickout(originalTextPickou
 	o.originalTextPickout = originalTextPickout
 }
 
+// SetDebugFormValue sets whether to store debug form values in the form context.
+// If true, will store the form values in the form context after saving model translations.
+// This is useful for debugging purposes, especially when the form value is not visible in the request body.
 func (o *SaveModelTranslationsOptions) SetDebugFormValue(debugFormValue bool) {
 	o.debugFormValue = debugFormValue
+}
+
+func (o *SaveModelTranslationsOptions) SetLanguageValues(languageValues map[string]map[string]string) {
+	o.LanguageValues = &languageValues
 }
 
 // OptionContentType returns a function that sets the content type for the specified field
@@ -233,5 +241,15 @@ func OptionOriginalTextPickout(originalTextPickout OriginalTextPicker) func(*Sav
 func OptionDebugFormValue(debugFormValue bool) func(*SaveModelTranslationsOptions) {
 	return func(o *SaveModelTranslationsOptions) {
 		o.SetDebugFormValue(debugFormValue)
+	}
+}
+
+// OptionLanguageValues returns a function option that sets the language values for SaveModelTranslationsOptions.
+// The input map associates language codes with their corresponding corresponding values.
+// The language values are used to populate the form with language-specific values.
+// For example, the values can be used to populate the form with the default translation values for each language.
+func OptionLanguageValues(languageValues map[string]map[string]string) func(*SaveModelTranslationsOptions) {
+	return func(o *SaveModelTranslationsOptions) {
+		o.SetLanguageValues(languageValues)
 	}
 }

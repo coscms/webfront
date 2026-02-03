@@ -77,6 +77,25 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 	if cfg.TrimOverflowText != nil {
 		trimOverflowText = *cfg.TrimOverflowText
 	}
+	var getTranslatedText func(langCode string, keys ...string) string
+	if cfg.LanguageValues != nil {
+		getTranslatedText = func(langCode string, keys ...string) (translatedText string) {
+			if trs, ok := (*cfg.LanguageValues)[langCode]; ok {
+				for _, key := range keys {
+					translatedText, ok = trs[key]
+					if ok {
+						return
+					}
+				}
+			}
+			return
+		}
+	} else {
+		getTranslatedText = func(langCode string, keys ...string) (translatedText string) {
+			translatedText = ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+keys[1]+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+keys[2]+`]`)
+			return
+		}
+	}
 	langCfg := config.FromFile().Language
 	for field, info := range dbschema.DBI.Fields[table] {
 		if !info.Multilingual {
@@ -117,7 +136,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 			if langDefault == langCode {
 				continue
 			}
-			translatedText := ctx.FormAny(cfg.FormNamePrefix+`[`+langCode+`][`+formNameL+`]`, cfg.FormNamePrefix+`[`+langCode+`][`+formNameU+`]`)
+			translatedText := getTranslatedText(langCode, field, formNameL, formNameU)
 			if cfg.debugFormValue {
 				com.Dump(echo.H{
 					`field`:          field,
