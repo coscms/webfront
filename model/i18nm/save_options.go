@@ -144,6 +144,10 @@ func (o *SaveModelTranslationsOptions) SetDebugFormValue(debugFormValue bool) {
 	o.debugFormValue = debugFormValue
 }
 
+// SetLanguageValues sets the language values for SaveModelTranslationsOptions.
+// The input map associates language codes with their corresponding corresponding corresponding values.
+// The language values are used to populate the form with language-specific values.
+// For example, the values can be used to populate the form with the default translation values for each language.
 func (o *SaveModelTranslationsOptions) SetLanguageValues(languageValues map[string]map[string]string) {
 	o.LanguageValues = &languageValues
 }

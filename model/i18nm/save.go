@@ -78,7 +78,7 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 		trimOverflowText = *cfg.TrimOverflowText
 	}
 	var getTranslatedText func(langCode string, keys ...string) string
-	if cfg.LanguageValues != nil {
+	if cfg.LanguageValues != nil && *cfg.LanguageValues != nil {
 		getTranslatedText = func(langCode string, keys ...string) (translatedText string) {
 			if trs, ok := (*cfg.LanguageValues)[langCode]; ok {
 				for _, key := range keys {
