@@ -43,6 +43,7 @@ func (f *Area) check() error {
 	if len(f.CountryAbbr) != 2 || !com.StrIsAlpha(f.CountryAbbr) {
 		return ctx.NewError(code.InvalidParameter, `请输入两个字母的国家码`).SetZone(`countryAbbr`)
 	}
+	f.CountryAbbr = strings.ToUpper(f.CountryAbbr)
 	var (
 		exists bool
 		err    error
@@ -92,7 +93,6 @@ func (f *Area) check() error {
 	} else {
 		f.First = ``
 	}
-	f.CountryAbbr = strings.ToUpper(f.CountryAbbr)
 	return nil
 }
 

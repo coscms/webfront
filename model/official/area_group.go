@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/coscms/webcore/library/common"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -41,6 +42,10 @@ func (f *AreaGroup) check() error {
 	if len(f.Name) == 0 {
 		return f.Context().NewError(code.InvalidParameter, `请输入地区组名称`).SetZone(`name`)
 	}
+	if len(f.CountryAbbr) != 2 || !com.StrIsAlpha(f.CountryAbbr) {
+		return f.Context().NewError(code.InvalidParameter, `请输入两个字母的国家码`).SetZone(`countryAbbr`)
+	}
+	f.CountryAbbr = strings.ToUpper(f.CountryAbbr)
 	var (
 		exists bool
 		err    error
@@ -56,8 +61,6 @@ func (f *AreaGroup) check() error {
 	if exists {
 		return f.Context().E(`缩写“%s-%s”已存在`, f.CountryAbbr, f.Abbr)
 	}
-
-	f.CountryAbbr = strings.ToUpper(f.CountryAbbr)
 	return nil
 }
 
