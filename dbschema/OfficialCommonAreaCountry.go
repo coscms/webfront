@@ -31,6 +31,8 @@ type OfficialCommonAreaCountry struct {
 	Name     string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
 	Short    string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
 	Code     string `db:"code" bson:"code" comment:"国家码" json:"code" xml:"code"`
+	Lng      string `db:"lng" bson:"lng" comment:"经度" json:"lng" xml:"lng"`
+	Lat      string `db:"lat" bson:"lat" comment:"纬度" json:"lat" xml:"lat"`
 	Sort     int    `db:"sort" bson:"sort" comment:"序号" json:"sort" xml:"sort"`
 	Disabled string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
 }
@@ -580,6 +582,8 @@ func (a *OfficialCommonAreaCountry) Reset() *OfficialCommonAreaCountry {
 	a.Name = ``
 	a.Short = ``
 	a.Code = ``
+	a.Lng = ``
+	a.Lat = ``
 	a.Sort = 0
 	a.Disabled = ``
 	return a
@@ -593,6 +597,8 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 		r["Name"] = a.Name
 		r["Short"] = a.Short
 		r["Code"] = a.Code
+		r["Lng"] = a.Lng
+		r["Lat"] = a.Lat
 		r["Sort"] = a.Sort
 		r["Disabled"] = a.Disabled
 		return r
@@ -609,6 +615,10 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 			r["Short"] = a.Short
 		case "Code":
 			r["Code"] = a.Code
+		case "Lng":
+			r["Lng"] = a.Lng
+		case "Lat":
+			r["Lat"] = a.Lat
 		case "Sort":
 			r["Sort"] = a.Sort
 		case "Disabled":
@@ -619,7 +629,7 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonAreaCountry) Clone() *OfficialCommonAreaCountry {
-	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Sort: a.Sort, Disabled: a.Disabled}
+	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Lng: a.Lng, Lat: a.Lat, Sort: a.Sort, Disabled: a.Disabled}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -640,6 +650,10 @@ func (a *OfficialCommonAreaCountry) FromRow(row map[string]interface{}) {
 			a.Short = param.AsString(value)
 		case "code":
 			a.Code = param.AsString(value)
+		case "lng":
+			a.Lng = param.AsString(value)
+		case "lat":
+			a.Lat = param.AsString(value)
 		case "sort":
 			a.Sort = param.AsInt(value)
 		case "disabled":
@@ -660,6 +674,10 @@ func (a *OfficialCommonAreaCountry) GetField(field string) interface{} {
 		return a.Short
 	case "Code":
 		return a.Code
+	case "Lng":
+		return a.Lng
+	case "Lat":
+		return a.Lat
 	case "Sort":
 		return a.Sort
 	case "Disabled":
@@ -676,6 +694,8 @@ func (a *OfficialCommonAreaCountry) GetAllFieldNames() []string {
 		"Name",
 		"Short",
 		"Code",
+		"Lng",
+		"Lat",
 		"Sort",
 		"Disabled",
 	}
@@ -692,6 +712,10 @@ func (a *OfficialCommonAreaCountry) HasField(field string) bool {
 	case "Short":
 		return true
 	case "Code":
+		return true
+	case "Lng":
+		return true
+	case "Lat":
 		return true
 	case "Sort":
 		return true
@@ -732,6 +756,10 @@ func (a *OfficialCommonAreaCountry) Set(key interface{}, value ...interface{}) {
 			a.Short = param.AsString(vv)
 		case "Code":
 			a.Code = param.AsString(vv)
+		case "Lng":
+			a.Lng = param.AsString(vv)
+		case "Lat":
+			a.Lat = param.AsString(vv)
 		case "Sort":
 			a.Sort = param.AsInt(vv)
 		case "Disabled":
@@ -748,6 +776,8 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 		r["name"] = a.Name
 		r["short"] = a.Short
 		r["code"] = a.Code
+		r["lng"] = a.Lng
+		r["lat"] = a.Lat
 		r["sort"] = a.Sort
 		r["disabled"] = a.Disabled
 		return r
@@ -764,6 +794,10 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 			r["short"] = a.Short
 		case "code":
 			r["code"] = a.Code
+		case "lng":
+			r["lng"] = a.Lng
+		case "lat":
+			r["lat"] = a.Lat
 		case "sort":
 			r["sort"] = a.Sort
 		case "disabled":

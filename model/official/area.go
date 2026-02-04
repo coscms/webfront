@@ -93,6 +93,8 @@ func (f *Area) check() error {
 	} else {
 		f.First = ``
 	}
+	f.Lng = strings.TrimSpace(f.Lng)
+	f.Lat = strings.TrimSpace(f.Lat)
 	return nil
 }
 
