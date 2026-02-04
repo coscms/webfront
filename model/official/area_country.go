@@ -26,6 +26,13 @@ func (f *AreaCountry) Exists(abbr string) (bool, error) {
 	return f.OfficialCommonAreaCountry.Exists(nil, db.Cond{`abbr`: abbr})
 }
 
+func (f *AreaCountry) ExistsOther(abbr string, id uint) (bool, error) {
+	return f.OfficialCommonAreaCountry.Exists(nil, db.And(
+		db.Cond{`abbr`: abbr},
+		db.Cond{`id`: db.NotEq(id)},
+	))
+}
+
 func (f *AreaCountry) check() error {
 	f.Name = strings.TrimSpace(f.Name)
 	if len(f.Name) == 0 {
@@ -45,7 +52,15 @@ func (f *AreaCountry) check() error {
 	f.Abbr = strings.ToUpper(f.Abbr)
 	f.Disabled = common.GetBoolFlag(f.Disabled)
 	f.Code = strings.TrimSpace(f.Code)
-	exists, err := f.Exists(f.Abbr)
+	var (
+		exists bool
+		err    error
+	)
+	if f.Id < 1 {
+		exists, err = f.Exists(f.Abbr)
+	} else {
+		exists, err = f.ExistsOther(f.Abbr, f.Id)
+	}
 	if err != nil {
 		return err
 	}

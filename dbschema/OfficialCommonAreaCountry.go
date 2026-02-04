@@ -26,7 +26,8 @@ type OfficialCommonAreaCountry struct {
 	base    factory.Base
 	objects []*OfficialCommonAreaCountry
 
-	Abbr     string `db:"abbr,pk" bson:"abbr" comment:"国家缩写" json:"abbr" xml:"abbr"`
+	Id       uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Abbr     string `db:"abbr" bson:"abbr" comment:"国家缩写" json:"abbr" xml:"abbr"`
 	Name     string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
 	Short    string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
 	Code     string `db:"code" bson:"code" comment:"国家码" json:"code" xml:"code"`
@@ -257,7 +258,7 @@ func (a *OfficialCommonAreaCountry) ListByOffset(recv interface{}, mw func(db.Re
 }
 
 func (a *OfficialCommonAreaCountry) Insert() (pk interface{}, err error) {
-
+	a.Id = 0
 	if len(a.Abbr) == 0 {
 		a.Abbr = "CN"
 	}
@@ -274,7 +275,13 @@ func (a *OfficialCommonAreaCountry) Insert() (pk interface{}, err error) {
 		}
 	}
 	pk, err = a.Param(nil).SetSend(a).Insert()
-
+	if err == nil && pk != nil {
+		if v, y := pk.(uint); y {
+			a.Id = v
+		} else if v, y := pk.(int64); y {
+			a.Id = uint(v)
+		}
+	}
 	if err == nil && a.base.Eventable() {
 		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
@@ -498,6 +505,7 @@ func (a *OfficialCommonAreaCountry) Upsert(mw func(db.Result) db.Result, args ..
 		}
 		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
+		a.Id = 0
 		if len(a.Abbr) == 0 {
 			a.Abbr = "CN"
 		}
@@ -512,7 +520,13 @@ func (a *OfficialCommonAreaCountry) Upsert(mw func(db.Result) db.Result, args ..
 		}
 		return a.base.Fire(factory.EventCreating, a, nil)
 	})
-
+	if err == nil && pk != nil {
+		if v, y := pk.(uint); y {
+			a.Id = v
+		} else if v, y := pk.(int64); y {
+			a.Id = uint(v)
+		}
+	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
 			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
@@ -561,6 +575,7 @@ func (a *OfficialCommonAreaCountry) Exists(mw func(db.Result) db.Result, args ..
 }
 
 func (a *OfficialCommonAreaCountry) Reset() *OfficialCommonAreaCountry {
+	a.Id = 0
 	a.Abbr = ``
 	a.Name = ``
 	a.Short = ``
@@ -573,6 +588,7 @@ func (a *OfficialCommonAreaCountry) Reset() *OfficialCommonAreaCountry {
 func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
+		r["Id"] = a.Id
 		r["Abbr"] = a.Abbr
 		r["Name"] = a.Name
 		r["Short"] = a.Short
@@ -583,6 +599,8 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 	}
 	for _, field := range onlyFields {
 		switch field {
+		case "Id":
+			r["Id"] = a.Id
 		case "Abbr":
 			r["Abbr"] = a.Abbr
 		case "Name":
@@ -601,7 +619,7 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonAreaCountry) Clone() *OfficialCommonAreaCountry {
-	cloned := OfficialCommonAreaCountry{Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Sort: a.Sort, Disabled: a.Disabled}
+	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Sort: a.Sort, Disabled: a.Disabled}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -612,6 +630,8 @@ func (a *OfficialCommonAreaCountry) FromRow(row map[string]interface{}) {
 			continue
 		}
 		switch key {
+		case "id":
+			a.Id = param.AsUint(value)
 		case "abbr":
 			a.Abbr = param.AsString(value)
 		case "name":
@@ -630,6 +650,8 @@ func (a *OfficialCommonAreaCountry) FromRow(row map[string]interface{}) {
 
 func (a *OfficialCommonAreaCountry) GetField(field string) interface{} {
 	switch field {
+	case "Id":
+		return a.Id
 	case "Abbr":
 		return a.Abbr
 	case "Name":
@@ -649,6 +671,7 @@ func (a *OfficialCommonAreaCountry) GetField(field string) interface{} {
 
 func (a *OfficialCommonAreaCountry) GetAllFieldNames() []string {
 	return []string{
+		"Id",
 		"Abbr",
 		"Name",
 		"Short",
@@ -660,6 +683,8 @@ func (a *OfficialCommonAreaCountry) GetAllFieldNames() []string {
 
 func (a *OfficialCommonAreaCountry) HasField(field string) bool {
 	switch field {
+	case "Id":
+		return true
 	case "Abbr":
 		return true
 	case "Name":
@@ -697,6 +722,8 @@ func (a *OfficialCommonAreaCountry) Set(key interface{}, value ...interface{}) {
 			vv = value[0]
 		}
 		switch kk {
+		case "Id":
+			a.Id = param.AsUint(vv)
 		case "Abbr":
 			a.Abbr = param.AsString(vv)
 		case "Name":
@@ -716,6 +743,7 @@ func (a *OfficialCommonAreaCountry) Set(key interface{}, value ...interface{}) {
 func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
+		r["id"] = a.Id
 		r["abbr"] = a.Abbr
 		r["name"] = a.Name
 		r["short"] = a.Short
@@ -726,6 +754,8 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 	}
 	for _, field := range onlyFields {
 		switch field {
+		case "id":
+			r["id"] = a.Id
 		case "abbr":
 			r["abbr"] = a.Abbr
 		case "name":
