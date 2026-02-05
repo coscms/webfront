@@ -18,6 +18,7 @@ type Config struct {
 	On          bool
 	IPWhitelist string
 	Rules       []*Rule // Rules[0][Path]
+	Message     string  // 提示信息
 	filter      *ipfilter.IPFilter
 	once        once.Once
 }

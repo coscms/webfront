@@ -18,29 +18,30 @@ import (
 	"github.com/coscms/webfront/dbschema"
 )
 
-func underAttackSkipper(c echo.Context) bool {
+func underAttackSkipper(c echo.Context) (*Config, bool) {
 	if defaults.IsMockContext(c) || c.Route().Bool(`noAttack`) {
-		return true
+		return nil, true
 	}
 	customer, ok := c.Session().Get(`customer`).(*dbschema.OfficialCustomer)
 	if ok && customer != nil {
-		return true
+		return nil, true
 	}
 	cfg := config.Setting(`frequency`).Get(`underAttack`)
 	switch v := cfg.(type) {
 	case *Config:
-		return !v.On || v.IsAllowed(c)
+		return v, !v.On || v.IsAllowed(c)
 	case string:
-		return v != `1`
+		return nil, v != `1`
 	default:
-		return true
+		return nil, true
 	}
 }
 
 func Middleware(maxAge int) echo.MiddlewareFunc {
 	return func(h echo.Handler) echo.Handler {
 		return echo.HandlerFunc(func(c echo.Context) error {
-			if underAttackSkipper(c) {
+			cfg, skip := underAttackSkipper(c)
+			if skip {
 				return h.Handle(c)
 			}
 			if cookieValue := c.Cookie().DecryptGet(`CaptVerified`); len(cookieValue) > 0 {
@@ -69,6 +70,9 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 			}
 			_, captchaType := captchabiz.GetCaptchaType()
 			c.Set(`captchaType`, captchaType)
+			if cfg != nil {
+				c.Set(`message`, cfg.Message)
+			}
 			return c.Render(`under_attack`, nil, http.StatusForbidden) //http.StatusRequestTimeout
 		})
 	}
