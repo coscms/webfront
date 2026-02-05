@@ -26,6 +26,7 @@ type Config struct {
 func (c *Config) FromStore(r echo.H) *Config {
 	c.On = r.Bool(`On`)
 	c.IPWhitelist = strings.TrimSpace(r.String(`IPWhitelist`))
+	c.Message = strings.TrimSpace(r.String(`Message`))
 	m := r.GetStore(`Rules`)
 	pathList := getSliceString(m.Get(`Path`))
 	uaList := getSliceString(m.Get(`UAWhitelist`))
