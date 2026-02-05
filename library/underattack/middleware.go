@@ -45,7 +45,7 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 			}
 			if cookieValue := c.Cookie().DecryptGet(`CaptVerified`); len(cookieValue) > 0 {
 				parts := strings.SplitN(cookieValue, `|`, 3)
-				if len(parts) == 3 {
+				if len(parts) == 4 {
 					unixtime := com.Int64(parts[2])
 					passed := unixtime >= time.Now().Unix() && parts[0] == c.RealIP() && parts[1] == com.Md5(c.Request().UserAgent())
 					if passed {
@@ -63,7 +63,7 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 					return err
 				}
 				duration := time.Second * time.Duration(maxAge)
-				cookieValue := c.RealIP() + `|` + com.Md5(c.Request().UserAgent()) + `|` + com.String(time.Now().Add(duration).Unix())
+				cookieValue := c.RealIP() + `|` + com.Md5(c.Request().UserAgent()) + `|` + com.String(time.Now().Add(duration).Unix()) + `|` + com.RandomAlphanumeric(6)
 				c.Cookie().EncryptSet(`CaptVerified`, cookieValue, duration)
 				return c.Redirect(c.FullRequestURI())
 			}
