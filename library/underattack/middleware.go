@@ -9,6 +9,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 	"github.com/webx-top/echo/defaults"
+	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
@@ -55,7 +56,7 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 			if c.IsPost() {
 				data := captchabiz.VerifyCaptcha(c, httpserver.KindFrontend, `code`)
 				if nerrors.IsFailureCode(data.GetCode()) {
-					err := c.NewError(code.InvalidParameter, `验证码不正确`).SetZone(`code`)
+					err := c.NewError(code.InvalidParameter, param.AsString(data.GetInfo())).SetZone(`code`)
 					if c.Format() == echo.ContentTypeJSON {
 						return c.JSON(data)
 					}
