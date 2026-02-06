@@ -38,6 +38,7 @@ func underAttackSkipper(c echo.Context) (*Config, bool) {
 }
 
 func Middleware(maxAge int) echo.MiddlewareFunc {
+	partsLen := 4
 	return func(h echo.Handler) echo.Handler {
 		return echo.HandlerFunc(func(c echo.Context) error {
 			cfg, skip := underAttackSkipper(c)
@@ -45,8 +46,8 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 				return h.Handle(c)
 			}
 			if cookieValue := c.Cookie().DecryptGet(`CaptVerified`); len(cookieValue) > 0 {
-				parts := strings.SplitN(cookieValue, `|`, 4)
-				if len(parts) == 4 {
+				parts := strings.SplitN(cookieValue, `|`, partsLen)
+				if len(parts) == partsLen {
 					unixtime := com.Int64(parts[2])
 					passed := unixtime >= time.Now().Unix() && parts[0] == c.RealIP() && parts[1] == com.Md5(c.Request().UserAgent())
 					if passed {
