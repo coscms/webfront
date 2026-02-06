@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260202062807-7a3c1b00b249
+require github.com/coscms/webcore v0.13.3-0.20260206060101-774997e22d21
 
 require (
 	github.com/RichardKnop/machinery v1.10.8
@@ -110,7 +110,7 @@ require (
 	github.com/admpub/go-bindata-assetfs v0.0.1 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
 	github.com/admpub/go-captcha/v2 v2.0.7 // indirect
-	github.com/admpub/go-figure v0.0.2 // indirect
+	github.com/admpub/go-figure v0.1.0 // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
 	github.com/admpub/go-pretty/v6 v6.0.4 // indirect
@@ -128,7 +128,6 @@ require (
 	github.com/admpub/ip2region/v3 v3.0.5 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/machineid v1.0.2 // indirect
-	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/map2struct v0.1.3 // indirect
 	github.com/admpub/mysql-schema-sync v0.2.6 // indirect
@@ -156,11 +155,11 @@ require (
 	github.com/caddyserver/zerossl v0.1.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
-	github.com/clipperhouse/uax29/v2 v2.4.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.5.0 // indirect
 	github.com/coscms/go-imgparse v0.0.1 // indirect
-	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61 // indirect
-	github.com/coscms/session-mysqlstore v0.0.0-20250617035706-a20b648443b1 // indirect
-	github.com/coscms/session-redisstore v0.0.0-20250624032337-117cf04cfaf4 // indirect
+	github.com/coscms/session-boltstore v0.0.0-20260203210304-79c433bb1621 // indirect
+	github.com/coscms/session-mysqlstore v0.0.0-20260127080438-1856d3685966 // indirect
+	github.com/coscms/session-redisstore v0.0.0-20260127080202-3c5732ae77b4 // indirect
 	github.com/coscms/session-sqlitestore v0.0.4 // indirect
 	github.com/coscms/session-sqlstore v0.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -173,7 +172,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fynelabs/selfupdate v0.2.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
@@ -247,7 +246,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
-	github.com/shirou/gopsutil/v4 v4.25.12 // indirect
+	github.com/shirou/gopsutil/v4 v4.26.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
@@ -304,7 +303,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.67.6 // indirect
+	modernc.org/libc v1.67.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.44.3 // indirect
