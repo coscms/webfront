@@ -45,7 +45,7 @@ func Middleware(maxAge int) echo.MiddlewareFunc {
 				return h.Handle(c)
 			}
 			if cookieValue := c.Cookie().DecryptGet(`CaptVerified`); len(cookieValue) > 0 {
-				parts := strings.SplitN(cookieValue, `|`, 3)
+				parts := strings.SplitN(cookieValue, `|`, 4)
 				if len(parts) == 4 {
 					unixtime := com.Int64(parts[2])
 					passed := unixtime >= time.Now().Unix() && parts[0] == c.RealIP() && parts[1] == com.Md5(c.Request().UserAgent())
