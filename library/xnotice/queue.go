@@ -58,8 +58,16 @@ func (q *queueCmder) Boot() error {
 }
 
 // ./webx --config ./config/config.yaml --type queue:worker
-func RegisterCmder() {
-	cmder.Register(`queue:worker`, &queueCmder{Simple: cmder.NewSimple()})
+func RegisterCmder(startup ...bool) {
+	cmdName := `queue:worker`
+	cmder.Register(cmdName, &queueCmder{Simple: cmder.NewSimple()})
+	if len(startup) > 0 && startup[0] {
+		if len(config.DefaultStartup) > 0 {
+			config.DefaultStartup += `,` + cmdName
+		} else {
+			config.DefaultStartup += cmdName
+		}
+	}
 }
 
 func SendOnlineStatusToQueue(sessionId string, customerID uint64, online bool) error {

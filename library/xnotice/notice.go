@@ -194,5 +194,7 @@ func GetNSenderFromConfig(cfg echo.H) NSender {
 func RegisterRoute(r echo.RouteRegister, cfg echo.H) {
 	sender := GetNSenderFromConfig(cfg)
 	ws.New("/notice", MakeHandler(sender, DefaultReceiver)).Wrapper(r).SetMetaKV(httpserver.PermPublicKV())
-	r.Get("/sse", MakeSSEHandler(sender)).SetMetaKV(httpserver.PermPublicKV())
+	if cfg.Bool(`enableSSE`) {
+		r.Get("/sse", MakeSSEHandler(sender)).SetMetaKV(httpserver.PermPublicKV())
+	}
 }
