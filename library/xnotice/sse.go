@@ -6,6 +6,7 @@ import (
 	"github.com/admpub/sse"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
@@ -24,9 +25,6 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 		}
 		if _close != nil {
 			defer _close()
-		}
-		if msgChan == nil {
-			return nil
 		}
 		data := make(chan interface{})
 		defer close(data)
@@ -51,7 +49,13 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 				}
 			}
 		}
-		go exec(msgChan)
+		if msgChan == nil {
+			ch := make(chan *notice.Message, 1)
+			ch <- notice.NewMessage().SetMode(`-`).SetType(`clientID`).SetClientID(param.AsString(time.Now().UnixMilli()))
+			go exec(ch)
+		} else {
+			go exec(msgChan)
+		}
 		ctx.SetRenderer(notice.SSERender)
 		err = ctx.SSEvent(notice.SSEventName, data)
 		return err
