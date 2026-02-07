@@ -58,7 +58,7 @@ func (q *queueCmder) Boot() error {
 }
 
 // ./webx --config ./config/config.yaml --type queue:worker
-func RegsterCmder() {
+func RegisterCmder() {
 	cmder.Register(`queue:worker`, &queueCmder{Simple: cmder.NewSimple()})
 }
 
