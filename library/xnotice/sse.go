@@ -29,9 +29,9 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 			return nil
 		}
 		data := make(chan interface{})
-		var encodedClientID string
-		go func() {
-			defer close(data)
+		defer close(data)
+		exec := func(msgChan <-chan *notice.Message) {
+			var encodedClientID string
 			for {
 				select {
 				case msg, ok := <-msgChan:
@@ -50,7 +50,8 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 					return
 				}
 			}
-		}()
+		}
+		go exec(msgChan)
 		ctx.SetRenderer(notice.SSERender)
 		err = ctx.SSEvent(notice.SSEventName, data)
 		return err
