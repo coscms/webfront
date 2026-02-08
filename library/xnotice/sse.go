@@ -31,8 +31,12 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 		if _close != nil {
 			defer _close()
 		}
-		data := make(chan interface{}, 1)
+
+		ctx.SetRenderer(notice.SSERender)
+
+		data := make(chan interface{})
 		defer close(data)
+
 		exec := func(msgChan <-chan *notice.Message) {
 			var encodedClientID string
 			getEncodedClientID := func(msg *notice.Message) string {
@@ -62,6 +66,7 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 				}
 			}
 		}
+
 		if msgChan == nil {
 			ch := make(chan *notice.Message, 1)
 			ch <- notice.NewMessage().SetMode(`-`).SetType(`clientID`).SetClientID(param.AsString(time.Now().UnixMilli()))
@@ -69,7 +74,7 @@ func MakeSSEHandler(msgGetter NSender) func(ctx echo.Context) error {
 		} else {
 			go exec(msgChan)
 		}
-		ctx.SetRenderer(notice.SSERender)
+
 		err = ctx.SSEvent(notice.SSEventName, data)
 		return err
 	}
