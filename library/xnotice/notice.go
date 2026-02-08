@@ -10,14 +10,11 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
-	ws "github.com/webx-top/echo/handler/websocket"
 
 	"github.com/coscms/webcore/library/config"
-	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/initialize/frontend"
-	"github.com/coscms/webfront/middleware/sessdata"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
@@ -44,71 +41,6 @@ func send(c *websocket.Conn, message *notice.Message) error {
 		message.Success()
 	}
 	return err
-}
-
-func MakeHandler(msgGetter NSender, msgSetter NReceiver) func(c *websocket.Conn, ctx echo.Context) error {
-	return func(c *websocket.Conn, ctx echo.Context) error {
-		customer := sessdata.Customer(ctx)
-		//push(writer)
-		close, ch, err := msgGetter(ctx, customer)
-		if err != nil {
-			return err
-		}
-		if close != nil {
-			defer close()
-		}
-		if ch == nil {
-			return nil
-		}
-		go func() {
-			for {
-				select {
-				case message, ok := <-ch:
-					if !ok || message == nil {
-						c.Close()
-						return
-					}
-					if send(c, message) != nil {
-						return
-					}
-				case <-ctx.Done():
-					return
-				}
-			}
-		}()
-
-		//echo
-		execute := func(conn *websocket.Conn) error {
-			for {
-				mt, message, err := conn.ReadMessage()
-				if err != nil {
-					return err
-				}
-
-				if msgSetter != nil {
-					var reply []byte
-					reply, err = msgSetter(ctx, customer, message)
-					if err != nil {
-						return err
-					}
-					if reply != nil {
-						if err = conn.WriteMessage(mt, reply); err != nil {
-							return err
-						}
-					}
-				}
-			}
-		}
-		err = execute(c)
-		if err != nil {
-			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
-				ctx.Logger().Debug(err.Error())
-			} else {
-				ctx.Logger().Error(err.Error())
-			}
-		}
-		return nil
-	}
 }
 
 func ResetClientCount() {
@@ -189,12 +121,4 @@ func GetNSenderFromConfig(cfg echo.H) NSender {
 		noticeNS = DefaultSender
 	}
 	return noticeNS
-}
-
-func RegisterRoute(r echo.RouteRegister, cfg echo.H) {
-	sender := GetNSenderFromConfig(cfg)
-	ws.New("/notice", MakeHandler(sender, DefaultReceiver)).Wrapper(r).SetMetaKV(httpserver.PermPublicKV())
-	//if cfg.Bool(`enableSSE`) {
-	r.Get("/sse", MakeSSEHandler(sender)).SetMetaKV(httpserver.PermPublicKV())
-	//}
 }
