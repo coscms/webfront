@@ -297,6 +297,31 @@ func (a *OfficialCommonTags) Update(mw func(db.Result) db.Result, args ...interf
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonTags) GetDiffColumns(old *OfficialCommonTags) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Num != a.Num {
+		changedCols = append(changedCols, `num`)
+	}
+
+	if old.Group != a.Group {
+		changedCols = append(changedCols, `group`)
+	}
+
+	if old.Display != a.Display {
+		changedCols = append(changedCols, `display`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonTags) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Display) == 0 {
@@ -313,6 +338,28 @@ func (a *OfficialCommonTags) Updatex(mw func(db.Result) db.Result, args ...inter
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonTags) Save(old *OfficialCommonTags, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Display) == 0 {
+		a.Display = "Y"
+	}
+	if old == nil {
+		old = NewOfficialCommonTags(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonTags) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

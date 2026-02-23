@@ -333,6 +333,91 @@ func (a *OfficialCustomerLevel) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerLevel) GetDiffColumns(old *OfficialCustomerLevel) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Short != a.Short {
+		changedCols = append(changedCols, `short`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.IconImage != a.IconImage {
+		changedCols = append(changedCols, `icon_image`)
+	}
+
+	if old.IconClass != a.IconClass {
+		changedCols = append(changedCols, `icon_class`)
+	}
+
+	if old.Color != a.Color {
+		changedCols = append(changedCols, `color`)
+	}
+
+	if old.Bgcolor != a.Bgcolor {
+		changedCols = append(changedCols, `bgcolor`)
+	}
+
+	if old.Price != a.Price {
+		changedCols = append(changedCols, `price`)
+	}
+
+	if old.IntegralAsset != a.IntegralAsset {
+		changedCols = append(changedCols, `integral_asset`)
+	}
+
+	if old.IntegralAmountType != a.IntegralAmountType {
+		changedCols = append(changedCols, `integral_amount_type`)
+	}
+
+	if old.IntegralMin != a.IntegralMin {
+		changedCols = append(changedCols, `integral_min`)
+	}
+
+	if old.IntegralMax != a.IntegralMax {
+		changedCols = append(changedCols, `integral_max`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Score != a.Score {
+		changedCols = append(changedCols, `score`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Extra != a.Extra {
+		changedCols = append(changedCols, `extra`)
+	}
+
+	if old.Group != a.Group {
+		changedCols = append(changedCols, `group`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerLevel) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.IntegralAsset) == 0 {
@@ -358,6 +443,37 @@ func (a *OfficialCustomerLevel) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerLevel) Save(old *OfficialCustomerLevel, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.IntegralAsset) == 0 {
+		a.IntegralAsset = "integral"
+	}
+	if len(a.IntegralAmountType) == 0 {
+		a.IntegralAmountType = "balance"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Group) == 0 {
+		a.Group = "base"
+	}
+	if old == nil {
+		old = NewOfficialCustomerLevel(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerLevel) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

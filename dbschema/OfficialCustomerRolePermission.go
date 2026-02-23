@@ -283,6 +283,23 @@ func (a *OfficialCustomerRolePermission) Update(mw func(db.Result) db.Result, ar
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerRolePermission) GetDiffColumns(old *OfficialCustomerRolePermission) (changedCols []interface{}) {
+
+	if old.RoleId != a.RoleId {
+		changedCols = append(changedCols, `role_id`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Permission != a.Permission {
+		changedCols = append(changedCols, `permission`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerRolePermission) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -296,6 +313,25 @@ func (a *OfficialCustomerRolePermission) Updatex(mw func(db.Result) db.Result, a
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerRolePermission) Save(old *OfficialCustomerRolePermission, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewOfficialCustomerRolePermission(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerRolePermission) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

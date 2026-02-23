@@ -326,6 +326,63 @@ func (a *OfficialCommonRoutePage) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonRoutePage) GetDiffColumns(old *OfficialCommonRoutePage) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Route != a.Route {
+		changedCols = append(changedCols, `route`)
+	}
+
+	if old.Method != a.Method {
+		changedCols = append(changedCols, `method`)
+	}
+
+	if old.PageContent != a.PageContent {
+		changedCols = append(changedCols, `page_content`)
+	}
+
+	if old.PageVars != a.PageVars {
+		changedCols = append(changedCols, `page_vars`)
+	}
+
+	if old.PageType != a.PageType {
+		changedCols = append(changedCols, `page_type`)
+	}
+
+	if old.PageId != a.PageId {
+		changedCols = append(changedCols, `page_id`)
+	}
+
+	if old.TemplateEnabled != a.TemplateEnabled {
+		changedCols = append(changedCols, `template_enabled`)
+	}
+
+	if old.TemplateFile != a.TemplateFile {
+		changedCols = append(changedCols, `template_file`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonRoutePage) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Method) == 0 {
@@ -351,6 +408,37 @@ func (a *OfficialCommonRoutePage) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonRoutePage) Save(old *OfficialCommonRoutePage, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Method) == 0 {
+		a.Method = "GET"
+	}
+	if len(a.PageType) == 0 {
+		a.PageType = "html"
+	}
+	if len(a.TemplateEnabled) == 0 {
+		a.TemplateEnabled = "N"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialCommonRoutePage(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonRoutePage) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

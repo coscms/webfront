@@ -292,6 +292,27 @@ func (a *OfficialCustomerFollowing) Update(mw func(db.Result) db.Result, args ..
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerFollowing) GetDiffColumns(old *OfficialCustomerFollowing) (changedCols []interface{}) {
+
+	if old.CustomerA != a.CustomerA {
+		changedCols = append(changedCols, `customer_a`)
+	}
+
+	if old.CustomerB != a.CustomerB {
+		changedCols = append(changedCols, `customer_b`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Mutual != a.Mutual {
+		changedCols = append(changedCols, `mutual`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerFollowing) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Mutual) == 0 {
@@ -308,6 +329,28 @@ func (a *OfficialCustomerFollowing) Updatex(mw func(db.Result) db.Result, args .
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerFollowing) Save(old *OfficialCustomerFollowing, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Mutual) == 0 {
+		a.Mutual = "N"
+	}
+	if old == nil {
+		old = NewOfficialCustomerFollowing(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerFollowing) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -347,6 +347,99 @@ func (a *OfficialCommonComment) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonComment) GetDiffColumns(old *OfficialCommonComment) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.ReplyCommentId != a.ReplyCommentId {
+		changedCols = append(changedCols, `reply_comment_id`)
+	}
+
+	if old.ReplyOwnerId != a.ReplyOwnerId {
+		changedCols = append(changedCols, `reply_owner_id`)
+	}
+
+	if old.ReplyOwnerType != a.ReplyOwnerType {
+		changedCols = append(changedCols, `reply_owner_type`)
+	}
+
+	if old.RootId != a.RootId {
+		changedCols = append(changedCols, `root_id`)
+	}
+
+	if old.TargetType != a.TargetType {
+		changedCols = append(changedCols, `target_type`)
+	}
+
+	if old.TargetSubtype != a.TargetSubtype {
+		changedCols = append(changedCols, `target_subtype`)
+	}
+
+	if old.TargetId != a.TargetId {
+		changedCols = append(changedCols, `target_id`)
+	}
+
+	if old.TargetOwnerId != a.TargetOwnerId {
+		changedCols = append(changedCols, `target_owner_id`)
+	}
+
+	if old.TargetOwnerType != a.TargetOwnerType {
+		changedCols = append(changedCols, `target_owner_type`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Contype != a.Contype {
+		changedCols = append(changedCols, `contype`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Display != a.Display {
+		changedCols = append(changedCols, `display`)
+	}
+
+	if old.Level != a.Level {
+		changedCols = append(changedCols, `level`)
+	}
+
+	if old.Path != a.Path {
+		changedCols = append(changedCols, `path`)
+	}
+
+	if old.Replies != a.Replies {
+		changedCols = append(changedCols, `replies`)
+	}
+
+	if old.Likes != a.Likes {
+		changedCols = append(changedCols, `likes`)
+	}
+
+	if old.Hates != a.Hates {
+		changedCols = append(changedCols, `hates`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonComment) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.ReplyOwnerType) == 0 {
@@ -378,6 +471,43 @@ func (a *OfficialCommonComment) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonComment) Save(old *OfficialCommonComment, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.ReplyOwnerType) == 0 {
+		a.ReplyOwnerType = "customer"
+	}
+	if len(a.TargetType) == 0 {
+		a.TargetType = "article"
+	}
+	if len(a.TargetOwnerType) == 0 {
+		a.TargetOwnerType = "customer"
+	}
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if len(a.Contype) == 0 {
+		a.Contype = "text"
+	}
+	if len(a.Display) == 0 {
+		a.Display = "N"
+	}
+	if old == nil {
+		old = NewOfficialCommonComment(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonComment) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -308,6 +308,39 @@ func (a *OfficialCommonClickFlow) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonClickFlow) GetDiffColumns(old *OfficialCommonClickFlow) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.TargetType != a.TargetType {
+		changedCols = append(changedCols, `target_type`)
+	}
+
+	if old.TargetId != a.TargetId {
+		changedCols = append(changedCols, `target_id`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonClickFlow) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.TargetType) == 0 {
@@ -327,6 +360,31 @@ func (a *OfficialCommonClickFlow) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonClickFlow) Save(old *OfficialCommonClickFlow, args ...interface{}) (affected int64, err error) {
+
+	if len(a.TargetType) == 0 {
+		a.TargetType = "article"
+	}
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if old == nil {
+		old = NewOfficialCommonClickFlow(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonClickFlow) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

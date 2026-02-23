@@ -351,6 +351,139 @@ func (a *OfficialCustomer) Update(mw func(db.Result) db.Result, args ...interfac
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomer) GetDiffColumns(old *OfficialCustomer) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.GroupId != a.GroupId {
+		changedCols = append(changedCols, `group_id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Password != a.Password {
+		changedCols = append(changedCols, `password`)
+	}
+
+	if old.Salt != a.Salt {
+		changedCols = append(changedCols, `salt`)
+	}
+
+	if old.SafePwd != a.SafePwd {
+		changedCols = append(changedCols, `safe_pwd`)
+	}
+
+	if old.SessionId != a.SessionId {
+		changedCols = append(changedCols, `session_id`)
+	}
+
+	if old.RealName != a.RealName {
+		changedCols = append(changedCols, `real_name`)
+	}
+
+	if old.Mobile != a.Mobile {
+		changedCols = append(changedCols, `mobile`)
+	}
+
+	if old.MobileBind != a.MobileBind {
+		changedCols = append(changedCols, `mobile_bind`)
+	}
+
+	if old.Email != a.Email {
+		changedCols = append(changedCols, `email`)
+	}
+
+	if old.EmailBind != a.EmailBind {
+		changedCols = append(changedCols, `email_bind`)
+	}
+
+	if old.Online != a.Online {
+		changedCols = append(changedCols, `online`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Gender != a.Gender {
+		changedCols = append(changedCols, `gender`)
+	}
+
+	if old.IdCardNo != a.IdCardNo {
+		changedCols = append(changedCols, `id_card_no`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Avatar != a.Avatar {
+		changedCols = append(changedCols, `avatar`)
+	}
+
+	if old.Licenses != a.Licenses {
+		changedCols = append(changedCols, `licenses`)
+	}
+
+	if old.LoginFails != a.LoginFails {
+		changedCols = append(changedCols, `login_fails`)
+	}
+
+	if old.LevelId != a.LevelId {
+		changedCols = append(changedCols, `level_id`)
+	}
+
+	if old.AgentLevel != a.AgentLevel {
+		changedCols = append(changedCols, `agent_level`)
+	}
+
+	if old.InviterId != a.InviterId {
+		changedCols = append(changedCols, `inviter_id`)
+	}
+
+	if old.Following != a.Following {
+		changedCols = append(changedCols, `following`)
+	}
+
+	if old.Followers != a.Followers {
+		changedCols = append(changedCols, `followers`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	if old.FileSize != a.FileSize {
+		changedCols = append(changedCols, `file_size`)
+	}
+
+	if old.FileNum != a.FileNum {
+		changedCols = append(changedCols, `file_num`)
+	}
+
+	if old.RegisteredBy != a.RegisteredBy {
+		changedCols = append(changedCols, `registered_by`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomer) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.MobileBind) == 0 {
@@ -379,6 +512,40 @@ func (a *OfficialCustomer) Updatex(mw func(db.Result) db.Result, args ...interfa
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomer) Save(old *OfficialCustomer, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.MobileBind) == 0 {
+		a.MobileBind = "N"
+	}
+	if len(a.EmailBind) == 0 {
+		a.EmailBind = "N"
+	}
+	if len(a.Online) == 0 {
+		a.Online = "N"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Gender) == 0 {
+		a.Gender = "secret"
+	}
+	if old == nil {
+		old = NewOfficialCustomer(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomer) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

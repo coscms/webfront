@@ -304,6 +304,47 @@ func (a *OfficialPageBlock) Update(mw func(db.Result) db.Result, args ...interfa
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialPageBlock) GetDiffColumns(old *OfficialPageBlock) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Style != a.Style {
+		changedCols = append(changedCols, `style`)
+	}
+
+	if old.WithItems != a.WithItems {
+		changedCols = append(changedCols, `with_items`)
+	}
+
+	if old.ItemConfigs != a.ItemConfigs {
+		changedCols = append(changedCols, `item_configs`)
+	}
+
+	if old.Template != a.Template {
+		changedCols = append(changedCols, `template`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialPageBlock) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -320,6 +361,28 @@ func (a *OfficialPageBlock) Updatex(mw func(db.Result) db.Result, args ...interf
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialPageBlock) Save(old *OfficialPageBlock, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialPageBlock(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialPageBlock) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -296,6 +296,39 @@ func (a *OfficialCustomerInvitationUsed) Update(mw func(db.Result) db.Result, ar
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerInvitationUsed) GetDiffColumns(old *OfficialCustomerInvitationUsed) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.InvitationId != a.InvitationId {
+		changedCols = append(changedCols, `invitation_id`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.LevelId != a.LevelId {
+		changedCols = append(changedCols, `level_id`)
+	}
+
+	if old.AgentLevelId != a.AgentLevelId {
+		changedCols = append(changedCols, `agent_level_id`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerInvitationUsed) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -309,6 +342,25 @@ func (a *OfficialCustomerInvitationUsed) Updatex(mw func(db.Result) db.Result, a
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerInvitationUsed) Save(old *OfficialCustomerInvitationUsed, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewOfficialCustomerInvitationUsed(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerInvitationUsed) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

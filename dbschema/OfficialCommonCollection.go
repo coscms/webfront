@@ -303,6 +303,43 @@ func (a *OfficialCommonCollection) Update(mw func(db.Result) db.Result, args ...
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonCollection) GetDiffColumns(old *OfficialCommonCollection) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.TargetType != a.TargetType {
+		changedCols = append(changedCols, `target_type`)
+	}
+
+	if old.TargetId != a.TargetId {
+		changedCols = append(changedCols, `target_id`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.Views != a.Views {
+		changedCols = append(changedCols, `views`)
+	}
+
+	if old.Visited != a.Visited {
+		changedCols = append(changedCols, `visited`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonCollection) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.TargetType) == 0 {
@@ -319,6 +356,28 @@ func (a *OfficialCommonCollection) Updatex(mw func(db.Result) db.Result, args ..
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonCollection) Save(old *OfficialCommonCollection, args ...interface{}) (affected int64, err error) {
+
+	if len(a.TargetType) == 0 {
+		a.TargetType = "article"
+	}
+	if old == nil {
+		old = NewOfficialCommonCollection(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonCollection) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

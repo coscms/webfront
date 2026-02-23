@@ -361,6 +361,131 @@ func (a *OfficialCommonArticle) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonArticle) GetDiffColumns(old *OfficialCommonArticle) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Category1 != a.Category1 {
+		changedCols = append(changedCols, `category1`)
+	}
+
+	if old.Category2 != a.Category2 {
+		changedCols = append(changedCols, `category2`)
+	}
+
+	if old.Category3 != a.Category3 {
+		changedCols = append(changedCols, `category3`)
+	}
+
+	if old.CategoryId != a.CategoryId {
+		changedCols = append(changedCols, `category_id`)
+	}
+
+	if old.SourceId != a.SourceId {
+		changedCols = append(changedCols, `source_id`)
+	}
+
+	if old.SourceTable != a.SourceTable {
+		changedCols = append(changedCols, `source_table`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Keywords != a.Keywords {
+		changedCols = append(changedCols, `keywords`)
+	}
+
+	if old.Image != a.Image {
+		changedCols = append(changedCols, `image`)
+	}
+
+	if old.ImageOriginal != a.ImageOriginal {
+		changedCols = append(changedCols, `image_original`)
+	}
+
+	if old.Summary != a.Summary {
+		changedCols = append(changedCols, `summary`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Contype != a.Contype {
+		changedCols = append(changedCols, `contype`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Display != a.Display {
+		changedCols = append(changedCols, `display`)
+	}
+
+	if old.Template != a.Template {
+		changedCols = append(changedCols, `template`)
+	}
+
+	if old.Comments != a.Comments {
+		changedCols = append(changedCols, `comments`)
+	}
+
+	if old.CloseComment != a.CloseComment {
+		changedCols = append(changedCols, `close_comment`)
+	}
+
+	if old.CommentAutoDisplay != a.CommentAutoDisplay {
+		changedCols = append(changedCols, `comment_auto_display`)
+	}
+
+	if old.CommentAllowUser != a.CommentAllowUser {
+		changedCols = append(changedCols, `comment_allow_user`)
+	}
+
+	if old.Likes != a.Likes {
+		changedCols = append(changedCols, `likes`)
+	}
+
+	if old.Hates != a.Hates {
+		changedCols = append(changedCols, `hates`)
+	}
+
+	if old.Views != a.Views {
+		changedCols = append(changedCols, `views`)
+	}
+
+	if old.Tags != a.Tags {
+		changedCols = append(changedCols, `tags`)
+	}
+
+	if old.Price != a.Price {
+		changedCols = append(changedCols, `price`)
+	}
+
+	if old.Slugify != a.Slugify {
+		changedCols = append(changedCols, `slugify`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonArticle) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.OwnerType) == 0 {
@@ -395,6 +520,46 @@ func (a *OfficialCommonArticle) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonArticle) Save(old *OfficialCommonArticle, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if len(a.Contype) == 0 {
+		a.Contype = "markdown"
+	}
+	if len(a.Display) == 0 {
+		a.Display = "Y"
+	}
+	if len(a.CloseComment) == 0 {
+		a.CloseComment = "N"
+	}
+	if len(a.CommentAutoDisplay) == 0 {
+		a.CommentAutoDisplay = "N"
+	}
+	if len(a.CommentAllowUser) == 0 {
+		a.CommentAllowUser = "all"
+	}
+	if len(a.Tags) == 0 {
+		a.Tags = "[]"
+	}
+	if old == nil {
+		old = NewOfficialCommonArticle(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonArticle) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

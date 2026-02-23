@@ -292,6 +292,35 @@ func (a *OfficialCommonAreaGroup) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonAreaGroup) GetDiffColumns(old *OfficialCommonAreaGroup) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CountryAbbr != a.CountryAbbr {
+		changedCols = append(changedCols, `country_abbr`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Abbr != a.Abbr {
+		changedCols = append(changedCols, `abbr`)
+	}
+
+	if old.AreaIds != a.AreaIds {
+		changedCols = append(changedCols, `area_ids`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonAreaGroup) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -305,6 +334,25 @@ func (a *OfficialCommonAreaGroup) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonAreaGroup) Save(old *OfficialCommonAreaGroup, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewOfficialCommonAreaGroup(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonAreaGroup) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

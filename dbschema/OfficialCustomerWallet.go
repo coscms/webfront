@@ -295,6 +295,39 @@ func (a *OfficialCustomerWallet) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerWallet) GetDiffColumns(old *OfficialCustomerWallet) (changedCols []interface{}) {
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.AssetType != a.AssetType {
+		changedCols = append(changedCols, `asset_type`)
+	}
+
+	if old.Balance != a.Balance {
+		changedCols = append(changedCols, `balance`)
+	}
+
+	if old.Freeze != a.Freeze {
+		changedCols = append(changedCols, `freeze`)
+	}
+
+	if old.Accumulated != a.Accumulated {
+		changedCols = append(changedCols, `accumulated`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerWallet) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.AssetType) == 0 {
@@ -311,6 +344,28 @@ func (a *OfficialCustomerWallet) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerWallet) Save(old *OfficialCustomerWallet, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.AssetType) == 0 {
+		a.AssetType = "money"
+	}
+	if old == nil {
+		old = NewOfficialCustomerWallet(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerWallet) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

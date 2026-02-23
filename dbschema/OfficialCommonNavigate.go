@@ -337,6 +337,83 @@ func (a *OfficialCommonNavigate) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonNavigate) GetDiffColumns(old *OfficialCommonNavigate) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.LinkType != a.LinkType {
+		changedCols = append(changedCols, `link_type`)
+	}
+
+	if old.ParentId != a.ParentId {
+		changedCols = append(changedCols, `parent_id`)
+	}
+
+	if old.HasChild != a.HasChild {
+		changedCols = append(changedCols, `has_child`)
+	}
+
+	if old.Level != a.Level {
+		changedCols = append(changedCols, `level`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Cover != a.Cover {
+		changedCols = append(changedCols, `cover`)
+	}
+
+	if old.Url != a.Url {
+		changedCols = append(changedCols, `url`)
+	}
+
+	if old.Ident != a.Ident {
+		changedCols = append(changedCols, `ident`)
+	}
+
+	if old.Remark != a.Remark {
+		changedCols = append(changedCols, `remark`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Target != a.Target {
+		changedCols = append(changedCols, `target`)
+	}
+
+	if old.Direction != a.Direction {
+		changedCols = append(changedCols, `direction`)
+	}
+
+	if old.Badge != a.Badge {
+		changedCols = append(changedCols, `badge`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonNavigate) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Type) == 0 {
@@ -365,6 +442,40 @@ func (a *OfficialCommonNavigate) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonNavigate) Save(old *OfficialCommonNavigate, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "default"
+	}
+	if len(a.LinkType) == 0 {
+		a.LinkType = "custom"
+	}
+	if len(a.HasChild) == 0 {
+		a.HasChild = "N"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Direction) == 0 {
+		a.Direction = "Y"
+	}
+	if old == nil {
+		old = NewOfficialCommonNavigate(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonNavigate) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

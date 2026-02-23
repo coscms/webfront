@@ -321,6 +321,67 @@ func (a *OfficialAdItem) Update(mw func(db.Result) db.Result, args ...interface{
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialAdItem) GetDiffColumns(old *OfficialAdItem) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.PublisherId != a.PublisherId {
+		changedCols = append(changedCols, `publisher_id`)
+	}
+
+	if old.PositionId != a.PositionId {
+		changedCols = append(changedCols, `position_id`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Contype != a.Contype {
+		changedCols = append(changedCols, `contype`)
+	}
+
+	if old.Mode != a.Mode {
+		changedCols = append(changedCols, `mode`)
+	}
+
+	if old.Url != a.Url {
+		changedCols = append(changedCols, `url`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Start != a.Start {
+		changedCols = append(changedCols, `start`)
+	}
+
+	if old.End != a.End {
+		changedCols = append(changedCols, `end`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialAdItem) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Contype) == 0 {
@@ -343,6 +404,34 @@ func (a *OfficialAdItem) Updatex(mw func(db.Result) db.Result, args ...interface
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialAdItem) Save(old *OfficialAdItem, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Contype) == 0 {
+		a.Contype = "image"
+	}
+	if len(a.Mode) == 0 {
+		a.Mode = "CPS"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialAdItem(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialAdItem) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

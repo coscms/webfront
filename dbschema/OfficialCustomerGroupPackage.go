@@ -322,6 +322,71 @@ func (a *OfficialCustomerGroupPackage) Update(mw func(db.Result) db.Result, args
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerGroupPackage) GetDiffColumns(old *OfficialCustomerGroupPackage) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Group != a.Group {
+		changedCols = append(changedCols, `group`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Price != a.Price {
+		changedCols = append(changedCols, `price`)
+	}
+
+	if old.TimeDuration != a.TimeDuration {
+		changedCols = append(changedCols, `time_duration`)
+	}
+
+	if old.TimeUnit != a.TimeUnit {
+		changedCols = append(changedCols, `time_unit`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Recommend != a.Recommend {
+		changedCols = append(changedCols, `recommend`)
+	}
+
+	if old.Sold != a.Sold {
+		changedCols = append(changedCols, `sold`)
+	}
+
+	if old.IconImage != a.IconImage {
+		changedCols = append(changedCols, `icon_image`)
+	}
+
+	if old.IconClass != a.IconClass {
+		changedCols = append(changedCols, `icon_class`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerGroupPackage) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.TimeUnit) == 0 {
@@ -344,6 +409,34 @@ func (a *OfficialCustomerGroupPackage) Updatex(mw func(db.Result) db.Result, arg
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerGroupPackage) Save(old *OfficialCustomerGroupPackage, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.TimeUnit) == 0 {
+		a.TimeUnit = "forever"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Recommend) == 0 {
+		a.Recommend = "N"
+	}
+	if old == nil {
+		old = NewOfficialCustomerGroupPackage(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerGroupPackage) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

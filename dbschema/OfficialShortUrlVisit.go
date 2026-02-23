@@ -309,6 +309,95 @@ func (a *OfficialShortUrlVisit) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialShortUrlVisit) GetDiffColumns(old *OfficialShortUrlVisit) (changedCols []interface{}) {
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.UrlId != a.UrlId {
+		changedCols = append(changedCols, `url_id`)
+	}
+
+	if old.DomainId != a.DomainId {
+		changedCols = append(changedCols, `domain_id`)
+	}
+
+	if old.Year != a.Year {
+		changedCols = append(changedCols, `year`)
+	}
+
+	if old.Month != a.Month {
+		changedCols = append(changedCols, `month`)
+	}
+
+	if old.Day != a.Day {
+		changedCols = append(changedCols, `day`)
+	}
+
+	if old.Hour != a.Hour {
+		changedCols = append(changedCols, `hour`)
+	}
+
+	if old.Ip != a.Ip {
+		changedCols = append(changedCols, `ip`)
+	}
+
+	if old.Referer != a.Referer {
+		changedCols = append(changedCols, `referer`)
+	}
+
+	if old.Language != a.Language {
+		changedCols = append(changedCols, `language`)
+	}
+
+	if old.Country != a.Country {
+		changedCols = append(changedCols, `country`)
+	}
+
+	if old.Region != a.Region {
+		changedCols = append(changedCols, `region`)
+	}
+
+	if old.Province != a.Province {
+		changedCols = append(changedCols, `province`)
+	}
+
+	if old.City != a.City {
+		changedCols = append(changedCols, `city`)
+	}
+
+	if old.Isp != a.Isp {
+		changedCols = append(changedCols, `isp`)
+	}
+
+	if old.Os != a.Os {
+		changedCols = append(changedCols, `os`)
+	}
+
+	if old.OsVersion != a.OsVersion {
+		changedCols = append(changedCols, `os_version`)
+	}
+
+	if old.Browser != a.Browser {
+		changedCols = append(changedCols, `browser`)
+	}
+
+	if old.BrowserVersion != a.BrowserVersion {
+		changedCols = append(changedCols, `browser_version`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialShortUrlVisit) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.OwnerType) == 0 {
@@ -325,6 +414,28 @@ func (a *OfficialShortUrlVisit) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialShortUrlVisit) Save(old *OfficialShortUrlVisit, args ...interface{}) (affected int64, err error) {
+
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if old == nil {
+		old = NewOfficialShortUrlVisit(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialShortUrlVisit) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

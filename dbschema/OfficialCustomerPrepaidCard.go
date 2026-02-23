@@ -308,6 +308,63 @@ func (a *OfficialCustomerPrepaidCard) Update(mw func(db.Result) db.Result, args 
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerPrepaidCard) GetDiffColumns(old *OfficialCustomerPrepaidCard) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.Amount != a.Amount {
+		changedCols = append(changedCols, `amount`)
+	}
+
+	if old.SalePrice != a.SalePrice {
+		changedCols = append(changedCols, `sale_price`)
+	}
+
+	if old.Number != a.Number {
+		changedCols = append(changedCols, `number`)
+	}
+
+	if old.Password != a.Password {
+		changedCols = append(changedCols, `password`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Start != a.Start {
+		changedCols = append(changedCols, `start`)
+	}
+
+	if old.End != a.End {
+		changedCols = append(changedCols, `end`)
+	}
+
+	if old.Used != a.Used {
+		changedCols = append(changedCols, `used`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.BgImage != a.BgImage {
+		changedCols = append(changedCols, `bg_image`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerPrepaidCard) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Disabled) == 0 {
@@ -324,6 +381,28 @@ func (a *OfficialCustomerPrepaidCard) Updatex(mw func(db.Result) db.Result, args
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerPrepaidCard) Save(old *OfficialCustomerPrepaidCard, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialCustomerPrepaidCard(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerPrepaidCard) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

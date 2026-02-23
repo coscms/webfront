@@ -303,6 +303,43 @@ func (a *OfficialPageLayout) Update(mw func(db.Result) db.Result, args ...interf
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialPageLayout) GetDiffColumns(old *OfficialPageLayout) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.BlockId != a.BlockId {
+		changedCols = append(changedCols, `block_id`)
+	}
+
+	if old.PageId != a.PageId {
+		changedCols = append(changedCols, `page_id`)
+	}
+
+	if old.Configs != a.Configs {
+		changedCols = append(changedCols, `configs`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialPageLayout) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -319,6 +356,28 @@ func (a *OfficialPageLayout) Updatex(mw func(db.Result) db.Result, args ...inter
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialPageLayout) Save(old *OfficialPageLayout, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialPageLayout(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialPageLayout) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

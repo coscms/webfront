@@ -283,6 +283,23 @@ func (a *OfficialCustomerCounter) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerCounter) GetDiffColumns(old *OfficialCustomerCounter) (changedCols []interface{}) {
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.Target != a.Target {
+		changedCols = append(changedCols, `target`)
+	}
+
+	if old.Total != a.Total {
+		changedCols = append(changedCols, `total`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerCounter) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -296,6 +313,25 @@ func (a *OfficialCustomerCounter) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerCounter) Save(old *OfficialCustomerCounter, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewOfficialCustomerCounter(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerCounter) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

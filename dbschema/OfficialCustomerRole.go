@@ -309,6 +309,43 @@ func (a *OfficialCustomerRole) Update(mw func(db.Result) db.Result, args ...inte
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerRole) GetDiffColumns(old *OfficialCustomerRole) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.IsDefault != a.IsDefault {
+		changedCols = append(changedCols, `is_default`)
+	}
+
+	if old.ParentId != a.ParentId {
+		changedCols = append(changedCols, `parent_id`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerRole) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -328,6 +365,31 @@ func (a *OfficialCustomerRole) Updatex(mw func(db.Result) db.Result, args ...int
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerRole) Save(old *OfficialCustomerRole, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.IsDefault) == 0 {
+		a.IsDefault = "N"
+	}
+	if old == nil {
+		old = NewOfficialCustomerRole(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerRole) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

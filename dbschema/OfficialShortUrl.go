@@ -315,6 +315,67 @@ func (a *OfficialShortUrl) Update(mw func(db.Result) db.Result, args ...interfac
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialShortUrl) GetDiffColumns(old *OfficialShortUrl) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.LongUrl != a.LongUrl {
+		changedCols = append(changedCols, `long_url`)
+	}
+
+	if old.LongHash != a.LongHash {
+		changedCols = append(changedCols, `long_hash`)
+	}
+
+	if old.ShortUrl != a.ShortUrl {
+		changedCols = append(changedCols, `short_url`)
+	}
+
+	if old.DomainId != a.DomainId {
+		changedCols = append(changedCols, `domain_id`)
+	}
+
+	if old.Visited != a.Visited {
+		changedCols = append(changedCols, `visited`)
+	}
+
+	if old.Visits != a.Visits {
+		changedCols = append(changedCols, `visits`)
+	}
+
+	if old.Available != a.Available {
+		changedCols = append(changedCols, `available`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Expired != a.Expired {
+		changedCols = append(changedCols, `expired`)
+	}
+
+	if old.Password != a.Password {
+		changedCols = append(changedCols, `password`)
+	}
+
+	return
+}
+
 func (a *OfficialShortUrl) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.OwnerType) == 0 {
@@ -334,6 +395,31 @@ func (a *OfficialShortUrl) Updatex(mw func(db.Result) db.Result, args ...interfa
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialShortUrl) Save(old *OfficialShortUrl, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if len(a.Available) == 0 {
+		a.Available = "Y"
+	}
+	if old == nil {
+		old = NewOfficialShortUrl(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialShortUrl) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

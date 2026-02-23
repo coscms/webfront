@@ -314,6 +314,63 @@ func (a *OfficialCustomerInvitation) Update(mw func(db.Result) db.Result, args .
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerInvitation) GetDiffColumns(old *OfficialCustomerInvitation) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Code != a.Code {
+		changedCols = append(changedCols, `code`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Start != a.Start {
+		changedCols = append(changedCols, `start`)
+	}
+
+	if old.End != a.End {
+		changedCols = append(changedCols, `end`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.LevelId != a.LevelId {
+		changedCols = append(changedCols, `level_id`)
+	}
+
+	if old.AgentLevelId != a.AgentLevelId {
+		changedCols = append(changedCols, `agent_level_id`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	if old.UsedNum != a.UsedNum {
+		changedCols = append(changedCols, `used_num`)
+	}
+
+	if old.AllowNum != a.AllowNum {
+		changedCols = append(changedCols, `allow_num`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerInvitation) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.OwnerType) == 0 {
@@ -333,6 +390,31 @@ func (a *OfficialCustomerInvitation) Updatex(mw func(db.Result) db.Result, args 
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerInvitation) Save(old *OfficialCustomerInvitation, args ...interface{}) (affected int64, err error) {
+
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "user"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialCustomerInvitation(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerInvitation) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

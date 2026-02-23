@@ -307,6 +307,47 @@ func (a *OfficialAdSettings) Update(mw func(db.Result) db.Result, args ...interf
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialAdSettings) GetDiffColumns(old *OfficialAdSettings) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.AdvertId != a.AdvertId {
+		changedCols = append(changedCols, `advert_id`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Value != a.Value {
+		changedCols = append(changedCols, `value`)
+	}
+
+	if old.VStart != a.VStart {
+		changedCols = append(changedCols, `v_start`)
+	}
+
+	if old.VEnd != a.VEnd {
+		changedCols = append(changedCols, `v_end`)
+	}
+
+	if old.TStart != a.TStart {
+		changedCols = append(changedCols, `t_start`)
+	}
+
+	if old.TEnd != a.TEnd {
+		changedCols = append(changedCols, `t_end`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	return
+}
+
 func (a *OfficialAdSettings) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Type) == 0 {
@@ -326,6 +367,31 @@ func (a *OfficialAdSettings) Updatex(mw func(db.Result) db.Result, args ...inter
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialAdSettings) Save(old *OfficialAdSettings, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Type) == 0 {
+		a.Type = "area"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialAdSettings(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialAdSettings) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

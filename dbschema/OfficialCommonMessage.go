@@ -320,6 +320,87 @@ func (a *OfficialCommonMessage) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonMessage) GetDiffColumns(old *OfficialCommonMessage) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.CustomerA != a.CustomerA {
+		changedCols = append(changedCols, `customer_a`)
+	}
+
+	if old.CustomerB != a.CustomerB {
+		changedCols = append(changedCols, `customer_b`)
+	}
+
+	if old.CustomerGroupId != a.CustomerGroupId {
+		changedCols = append(changedCols, `customer_group_id`)
+	}
+
+	if old.UserA != a.UserA {
+		changedCols = append(changedCols, `user_a`)
+	}
+
+	if old.UserB != a.UserB {
+		changedCols = append(changedCols, `user_b`)
+	}
+
+	if old.UserRoleId != a.UserRoleId {
+		changedCols = append(changedCols, `user_role_id`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Contype != a.Contype {
+		changedCols = append(changedCols, `contype`)
+	}
+
+	if old.Encrypted != a.Encrypted {
+		changedCols = append(changedCols, `encrypted`)
+	}
+
+	if old.Password != a.Password {
+		changedCols = append(changedCols, `password`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Url != a.Url {
+		changedCols = append(changedCols, `url`)
+	}
+
+	if old.RootId != a.RootId {
+		changedCols = append(changedCols, `root_id`)
+	}
+
+	if old.ReplyId != a.ReplyId {
+		changedCols = append(changedCols, `reply_id`)
+	}
+
+	if old.HasNewReply != a.HasNewReply {
+		changedCols = append(changedCols, `has_new_reply`)
+	}
+
+	if old.ViewProgress != a.ViewProgress {
+		changedCols = append(changedCols, `view_progress`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonMessage) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Contype) == 0 {
@@ -339,6 +420,31 @@ func (a *OfficialCommonMessage) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonMessage) Save(old *OfficialCommonMessage, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Contype) == 0 {
+		a.Contype = "text"
+	}
+	if len(a.Encrypted) == 0 {
+		a.Encrypted = "N"
+	}
+	if old == nil {
+		old = NewOfficialCommonMessage(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonMessage) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

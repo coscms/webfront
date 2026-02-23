@@ -316,6 +316,71 @@ func (a *OfficialCustomerWalletFlow) Update(mw func(db.Result) db.Result, args .
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerWalletFlow) GetDiffColumns(old *OfficialCustomerWalletFlow) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.AssetType != a.AssetType {
+		changedCols = append(changedCols, `asset_type`)
+	}
+
+	if old.AmountType != a.AmountType {
+		changedCols = append(changedCols, `amount_type`)
+	}
+
+	if old.Amount != a.Amount {
+		changedCols = append(changedCols, `amount`)
+	}
+
+	if old.WalletAmount != a.WalletAmount {
+		changedCols = append(changedCols, `wallet_amount`)
+	}
+
+	if old.SourceCustomer != a.SourceCustomer {
+		changedCols = append(changedCols, `source_customer`)
+	}
+
+	if old.SourceType != a.SourceType {
+		changedCols = append(changedCols, `source_type`)
+	}
+
+	if old.SourceTable != a.SourceTable {
+		changedCols = append(changedCols, `source_table`)
+	}
+
+	if old.SourceId != a.SourceId {
+		changedCols = append(changedCols, `source_id`)
+	}
+
+	if old.Number != a.Number {
+		changedCols = append(changedCols, `number`)
+	}
+
+	if old.TradeNo != a.TradeNo {
+		changedCols = append(changedCols, `trade_no`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerWalletFlow) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.AmountType) == 0 {
@@ -335,6 +400,31 @@ func (a *OfficialCustomerWalletFlow) Updatex(mw func(db.Result) db.Result, args 
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerWalletFlow) Save(old *OfficialCustomerWalletFlow, args ...interface{}) (affected int64, err error) {
+
+	if len(a.AmountType) == 0 {
+		a.AmountType = "balance"
+	}
+	if len(a.Status) == 0 {
+		a.Status = "confirmed"
+	}
+	if old == nil {
+		old = NewOfficialCustomerWalletFlow(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerWalletFlow) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

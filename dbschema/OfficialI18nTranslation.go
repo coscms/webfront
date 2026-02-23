@@ -290,6 +290,27 @@ func (a *OfficialI18nTranslation) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialI18nTranslation) GetDiffColumns(old *OfficialI18nTranslation) (changedCols []interface{}) {
+
+	if old.ResourceId != a.ResourceId {
+		changedCols = append(changedCols, `resource_id`)
+	}
+
+	if old.RowId != a.RowId {
+		changedCols = append(changedCols, `row_id`)
+	}
+
+	if old.Lang != a.Lang {
+		changedCols = append(changedCols, `lang`)
+	}
+
+	if old.Text != a.Text {
+		changedCols = append(changedCols, `text`)
+	}
+
+	return
+}
+
 func (a *OfficialI18nTranslation) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Lang) == 0 {
@@ -306,6 +327,28 @@ func (a *OfficialI18nTranslation) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialI18nTranslation) Save(old *OfficialI18nTranslation, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Lang) == 0 {
+		a.Lang = "en"
+	}
+	if old == nil {
+		old = NewOfficialI18nTranslation(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialI18nTranslation) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

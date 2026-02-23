@@ -286,6 +286,27 @@ func (a *OfficialCustomerOnline) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerOnline) GetDiffColumns(old *OfficialCustomerOnline) (changedCols []interface{}) {
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.SessionId != a.SessionId {
+		changedCols = append(changedCols, `session_id`)
+	}
+
+	if old.ClientCount != a.ClientCount {
+		changedCols = append(changedCols, `client_count`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerOnline) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if !a.base.Eventable() {
@@ -299,6 +320,25 @@ func (a *OfficialCustomerOnline) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerOnline) Save(old *OfficialCustomerOnline, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if old == nil {
+		old = NewOfficialCustomerOnline(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerOnline) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

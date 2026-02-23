@@ -329,6 +329,75 @@ func (a *OfficialCommonCategory) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonCategory) GetDiffColumns(old *OfficialCommonCategory) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.ParentId != a.ParentId {
+		changedCols = append(changedCols, `parent_id`)
+	}
+
+	if old.HasChild != a.HasChild {
+		changedCols = append(changedCols, `has_child`)
+	}
+
+	if old.Level != a.Level {
+		changedCols = append(changedCols, `level`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Keywords != a.Keywords {
+		changedCols = append(changedCols, `keywords`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Cover != a.Cover {
+		changedCols = append(changedCols, `cover`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Template != a.Template {
+		changedCols = append(changedCols, `template`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.ShowOnMenu != a.ShowOnMenu {
+		changedCols = append(changedCols, `show_on_menu`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Slugify != a.Slugify {
+		changedCols = append(changedCols, `slugify`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonCategory) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.HasChild) == 0 {
@@ -354,6 +423,37 @@ func (a *OfficialCommonCategory) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonCategory) Save(old *OfficialCommonCategory, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.HasChild) == 0 {
+		a.HasChild = "N"
+	}
+	if len(a.Type) == 0 {
+		a.Type = "article"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.ShowOnMenu) == 0 {
+		a.ShowOnMenu = "Y"
+	}
+	if old == nil {
+		old = NewOfficialCommonCategory(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonCategory) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

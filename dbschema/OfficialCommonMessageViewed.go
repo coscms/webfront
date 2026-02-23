@@ -292,6 +292,27 @@ func (a *OfficialCommonMessageViewed) Update(mw func(db.Result) db.Result, args 
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonMessageViewed) GetDiffColumns(old *OfficialCommonMessageViewed) (changedCols []interface{}) {
+
+	if old.MessageId != a.MessageId {
+		changedCols = append(changedCols, `message_id`)
+	}
+
+	if old.ViewerId != a.ViewerId {
+		changedCols = append(changedCols, `viewer_id`)
+	}
+
+	if old.ViewerType != a.ViewerType {
+		changedCols = append(changedCols, `viewer_type`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonMessageViewed) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.ViewerType) == 0 {
@@ -308,6 +329,28 @@ func (a *OfficialCommonMessageViewed) Updatex(mw func(db.Result) db.Result, args
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonMessageViewed) Save(old *OfficialCommonMessageViewed, args ...interface{}) (affected int64, err error) {
+
+	if len(a.ViewerType) == 0 {
+		a.ViewerType = "customer"
+	}
+	if old == nil {
+		old = NewOfficialCommonMessageViewed(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonMessageViewed) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

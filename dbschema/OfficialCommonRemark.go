@@ -303,6 +303,43 @@ func (a *OfficialCommonRemark) Update(mw func(db.Result) db.Result, args ...inte
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonRemark) GetDiffColumns(old *OfficialCommonRemark) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.SourceType != a.SourceType {
+		changedCols = append(changedCols, `source_type`)
+	}
+
+	if old.SourceTable != a.SourceTable {
+		changedCols = append(changedCols, `source_table`)
+	}
+
+	if old.SourceId != a.SourceId {
+		changedCols = append(changedCols, `source_id`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonRemark) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.OwnerType) == 0 {
@@ -319,6 +356,28 @@ func (a *OfficialCommonRemark) Updatex(mw func(db.Result) db.Result, args ...int
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonRemark) Save(old *OfficialCommonRemark, args ...interface{}) (affected int64, err error) {
+
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if old == nil {
+		old = NewOfficialCommonRemark(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonRemark) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

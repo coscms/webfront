@@ -288,6 +288,19 @@ func (a *OfficialI18nResource) Update(mw func(db.Result) db.Result, args ...inte
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialI18nResource) GetDiffColumns(old *OfficialI18nResource) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Code != a.Code {
+		changedCols = append(changedCols, `code`)
+	}
+
+	return
+}
+
 func (a *OfficialI18nResource) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -301,6 +314,25 @@ func (a *OfficialI18nResource) Updatex(mw func(db.Result) db.Result, args ...int
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialI18nResource) Save(old *OfficialI18nResource, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewOfficialI18nResource(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialI18nResource) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -319,6 +319,83 @@ func (a *OfficialCommonFriendlink) Update(mw func(db.Result) db.Result, args ...
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonFriendlink) GetDiffColumns(old *OfficialCommonFriendlink) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CategoryId != a.CategoryId {
+		changedCols = append(changedCols, `category_id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.Logo != a.Logo {
+		changedCols = append(changedCols, `logo`)
+	}
+
+	if old.LogoOriginal != a.LogoOriginal {
+		changedCols = append(changedCols, `logo_original`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Url != a.Url {
+		changedCols = append(changedCols, `url`)
+	}
+
+	if old.Host != a.Host {
+		changedCols = append(changedCols, `host`)
+	}
+
+	if old.VerifyTime != a.VerifyTime {
+		changedCols = append(changedCols, `verify_time`)
+	}
+
+	if old.VerifyFailCount != a.VerifyFailCount {
+		changedCols = append(changedCols, `verify_fail_count`)
+	}
+
+	if old.VerifyResult != a.VerifyResult {
+		changedCols = append(changedCols, `verify_result`)
+	}
+
+	if old.Process != a.Process {
+		changedCols = append(changedCols, `process`)
+	}
+
+	if old.ProcessRemark != a.ProcessRemark {
+		changedCols = append(changedCols, `process_remark`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.ReturnTime != a.ReturnTime {
+		changedCols = append(changedCols, `return_time`)
+	}
+
+	if old.ReturnCount != a.ReturnCount {
+		changedCols = append(changedCols, `return_count`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonFriendlink) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.VerifyResult) == 0 {
@@ -338,6 +415,31 @@ func (a *OfficialCommonFriendlink) Updatex(mw func(db.Result) db.Result, args ..
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonFriendlink) Save(old *OfficialCommonFriendlink, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.VerifyResult) == 0 {
+		a.VerifyResult = "none"
+	}
+	if len(a.Process) == 0 {
+		a.Process = "idle"
+	}
+	if old == nil {
+		old = NewOfficialCommonFriendlink(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonFriendlink) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -307,6 +307,59 @@ func (a *OfficialCommonComplaint) Update(mw func(db.Result) db.Result, args ...i
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonComplaint) GetDiffColumns(old *OfficialCommonComplaint) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.TargetName != a.TargetName {
+		changedCols = append(changedCols, `target_name`)
+	}
+
+	if old.TargetId != a.TargetId {
+		changedCols = append(changedCols, `target_id`)
+	}
+
+	if old.TargetType != a.TargetType {
+		changedCols = append(changedCols, `target_type`)
+	}
+
+	if old.TargetIdent != a.TargetIdent {
+		changedCols = append(changedCols, `target_ident`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Process != a.Process {
+		changedCols = append(changedCols, `process`)
+	}
+
+	if old.Result != a.Result {
+		changedCols = append(changedCols, `result`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonComplaint) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Process) == 0 {
@@ -323,6 +376,28 @@ func (a *OfficialCommonComplaint) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonComplaint) Save(old *OfficialCommonComplaint, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Process) == 0 {
+		a.Process = "idle"
+	}
+	if old == nil {
+		old = NewOfficialCommonComplaint(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonComplaint) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

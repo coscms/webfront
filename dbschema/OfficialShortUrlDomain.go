@@ -309,6 +309,43 @@ func (a *OfficialShortUrlDomain) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialShortUrlDomain) GetDiffColumns(old *OfficialShortUrlDomain) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Domain != a.Domain {
+		changedCols = append(changedCols, `domain`)
+	}
+
+	if old.UrlCount != a.UrlCount {
+		changedCols = append(changedCols, `url_count`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialShortUrlDomain) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.OwnerType) == 0 {
@@ -328,6 +365,31 @@ func (a *OfficialShortUrlDomain) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialShortUrlDomain) Save(old *OfficialShortUrlDomain, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "customer"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialShortUrlDomain(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialShortUrlDomain) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

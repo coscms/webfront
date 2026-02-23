@@ -304,6 +304,47 @@ func (a *OfficialCustomerLevelRelation) Update(mw func(db.Result) db.Result, arg
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerLevelRelation) GetDiffColumns(old *OfficialCustomerLevelRelation) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.LevelId != a.LevelId {
+		changedCols = append(changedCols, `level_id`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Expired != a.Expired {
+		changedCols = append(changedCols, `expired`)
+	}
+
+	if old.AccumulatedDays != a.AccumulatedDays {
+		changedCols = append(changedCols, `accumulated_days`)
+	}
+
+	if old.LastRenewalAt != a.LastRenewalAt {
+		changedCols = append(changedCols, `last_renewal_at`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerLevelRelation) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Status) == 0 {
@@ -320,6 +361,28 @@ func (a *OfficialCustomerLevelRelation) Updatex(mw func(db.Result) db.Result, ar
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerLevelRelation) Save(old *OfficialCustomerLevelRelation, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Status) == 0 {
+		a.Status = "actived"
+	}
+	if old == nil {
+		old = NewOfficialCustomerLevelRelation(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerLevelRelation) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

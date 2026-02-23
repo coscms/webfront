@@ -298,6 +298,47 @@ func (a *OfficialCustomerDevice) Update(mw func(db.Result) db.Result, args ...in
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCustomerDevice) GetDiffColumns(old *OfficialCustomerDevice) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.CustomerId != a.CustomerId {
+		changedCols = append(changedCols, `customer_id`)
+	}
+
+	if old.SessionId != a.SessionId {
+		changedCols = append(changedCols, `session_id`)
+	}
+
+	if old.Scense != a.Scense {
+		changedCols = append(changedCols, `scense`)
+	}
+
+	if old.Platform != a.Platform {
+		changedCols = append(changedCols, `platform`)
+	}
+
+	if old.DeviceNo != a.DeviceNo {
+		changedCols = append(changedCols, `device_no`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Expired != a.Expired {
+		changedCols = append(changedCols, `expired`)
+	}
+
+	return
+}
+
 func (a *OfficialCustomerDevice) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if !a.base.Eventable() {
@@ -311,6 +352,25 @@ func (a *OfficialCustomerDevice) Updatex(mw func(db.Result) db.Result, args ...i
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCustomerDevice) Save(old *OfficialCustomerDevice, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if old == nil {
+		old = NewOfficialCustomerDevice(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCustomerDevice) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

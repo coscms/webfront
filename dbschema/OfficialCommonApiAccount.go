@@ -316,6 +316,71 @@ func (a *OfficialCommonApiAccount) Update(mw func(db.Result) db.Result, args ...
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *OfficialCommonApiAccount) GetDiffColumns(old *OfficialCommonApiAccount) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.GroupId != a.GroupId {
+		changedCols = append(changedCols, `group_id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Url != a.Url {
+		changedCols = append(changedCols, `url`)
+	}
+
+	if old.UrlDev != a.UrlDev {
+		changedCols = append(changedCols, `url_dev`)
+	}
+
+	if old.AppId != a.AppId {
+		changedCols = append(changedCols, `app_id`)
+	}
+
+	if old.AppSecret != a.AppSecret {
+		changedCols = append(changedCols, `app_secret`)
+	}
+
+	if old.PublicKey != a.PublicKey {
+		changedCols = append(changedCols, `public_key`)
+	}
+
+	if old.Encryption != a.Encryption {
+		changedCols = append(changedCols, `encryption`)
+	}
+
+	if old.Extra != a.Extra {
+		changedCols = append(changedCols, `extra`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *OfficialCommonApiAccount) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.OwnerType) == 0 {
@@ -335,6 +400,31 @@ func (a *OfficialCommonApiAccount) Updatex(mw func(db.Result) db.Result, args ..
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *OfficialCommonApiAccount) Save(old *OfficialCommonApiAccount, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "user"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewOfficialCommonApiAccount(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *OfficialCommonApiAccount) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
