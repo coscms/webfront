@@ -1,11 +1,15 @@
 package official
 
-import "github.com/webx-top/echo"
+import (
+	"github.com/coscms/webfront/dbschema"
+	"github.com/webx-top/echo"
+)
 
 type ClickFlowTargetInfo struct {
 	ID         uint64
 	AuthorType string
 	AuthorID   uint64
+	IsAuthor   func(echo.Context, *dbschema.OfficialCustomer) (bool, error)
 }
 
 type ClickFlowTargetFunc func(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, infoGetter func() ClickFlowTargetInfo, err error)
