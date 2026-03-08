@@ -3,8 +3,9 @@ package official
 import "github.com/webx-top/echo"
 
 type ClickFlowTargetInfo struct {
-	ID       uint64
-	AuthorID uint64
+	ID         uint64
+	AuthorType string
+	AuthorID   uint64
 }
 
 type ClickFlowTargetFunc func(ctx echo.Context, id interface{}) (after func(typ string, isCancel ...bool) error, infoGetter func() ClickFlowTargetInfo, err error)
