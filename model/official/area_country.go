@@ -86,10 +86,10 @@ func (f *AreaCountry) Edit(mw func(db.Result) db.Result, args ...interface{}) er
 	return f.OfficialCommonAreaCountry.Update(mw, args...)
 }
 
-func (f *AreaCountry) ListMustAtLeastOne() ([]*dbschema.OfficialCommonAreaCountry, error) {
+func (f *AreaCountry) ListMustAtLeastOne(args ...interface{}) ([]*dbschema.OfficialCommonAreaCountry, error) {
 	_, err := f.ListByOffset(nil, func(r db.Result) db.Result {
 		return r.OrderBy(`sort`, `id`)
-	}, 0, -1)
+	}, 0, -1, args...)
 	var countryList []*dbschema.OfficialCommonAreaCountry
 	if err == nil {
 		countryList = f.Objects()
