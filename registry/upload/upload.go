@@ -10,4 +10,5 @@ func init() {
 	upload.Subdir.Add(`navigate`, echo.T(`导航`))
 	upload.Subdir.Add(`friendlink`, echo.T(`友情链接`))
 	upload.Subdir.Add(`membership`, echo.T(`会员套餐`))
+	upload.Subdir.Add(`advert`, echo.T(`广告`))
 }
