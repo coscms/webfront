@@ -1,6 +1,7 @@
 package upload
 
 import (
+	_ "github.com/coscms/webfront/listener/upload/advert"
 	_ "github.com/coscms/webfront/listener/upload/article"
 	_ "github.com/coscms/webfront/listener/upload/category"
 	_ "github.com/coscms/webfront/listener/upload/comment"
