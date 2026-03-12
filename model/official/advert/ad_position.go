@@ -174,9 +174,11 @@ func (f *AdPosition) GetAdvertsByIdent(multilingual bool, idents ...string) (Pos
 			continue
 		}
 		item := &dbschema.OfficialAdItem{
-			Content: pos.Content,
-			Contype: pos.Contype,
-			Url:     pos.Url,
+			Content:     pos.Content,
+			Contype:     pos.Contype,
+			Url:         pos.Url,
+			Title:       pos.Title,
+			Description: pos.Description,
 		}
 		list[pos.Ident] = []*ItemResponse{NewItemResponse(item, pos)}
 	}

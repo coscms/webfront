@@ -7,15 +7,19 @@ import (
 	"github.com/webx-top/com"
 )
 
+var _ Adverter = (*ItemResponse)(nil)
+
 type ItemResponse struct {
-	Content  string `json:"content" xml:"content"`
-	Contype  string `json:"contype" xml:"contype"`
-	URL      string `json:"url" xml:"url"`
-	Start    uint   `json:"start,omitempty" xml:"start,omitempty"`
-	End      uint   `json:"end,omitempty" xml:"end,omitempty"`
-	Width    uint   `json:"width,omitempty" xml:"width,omitempty"`
-	Height   uint   `json:"height,omitempty" xml:"height,omitempty"`
-	Rendered string `json:"rendered,omitempty" xml:"rendered,omitempty"`
+	Content     string `json:"content" xml:"content"`
+	Contype     string `json:"contype" xml:"contype"`
+	URL         string `json:"url" xml:"url"`
+	Start       uint   `json:"start,omitempty" xml:"start,omitempty"`
+	End         uint   `json:"end,omitempty" xml:"end,omitempty"`
+	Width       uint   `json:"width,omitempty" xml:"width,omitempty"`
+	Height      uint   `json:"height,omitempty" xml:"height,omitempty"`
+	Rendered    string `json:"rendered,omitempty" xml:"rendered,omitempty"`
+	Title       string `json:"title" xml:"title"`
+	Description string `json:"description" xml:"description"`
 }
 
 func (i *ItemResponse) GetWidth() uint {
@@ -53,6 +57,20 @@ func (i *ItemResponse) GetContype() string {
 	return i.Contype
 }
 
+func (i *ItemResponse) GetTitle() string {
+	if i == nil {
+		return ``
+	}
+	return i.Title
+}
+
+func (i *ItemResponse) GetDescription() string {
+	if i == nil {
+		return ``
+	}
+	return i.Description
+}
+
 func (i *ItemResponse) GenHTML() *ItemResponse {
 	if i == nil {
 		return i
@@ -72,15 +90,24 @@ func (i *ItemResponse) HTML() template.HTML {
 }
 
 func NewItemResponse(item *dbschema.OfficialAdItem, position *dbschema.OfficialAdPosition) *ItemResponse {
-	return &ItemResponse{
-		Content: item.Content,
-		Contype: item.Contype,
-		URL:     item.Url,
-		Start:   item.Start,
-		End:     item.End,
-		Width:   position.Width,
-		Height:  position.Height,
+	resp := ItemResponse{
+		Content:     item.Content,
+		Contype:     item.Contype,
+		URL:         item.Url,
+		Start:       item.Start,
+		End:         item.End,
+		Width:       position.Width,
+		Height:      position.Height,
+		Title:       item.Title,
+		Description: item.Description,
 	}
+	if len(resp.Title) == 0 {
+		resp.Title = position.Title
+	}
+	if len(resp.Description) == 0 {
+		resp.Description = position.Description
+	}
+	return &resp
 }
 
 type ItemsResponse []*ItemResponse

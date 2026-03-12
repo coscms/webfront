@@ -9,6 +9,8 @@ import (
 	"github.com/webx-top/echo"
 )
 
+var _ Adverter = (*ItemAndPosition)(nil)
+
 type ItemAndPosition struct {
 	*dbschema.OfficialAdItem
 	Rendered   string
@@ -33,6 +35,20 @@ func (i *ItemAndPosition) GetContent() string {
 
 func (i *ItemAndPosition) GetContype() string {
 	return i.Contype
+}
+
+func (i *ItemAndPosition) GetTitle() string {
+	if len(i.Title) == 0 {
+		return i.AdPosition.Title
+	}
+	return i.Title
+}
+
+func (i *ItemAndPosition) GetDescription() string {
+	if len(i.Description) == 0 {
+		return i.AdPosition.Description
+	}
+	return i.Description
 }
 
 type ItemAndRendered struct {
