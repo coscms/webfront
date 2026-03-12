@@ -34,6 +34,8 @@ type OfficialAdItem struct {
 	PositionId  uint64 `db:"position_id" bson:"position_id" comment:"广告位ID" json:"position_id" xml:"position_id"`
 	Content     string `db:"content" bson:"content" comment:"广告内容" json:"content" xml:"content"`
 	Contype     string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
+	Title       string `db:"title" bson:"title" comment:"广告标题" json:"title" xml:"title"`
+	Description string `db:"description" bson:"description" comment:"广告说明" json:"description" xml:"description"`
 	Mode        string `db:"mode" bson:"mode" comment:"广告模式" json:"mode" xml:"mode"`
 	Url         string `db:"url" bson:"url" comment:"广告链接" json:"url" xml:"url"`
 	Disabled    string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
@@ -345,6 +347,14 @@ func (a *OfficialAdItem) GetDiffColumns(old *OfficialAdItem) (changedCols []inte
 
 	if old.Contype != a.Contype {
 		changedCols = append(changedCols, `contype`)
+	}
+
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
 	}
 
 	if old.Mode != a.Mode {
@@ -682,6 +692,8 @@ func (a *OfficialAdItem) Reset() *OfficialAdItem {
 	a.PositionId = 0
 	a.Content = ``
 	a.Contype = ``
+	a.Title = ``
+	a.Description = ``
 	a.Mode = ``
 	a.Url = ``
 	a.Disabled = ``
@@ -702,6 +714,8 @@ func (a *OfficialAdItem) AsMap(onlyFields ...string) param.Store {
 		r["PositionId"] = a.PositionId
 		r["Content"] = a.Content
 		r["Contype"] = a.Contype
+		r["Title"] = a.Title
+		r["Description"] = a.Description
 		r["Mode"] = a.Mode
 		r["Url"] = a.Url
 		r["Disabled"] = a.Disabled
@@ -726,6 +740,10 @@ func (a *OfficialAdItem) AsMap(onlyFields ...string) param.Store {
 			r["Content"] = a.Content
 		case "Contype":
 			r["Contype"] = a.Contype
+		case "Title":
+			r["Title"] = a.Title
+		case "Description":
+			r["Description"] = a.Description
 		case "Mode":
 			r["Mode"] = a.Mode
 		case "Url":
@@ -748,7 +766,7 @@ func (a *OfficialAdItem) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialAdItem) Clone() *OfficialAdItem {
-	cloned := OfficialAdItem{Id: a.Id, Name: a.Name, PublisherId: a.PublisherId, PositionId: a.PositionId, Content: a.Content, Contype: a.Contype, Mode: a.Mode, Url: a.Url, Disabled: a.Disabled, Start: a.Start, End: a.End, Sort: a.Sort, Created: a.Created, Updated: a.Updated}
+	cloned := OfficialAdItem{Id: a.Id, Name: a.Name, PublisherId: a.PublisherId, PositionId: a.PositionId, Content: a.Content, Contype: a.Contype, Title: a.Title, Description: a.Description, Mode: a.Mode, Url: a.Url, Disabled: a.Disabled, Start: a.Start, End: a.End, Sort: a.Sort, Created: a.Created, Updated: a.Updated}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -771,6 +789,10 @@ func (a *OfficialAdItem) FromRow(row map[string]interface{}) {
 			a.Content = param.AsString(value)
 		case "contype":
 			a.Contype = param.AsString(value)
+		case "title":
+			a.Title = param.AsString(value)
+		case "description":
+			a.Description = param.AsString(value)
 		case "mode":
 			a.Mode = param.AsString(value)
 		case "url":
@@ -805,6 +827,10 @@ func (a *OfficialAdItem) GetField(field string) interface{} {
 		return a.Content
 	case "Contype":
 		return a.Contype
+	case "Title":
+		return a.Title
+	case "Description":
+		return a.Description
 	case "Mode":
 		return a.Mode
 	case "Url":
@@ -834,6 +860,8 @@ func (a *OfficialAdItem) GetAllFieldNames() []string {
 		"PositionId",
 		"Content",
 		"Contype",
+		"Title",
+		"Description",
 		"Mode",
 		"Url",
 		"Disabled",
@@ -858,6 +886,10 @@ func (a *OfficialAdItem) HasField(field string) bool {
 	case "Content":
 		return true
 	case "Contype":
+		return true
+	case "Title":
+		return true
+	case "Description":
 		return true
 	case "Mode":
 		return true
@@ -912,6 +944,10 @@ func (a *OfficialAdItem) Set(key interface{}, value ...interface{}) {
 			a.Content = param.AsString(vv)
 		case "Contype":
 			a.Contype = param.AsString(vv)
+		case "Title":
+			a.Title = param.AsString(vv)
+		case "Description":
+			a.Description = param.AsString(vv)
 		case "Mode":
 			a.Mode = param.AsString(vv)
 		case "Url":
@@ -941,6 +977,8 @@ func (a *OfficialAdItem) AsRow(onlyFields ...string) param.Store {
 		r["position_id"] = a.PositionId
 		r["content"] = a.Content
 		r["contype"] = a.Contype
+		r["title"] = a.Title
+		r["description"] = a.Description
 		r["mode"] = a.Mode
 		r["url"] = a.Url
 		r["disabled"] = a.Disabled
@@ -965,6 +1003,10 @@ func (a *OfficialAdItem) AsRow(onlyFields ...string) param.Store {
 			r["content"] = a.Content
 		case "contype":
 			r["contype"] = a.Contype
+		case "title":
+			r["title"] = a.Title
+		case "description":
+			r["description"] = a.Description
 		case "mode":
 			r["mode"] = a.Mode
 		case "url":

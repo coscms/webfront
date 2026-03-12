@@ -28,17 +28,19 @@ type OfficialAdPosition struct {
 	base    factory.Base
 	objects []*OfficialAdPosition
 
-	Id       uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Ident    string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
-	Name     string `db:"name" bson:"name" comment:"位置名称" json:"name" xml:"name"`
-	Width    uint   `db:"width" bson:"width" comment:"宽度" json:"width" xml:"width"`
-	Height   uint   `db:"height" bson:"height" comment:"高度" json:"height" xml:"height"`
-	Content  string `db:"content" bson:"content" comment:"默认内容" json:"content" xml:"content"`
-	Contype  string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
-	Url      string `db:"url" bson:"url" comment:"广告链接" json:"url" xml:"url"`
-	Disabled string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created  uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
-	Updated  uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Id          uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Ident       string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
+	Name        string `db:"name" bson:"name" comment:"位置名称" json:"name" xml:"name"`
+	Width       uint   `db:"width" bson:"width" comment:"宽度" json:"width" xml:"width"`
+	Height      uint   `db:"height" bson:"height" comment:"高度" json:"height" xml:"height"`
+	Content     string `db:"content" bson:"content" comment:"默认内容" json:"content" xml:"content"`
+	Contype     string `db:"contype" bson:"contype" comment:"内容类型" json:"contype" xml:"contype"`
+	Title       string `db:"title" bson:"title" comment:"默认标题" json:"title" xml:"title"`
+	Description string `db:"description" bson:"description" comment:"默认说明" json:"description" xml:"description"`
+	Url         string `db:"url" bson:"url" comment:"广告链接" json:"url" xml:"url"`
+	Disabled    string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
+	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated     uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function
@@ -342,6 +344,14 @@ func (a *OfficialAdPosition) GetDiffColumns(old *OfficialAdPosition) (changedCol
 		changedCols = append(changedCols, `contype`)
 	}
 
+	if old.Title != a.Title {
+		changedCols = append(changedCols, `title`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
 	if old.Url != a.Url {
 		changedCols = append(changedCols, `url`)
 	}
@@ -634,6 +644,8 @@ func (a *OfficialAdPosition) Reset() *OfficialAdPosition {
 	a.Height = 0
 	a.Content = ``
 	a.Contype = ``
+	a.Title = ``
+	a.Description = ``
 	a.Url = ``
 	a.Disabled = ``
 	a.Created = 0
@@ -651,6 +663,8 @@ func (a *OfficialAdPosition) AsMap(onlyFields ...string) param.Store {
 		r["Height"] = a.Height
 		r["Content"] = a.Content
 		r["Contype"] = a.Contype
+		r["Title"] = a.Title
+		r["Description"] = a.Description
 		r["Url"] = a.Url
 		r["Disabled"] = a.Disabled
 		r["Created"] = a.Created
@@ -673,6 +687,10 @@ func (a *OfficialAdPosition) AsMap(onlyFields ...string) param.Store {
 			r["Content"] = a.Content
 		case "Contype":
 			r["Contype"] = a.Contype
+		case "Title":
+			r["Title"] = a.Title
+		case "Description":
+			r["Description"] = a.Description
 		case "Url":
 			r["Url"] = a.Url
 		case "Disabled":
@@ -687,7 +705,7 @@ func (a *OfficialAdPosition) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialAdPosition) Clone() *OfficialAdPosition {
-	cloned := OfficialAdPosition{Id: a.Id, Ident: a.Ident, Name: a.Name, Width: a.Width, Height: a.Height, Content: a.Content, Contype: a.Contype, Url: a.Url, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
+	cloned := OfficialAdPosition{Id: a.Id, Ident: a.Ident, Name: a.Name, Width: a.Width, Height: a.Height, Content: a.Content, Contype: a.Contype, Title: a.Title, Description: a.Description, Url: a.Url, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -712,6 +730,10 @@ func (a *OfficialAdPosition) FromRow(row map[string]interface{}) {
 			a.Content = param.AsString(value)
 		case "contype":
 			a.Contype = param.AsString(value)
+		case "title":
+			a.Title = param.AsString(value)
+		case "description":
+			a.Description = param.AsString(value)
 		case "url":
 			a.Url = param.AsString(value)
 		case "disabled":
@@ -740,6 +762,10 @@ func (a *OfficialAdPosition) GetField(field string) interface{} {
 		return a.Content
 	case "Contype":
 		return a.Contype
+	case "Title":
+		return a.Title
+	case "Description":
+		return a.Description
 	case "Url":
 		return a.Url
 	case "Disabled":
@@ -762,6 +788,8 @@ func (a *OfficialAdPosition) GetAllFieldNames() []string {
 		"Height",
 		"Content",
 		"Contype",
+		"Title",
+		"Description",
 		"Url",
 		"Disabled",
 		"Created",
@@ -784,6 +812,10 @@ func (a *OfficialAdPosition) HasField(field string) bool {
 	case "Content":
 		return true
 	case "Contype":
+		return true
+	case "Title":
+		return true
+	case "Description":
 		return true
 	case "Url":
 		return true
@@ -832,6 +864,10 @@ func (a *OfficialAdPosition) Set(key interface{}, value ...interface{}) {
 			a.Content = param.AsString(vv)
 		case "Contype":
 			a.Contype = param.AsString(vv)
+		case "Title":
+			a.Title = param.AsString(vv)
+		case "Description":
+			a.Description = param.AsString(vv)
 		case "Url":
 			a.Url = param.AsString(vv)
 		case "Disabled":
@@ -854,6 +890,8 @@ func (a *OfficialAdPosition) AsRow(onlyFields ...string) param.Store {
 		r["height"] = a.Height
 		r["content"] = a.Content
 		r["contype"] = a.Contype
+		r["title"] = a.Title
+		r["description"] = a.Description
 		r["url"] = a.Url
 		r["disabled"] = a.Disabled
 		r["created"] = a.Created
@@ -876,6 +914,10 @@ func (a *OfficialAdPosition) AsRow(onlyFields ...string) param.Store {
 			r["content"] = a.Content
 		case "contype":
 			r["contype"] = a.Contype
+		case "title":
+			r["title"] = a.Title
+		case "description":
+			r["description"] = a.Description
 		case "url":
 			r["url"] = a.Url
 		case "disabled":
