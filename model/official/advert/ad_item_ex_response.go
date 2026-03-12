@@ -2,6 +2,8 @@ package advert
 
 import (
 	"html/template"
+	"math/rand"
+	"time"
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
@@ -121,6 +123,17 @@ func (i ItemsResponse) Rand() *ItemResponse {
 	default:
 		return com.RandSlicex(i)
 	}
+}
+
+func (i ItemsResponse) Shuffle() ItemsResponse {
+	r := make(ItemsResponse, len(i))
+	copy(r, i)
+	var random = rand.New(rand.NewSource(time.Now().Unix()))
+	for index := len(r) - 1; index > 0; index-- {
+		chooseIndex := random.Intn(index + 1)
+		r[chooseIndex], r[index] = r[index], r[chooseIndex]
+	}
+	return r
 }
 
 func (i ItemsResponse) Valid() bool {
