@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/webx-top/echo"
@@ -64,6 +65,14 @@ type CachedAdvert struct {
 func (c *CachedAdvert) GenHTML() *CachedAdvert {
 	c.List.GenHTML()
 	return c
+}
+
+func DeleteCachedAdvert(ctx echo.Context, idents ...string) {
+	identString := strings.Join(idents, `,`)
+	for _, lc := range config.FromFile().Language.AllList {
+		key := `advert:` + lc + `:` + identString
+		cache.Delete(ctx, key)
+	}
 }
 
 func GetCachedAdvert(ctx echo.Context, idents ...string) (*CachedAdvert, error) {

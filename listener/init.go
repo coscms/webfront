@@ -1,6 +1,7 @@
 package listener
 
 import (
+	_ "github.com/coscms/webfront/listener/database"
 	_ "github.com/coscms/webfront/listener/i18n"
 	_ "github.com/coscms/webfront/listener/upload"
 )
