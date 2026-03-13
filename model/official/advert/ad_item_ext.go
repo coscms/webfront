@@ -102,6 +102,17 @@ func GetCachedAdvert(ctx echo.Context, idents ...string) (*CachedAdvert, error) 
 
 // GetAdvertForHTML(ctx,`home1`).Place(`home1`).HTML()
 func GetAdvertForHTML(ctx echo.Context, idents ...string) interface{} {
+	internalKey := `Advert:` + strings.Join(idents, `,`)
+	advert := ctx.Internal().Get(internalKey)
+	if advert != nil {
+		return advert
+	}
+	advert = getAdvertForHTML(ctx, idents)
+	ctx.Internal().Set(internalKey, advert)
+	return advert
+}
+
+func getAdvertForHTML(ctx echo.Context, idents []string) interface{} {
 	sz := len(idents)
 	if sz < 1 || (sz == 1 && len(idents[0]) == 0) {
 		return ItemsResponse{}
