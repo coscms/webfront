@@ -83,7 +83,7 @@ func SearchLanguage(ctx echo.Context, langCode string, table string, alias strin
 		langCode,
 		rIDs,
 	)
-	if len(columns) > 0 && ctx.Internal().Bool(`searchDefaultLangColumns`) {
+	if len(columns) > 0 {
 		for i, v := range fields {
 			fields[i] = alias + `.` + v
 		}
@@ -95,12 +95,6 @@ func SearchLanguage(ctx echo.Context, langCode string, table string, alias strin
 	}
 	param.AddArgs(trCompound)
 	return err
-}
-
-// SetSearchDefaultLangColumns sets whether to enable default language columns in search operations.
-// The setting is stored in the echo.Context's internal data.
-func SetSearchDefaultLangColumns(ctx echo.Context, enable bool) {
-	ctx.Internal().Set(`searchDefaultLangColumns`, enable)
 }
 
 // SearchModel searches for records in the specified model using the given keyword and parameters.
