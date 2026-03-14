@@ -10,8 +10,17 @@ import (
 	"github.com/webx-top/echo"
 )
 
+func buildDefaultLangSearch(fields []string, alias string, keyword string) db.Compound {
+	for i, v := range fields {
+		if len(alias) > 0 {
+			v = alias + `.` + v
+		}
+		fields[i] = v
+	}
+	return mysql.SearchField(`~`+strings.Join(fields, `+`), keyword)
+}
+
 // Search performs a keyword search on i18n translations for the specified table and resource IDs.
-// It joins with the translations table to find matches in the specified language.
 // Parameters:
 //   - ctx: echo context containing request information
 //   - table: name of the resource table to search
@@ -30,9 +39,21 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 			table = parts[1]
 		}
 	}
+	if IsDefaultLang(ctx) {
+		if len(columns) == 0 {
+			return nil
+		}
+		param.AddArgs(buildDefaultLangSearch(columns, alias, keyword))
+		return nil
+	}
+	return SearchLanguage(ctx, ctx.Lang().Normalize(), table, alias, keyword, param, columns...)
+}
+
+// SearchLanguage
+func SearchLanguage(ctx echo.Context, langCode string, table string, alias string, keyword string, param *factory.Param, columns ...string) error {
 	fields := make([]string, len(columns))
 	copy(fields, columns)
-	rows, err := getResources(ctx, table, columns...)
+	rows, err := getResources(ctx, table, columns...) // columns 会被更改
 	if err != nil {
 		return err
 	}
@@ -46,7 +67,7 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 			}
 			fields[i] = v
 		}
-		param.AddArgs(mysql.SearchField(`~`+strings.Join(fields, `+`), keyword))
+		param.AddArgs(buildDefaultLangSearch(fields, alias, keyword))
 		return err
 	}
 	rIDs := make([]uint, len(rows))
@@ -59,14 +80,14 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	var trCompound db.Compound
 	// cond := db.NewCompounds()
-	// cond.Add(db.Cond{`TR.lang`: ctx.Lang().Normalize()})
+	// cond.Add(db.Cond{`TR.lang`: langCode})
 	// cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
 	// cond.From(mysql.SearchField(`~TR.text`, keyword))
 	// param.AddJoin(`INNER`, tM.Short_(), `TR`, alias+`.id = TR.row_id`)
 	// trCompound = cond.And()
 	trCompound = db.Raw(
 		`EXISTS (SELECT 1 FROM `+tM.Name_()+` AS TR WHERE TR.row_id=`+alias+`.id AND TR.lang=? AND TR.resource_id IN ? AND `+mysql.Match(keyword, true, `TR.text`).String()+`)`,
-		ctx.Lang().Normalize(),
+		langCode,
 		rIDs,
 	)
 	if len(columns) > 0 && ctx.Internal().Bool(`searchDefaultLangColumns`) {
