@@ -30,6 +30,8 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 			table = parts[1]
 		}
 	}
+	fields := make([]string, len(columns))
+	copy(fields, columns)
 	rows, err := getResources(ctx, table, columns...)
 	if err != nil {
 		return err
@@ -38,14 +40,13 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 		if len(columns) == 0 {
 			return err
 		}
-		fields := make([]string, len(columns))
-		for i, v := range columns {
+		for i, v := range fields {
 			if len(alias) > 0 {
 				v = alias + `.` + v
 			}
-			fields[i] = `~` + v
+			fields[i] = v
 		}
-		param.AddArgs(mysql.SearchFields(fields, keyword))
+		param.AddArgs(mysql.SearchField(`~`+strings.Join(fields, `+`), keyword))
 		return err
 	}
 	rIDs := make([]uint, len(rows))
@@ -55,21 +56,30 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 	if len(alias) == 0 {
 		alias = dbschema.WithPrefix(table)
 	}
-	cond := db.NewCompounds()
-	cond.Add(db.Cond{`TR.lang`: ctx.Lang().Normalize()})
-	cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
-	cond.From(mysql.SearchField(`~TR.text`, keyword))
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
-	param.AddJoin(`INNER`, tM.Short_(), `TR`, alias+`.id = TR.row_id`)
+	var trCompound db.Compound
+	// cond := db.NewCompounds()
+	// cond.Add(db.Cond{`TR.lang`: ctx.Lang().Normalize()})
+	// cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
+	// cond.From(mysql.SearchField(`~TR.text`, keyword))
+	// param.AddJoin(`INNER`, tM.Short_(), `TR`, alias+`.id = TR.row_id`)
+	// trCompound = cond.And()
+	trCompound = db.Raw(
+		`EXISTS (SELECT 1 FROM `+tM.Name_()+` AS TR WHERE TR.row_id=`+alias+`.id AND TR.lang=? AND TR.resource_id IN ? AND `+mysql.Match(keyword, true, `TR.text`).String()+`)`,
+		ctx.Lang().Normalize(),
+		rIDs,
+	)
 	if len(columns) > 0 && ctx.Internal().Bool(`searchDefaultLangColumns`) {
-		fields := make([]string, len(columns))
-		for i, v := range columns {
-			fields[i] = `~` + alias + `.` + v
+		for i, v := range fields {
+			fields[i] = alias + `.` + v
 		}
-		param.AddArgs(db.Or(cond.And(), mysql.SearchFields(fields, keyword)))
+		param.AddArgs(db.Or(
+			trCompound,
+			mysql.SearchField(`~`+strings.Join(fields, `+`), keyword),
+		))
 		return err
 	}
-	param.AddArgs(cond.And())
+	param.AddArgs(trCompound)
 	return err
 }
 
