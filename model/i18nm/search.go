@@ -24,21 +24,14 @@ func buildDefaultLangSearch(fields []string, alias string, keyword string) db.Co
 // Parameters:
 //   - ctx: echo context containing request information
 //   - table: name of the resource table to search
+//   - alias: alias of the resource table to search
 //   - keyword: search term to look for in translations
 //   - param: factory parameters for building the query
 //   - columns: optional columns to select from the resource table
 //
 // Returns:
 //   - error if any occurs during the search operation
-func Search(ctx echo.Context, table string, keyword string, param *factory.Param, columns ...string) error {
-	var alias string
-	if after, found := strings.CutPrefix(table, `(`); found { // format: (alias)table_name
-		parts := strings.SplitN(after, `)`, 2)
-		if len(parts) == 2 {
-			alias = parts[0]
-			table = parts[1]
-		}
-	}
+func Search(ctx echo.Context, table string, alias string, keyword string, param *factory.Param, columns ...string) error {
 	if IsDefaultLang(ctx) {
 		if len(columns) == 0 {
 			return nil
@@ -114,10 +107,11 @@ func SetSearchDefaultLangColumns(ctx echo.Context, enable bool) {
 // It delegates the actual search operation to the Search function with the model's short name.
 // ctx: Echo context for the request
 // mdl: The model to search in
+// alias: alias of the model table
 // keyword: The search term
 // param: Additional search parameters
 // columns: Optional columns to search in
 // Returns an error if the search fails
-func SearchModel(ctx echo.Context, mdl Model, keyword string, param *factory.Param, columns ...string) error {
-	return Search(ctx, mdl.Short_(), keyword, param, columns...)
+func SearchModel(ctx echo.Context, mdl Model, alias string, keyword string, param *factory.Param, columns ...string) error {
+	return Search(ctx, mdl.Short_(), alias, keyword, param, columns...)
 }
