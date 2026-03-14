@@ -1,6 +1,8 @@
 package i18nm
 
 import (
+	"strings"
+
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -20,6 +22,14 @@ import (
 // Returns:
 //   - error if any occurs during the search operation
 func Search(ctx echo.Context, table string, keyword string, param *factory.Param, columns ...string) error {
+	var alias string
+	if after, found := strings.CutPrefix(table, `(`); found { // format: (alias)table_name
+		parts := strings.SplitN(after, `)`, 2)
+		if len(parts) == 2 {
+			alias = parts[0]
+			table = parts[1]
+		}
+	}
 	rows, err := getResources(ctx, table, columns...)
 	if err != nil {
 		return err
@@ -30,6 +40,9 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 		}
 		fields := make([]string, len(columns))
 		for i, v := range columns {
+			if len(alias) > 0 {
+				v = alias + `.` + v
+			}
 			fields[i] = `~` + v
 		}
 		param.AddArgs(mysql.SearchFields(fields, keyword))
@@ -39,17 +52,19 @@ func Search(ctx echo.Context, table string, keyword string, param *factory.Param
 	for i, v := range rows {
 		rIDs[i] = v.Id
 	}
-	fullTableName := dbschema.WithPrefix(table)
+	if len(alias) == 0 {
+		alias = dbschema.WithPrefix(table)
+	}
 	cond := db.NewCompounds()
 	cond.Add(db.Cond{`TR.lang`: ctx.Lang().Normalize()})
 	cond.Add(db.Cond{`TR.resource_id`: db.In(rIDs)})
 	cond.From(mysql.SearchField(`~TR.text`, keyword))
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
-	param.AddJoin(`INNER`, tM.Short_(), `TR`, fullTableName+`.id = TR.row_id`)
+	param.AddJoin(`INNER`, tM.Short_(), `TR`, alias+`.id = TR.row_id`)
 	if len(columns) > 0 && ctx.Internal().Bool(`searchDefaultLangColumns`) {
 		fields := make([]string, len(columns))
 		for i, v := range columns {
-			fields[i] = `~` + fullTableName + `.` + v
+			fields[i] = `~` + alias + `.` + v
 		}
 		param.AddArgs(db.Or(cond.And(), mysql.SearchFields(fields, keyword)))
 		return err
