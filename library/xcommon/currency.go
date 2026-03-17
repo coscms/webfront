@@ -3,10 +3,12 @@ package xcommon
 import (
 	"fmt"
 	"html/template"
+	"strconv"
 
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 )
 
 // CurrencySymbols 货币符号
@@ -62,6 +64,35 @@ func GetCurrencySymbol(ctx echo.Context) string {
 	return currencySymbol
 }
 
+func GetCurrencyPrecision(ctx echo.Context) int32 {
+	v := ctx.Internal().Get(`currencyPrecision`)
+	if v == nil {
+		return Precision
+	}
+	switch n := v.(type) {
+	case string:
+		i, err := strconv.ParseInt(n, 10, 32)
+		if err != nil {
+			return Precision
+		}
+		precision := int32(i)
+		if precision < 0 {
+			precision = Precision
+		}
+		return precision
+	default:
+		precision := param.AsInt32(n)
+		if precision < 0 {
+			precision = Precision
+		}
+		return precision
+	}
+}
+
+func SetCurrencyPrecision(ctx echo.Context, precision int32) {
+	ctx.Internal().Set(`currencyPrecision`, precision)
+}
+
 // HTMLCurrency HTML模板函数：币种
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
@@ -70,16 +101,17 @@ func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
 	var numberFormatted string
 	if len(withFlags) > 0 {
 		if len(withFlags) > 1 && withFlags[1] {
-			numberFormatted = com.NumberFormat(v, Precision)
+			precision := GetCurrencyPrecision(ctx)
+			numberFormatted = com.NumberFormat(v, int(precision))
 			numberFormatted = com.NumberTrimZero(numberFormatted)
 		} else {
-			numberFormatted = fmt.Sprintf(`%.*f`, Precision, v)
+			numberFormatted = fmt.Sprintf(`%.*f`, GetCurrencyPrecision(ctx), v)
 		}
 		if withFlags[0] {
 			return template.HTML(currencySymbol + numberFormatted)
 		}
 	} else {
-		numberFormatted = fmt.Sprintf(`%.*f`, Precision, v)
+		numberFormatted = fmt.Sprintf(`%.*f`, GetCurrencyPrecision(ctx), v)
 	}
 	return numberFormatted
 }
