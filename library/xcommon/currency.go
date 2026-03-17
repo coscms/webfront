@@ -50,16 +50,23 @@ func DefaultCurrencySymbol() string {
 
 const Precision = 4 // 小数位数
 
-// HTMLCurrency HTML模板函数：币种
-// withFlags[0]: 是否带货币符号
-// withFlags[1]: 是否清楚小数末尾的0
-func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
+func GetCurrencySymbol(ctx echo.Context) string {
 	currencySymbol := DefaultCurrencySymbol()
 	if currency := ctx.Internal().String(`currency`); len(currency) > 0 {
 		if symbol, ok := CurrencySymbols[currency]; ok {
 			currencySymbol = symbol
+		} else {
+			currencySymbol = currency
 		}
 	}
+	return currencySymbol
+}
+
+// HTMLCurrency HTML模板函数：币种
+// withFlags[0]: 是否带货币符号
+// withFlags[1]: 是否清楚小数末尾的0
+func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
+	currencySymbol := GetCurrencySymbol(ctx)
 	var numberFormatted string
 	if len(withFlags) > 0 {
 		if len(withFlags) > 1 && withFlags[1] {
@@ -79,11 +86,6 @@ func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
 
 // HTMLCurrencySymbol HTML模板函数：币种符号
 func HTMLCurrencySymbol(ctx echo.Context) template.HTML {
-	currencySymbol := DefaultCurrencySymbol()
-	if currency := ctx.Internal().String(`currency`); len(currency) > 0 {
-		if symbol, ok := CurrencySymbols[currency]; ok {
-			currencySymbol = symbol
-		}
-	}
+	currencySymbol := GetCurrencySymbol(ctx)
 	return template.HTML(currencySymbol)
 }
