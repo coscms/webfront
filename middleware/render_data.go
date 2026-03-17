@@ -169,6 +169,10 @@ func (r *RenderData) Currency() string {
 	return conv.Currency()
 }
 
+func (r *RenderData) CurrencySymbol() template.HTML {
+	return xcommon.HTMLCurrencySymbol(r.ctx)
+}
+
 type PriceFormatter interface {
 	PriceFormat(ctx echo.Context, price float64, precision ...int32) string
 }
