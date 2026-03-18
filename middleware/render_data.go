@@ -132,22 +132,11 @@ func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
 }
 
 func (r *RenderData) Price(price float64, precision ...int32) float64 {
-	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(FloatConverter)
-	if !ok {
-		return price
-	}
-	return conv.Convert(price, precision...)
+	return xcommon.CalcPriceByInternal(r.ctx, price, precision...)
 }
 
 func (r *RenderData) PriceFormat(price float64, precision ...int32) template.HTML {
-	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(PriceFormatter)
-	if !ok {
-		if len(precision) == 0 {
-			return xcommon.HTMLCurrency(r.ctx, price, true, true)
-		}
-		return xcommon.HTMLCurrencyWithPrecision(r.ctx, price, precision[0], true, true)
-	}
-	return template.HTML(conv.PriceFormat(r.ctx, price, precision...))
+	return xcommon.PriceFormatByInternal(r.ctx, price, precision...)
 }
 
 func (r *RenderData) PriceWith(price float64, exchangeRate float64, precision ...int32) float64 {
@@ -159,25 +148,9 @@ func (r *RenderData) PriceFormatWith(price float64, currency string, exchangeRat
 }
 
 func (r *RenderData) Currency() string {
-	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(CurrencyGetter)
-	if !ok {
-		return xcommon.DefaultCurrency()
-	}
-	return conv.Currency()
+	return xcommon.CurrencyByInternal(r.ctx)
 }
 
 func (r *RenderData) CurrencySymbol(inputCurrency ...string) template.HTML {
 	return xcommon.HTMLCurrencySymbol(r.ctx, inputCurrency...)
-}
-
-type PriceFormatter interface {
-	PriceFormat(ctx echo.Context, price float64, precision ...int32) string
-}
-
-type FloatConverter interface {
-	Convert(price float64, precision ...int32) float64
-}
-
-type CurrencyGetter interface {
-	Currency() string
 }

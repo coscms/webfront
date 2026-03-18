@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"strconv"
 
-	"github.com/admpub/decimal"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -156,27 +155,4 @@ func HTMLCurrencyWithPrecision(ctx echo.Context, amount float64, precision int32
 func HTMLCurrencySymbol(ctx echo.Context, inputCurrency ...string) template.HTML {
 	currencySymbol := GetCurrencySymbol(ctx, inputCurrency...)
 	return template.HTML(currencySymbol)
-}
-
-func CalcPrice(price float64, exchangeRate float64, precision ...int32) float64 {
-	var _precision int32
-	if len(precision) > 0 {
-		_precision = precision[0]
-	} else {
-		_precision = Precision
-	}
-	priceD := decimal.NewFromFloat(price)
-	exchangeRateD := decimal.NewFromFloat(exchangeRate)
-	return priceD.Mul(exchangeRateD).Round(_precision).InexactFloat64()
-}
-
-func HTMLPriceFormat(ctx echo.Context, price float64, currency string, exchangeRate float64, precision ...int32) template.HTML {
-	var _precision int32
-	if len(precision) == 0 {
-		_precision = GetCurrencyPrecision(ctx)
-	} else {
-		_precision = precision[0]
-	}
-	price = CalcPrice(price, exchangeRate, precision...)
-	return template.HTML(CurrencyWithCurrencyAndPrecision(ctx, price, currency, _precision, true, true))
 }
