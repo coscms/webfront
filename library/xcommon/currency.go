@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"strconv"
 
+	"github.com/admpub/decimal"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -96,35 +97,62 @@ func SetCurrencyPrecision(ctx echo.Context, precision int32) {
 // HTMLCurrency HTML模板函数：币种
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
-func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) interface{} {
+func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) template.HTML {
 	return HTMLCurrencyWithPrecision(ctx, v, GetCurrencyPrecision(ctx), withFlags...)
 }
 
-// HTMLCurrency HTML模板函数：币种
+// CurrencyWithPrecision HTML模板函数：币种
 // precision: 小数位数
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
-func HTMLCurrencyWithPrecision(ctx echo.Context, v float64, precision int32, withFlags ...bool) interface{} {
+func CurrencyWithPrecision(ctx echo.Context, v float64, precision int32, withFlags ...bool) string {
 	currencySymbol := GetCurrencySymbol(ctx)
+	if len(withFlags) == 0 {
+		return fmt.Sprintf(`%.*f`, precision, v)
+	}
 	var numberFormatted string
-	if len(withFlags) > 0 {
-		if len(withFlags) > 1 && withFlags[1] {
-			numberFormatted = com.NumberFormat(v, int(precision))
-			numberFormatted = com.NumberTrimZero(numberFormatted)
-		} else {
-			numberFormatted = fmt.Sprintf(`%.*f`, precision, v)
-		}
-		if withFlags[0] {
-			return template.HTML(currencySymbol + numberFormatted)
-		}
+	if len(withFlags) > 1 && withFlags[1] {
+		numberFormatted = com.NumberFormat(v, int(precision))
+		numberFormatted = com.NumberTrimZero(numberFormatted)
 	} else {
 		numberFormatted = fmt.Sprintf(`%.*f`, precision, v)
 	}
+	if withFlags[0] {
+		return currencySymbol + numberFormatted
+	}
 	return numberFormatted
+}
+
+// HTMLCurrencyWithPrecision HTML模板函数：币种
+// precision: 小数位数
+// withFlags[0]: 是否带货币符号
+// withFlags[1]: 是否清楚小数末尾的0
+func HTMLCurrencyWithPrecision(ctx echo.Context, v float64, precision int32, withFlags ...bool) template.HTML {
+	return template.HTML(CurrencyWithPrecision(ctx, v, precision, withFlags...))
 }
 
 // HTMLCurrencySymbol HTML模板函数：币种符号
 func HTMLCurrencySymbol(ctx echo.Context) template.HTML {
 	currencySymbol := GetCurrencySymbol(ctx)
 	return template.HTML(currencySymbol)
+}
+
+func CalcPrice(price float64, exchangeRate float64, precision ...int32) float64 {
+	var _precision int32
+	if len(precision) > 0 {
+		_precision = precision[0]
+	} else {
+		_precision = Precision
+	}
+	priceD := decimal.NewFromFloat(price)
+	exchangeRateD := decimal.NewFromFloat(exchangeRate)
+	return priceD.Mul(exchangeRateD).Round(_precision).InexactFloat64()
+}
+
+func HTMLPriceFormat(ctx echo.Context, price float64, exchangeRate float64, precision ...int32) template.HTML {
+	price = CalcPrice(price, exchangeRate, precision...)
+	if len(precision) == 0 {
+		return HTMLCurrency(ctx, price, true, true)
+	}
+	return HTMLCurrencyWithPrecision(ctx, price, precision[0], true, true)
 }

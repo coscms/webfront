@@ -18,7 +18,6 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/middleware/tplfunc"
-	"github.com/webx-top/echo/param"
 )
 
 func init() {
@@ -143,22 +142,20 @@ func (r *RenderData) Price(price float64, precision ...int32) float64 {
 func (r *RenderData) PriceFormat(price float64, precision ...int32) template.HTML {
 	conv, ok := r.ctx.Internal().Get(`CurrencyRate`).(PriceFormatter)
 	if !ok {
-		var h interface{}
-		if len(precision) > 0 {
-			h = xcommon.HTMLCurrencyWithPrecision(r.ctx, price, precision[0], true, true)
-		} else {
-			h = xcommon.HTMLCurrency(r.ctx, price, true, true)
+		if len(precision) == 0 {
+			return xcommon.HTMLCurrency(r.ctx, price, true, true)
 		}
-		switch r := h.(type) {
-		case template.HTML:
-			return r
-		case string:
-			return template.HTML(r)
-		default:
-			return template.HTML(param.AsString(r))
-		}
+		return xcommon.HTMLCurrencyWithPrecision(r.ctx, price, precision[0], true, true)
 	}
 	return template.HTML(conv.PriceFormat(r.ctx, price, precision...))
+}
+
+func (r *RenderData) PriceWithExchangeRate(price float64, exchangeRate float64, precision ...int32) float64 {
+	return xcommon.CalcPrice(price, exchangeRate, precision...)
+}
+
+func (r *RenderData) PriceFormatWithExchangeRate(price float64, exchangeRate float64, precision ...int32) template.HTML {
+	return xcommon.HTMLPriceFormat(r.ctx, price, exchangeRate, precision...)
 }
 
 func (r *RenderData) Currency() string {
