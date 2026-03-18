@@ -166,8 +166,8 @@ func (r *RenderData) Currency() string {
 	return conv.Currency()
 }
 
-func (r *RenderData) CurrencySymbol() template.HTML {
-	return xcommon.HTMLCurrencySymbol(r.ctx)
+func (r *RenderData) CurrencySymbol(inputCurrency ...string) template.HTML {
+	return xcommon.HTMLCurrencySymbol(r.ctx, inputCurrency...)
 }
 
 type PriceFormatter interface {

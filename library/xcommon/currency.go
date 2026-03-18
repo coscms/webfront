@@ -153,8 +153,8 @@ func HTMLCurrencyWithPrecision(ctx echo.Context, amount float64, precision int32
 }
 
 // HTMLCurrencySymbol HTML模板函数：币种符号
-func HTMLCurrencySymbol(ctx echo.Context) template.HTML {
-	currencySymbol := GetCurrencySymbol(ctx)
+func HTMLCurrencySymbol(ctx echo.Context, inputCurrency ...string) template.HTML {
+	currencySymbol := GetCurrencySymbol(ctx, inputCurrency...)
 	return template.HTML(currencySymbol)
 }
 
