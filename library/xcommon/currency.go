@@ -53,14 +53,22 @@ func DefaultCurrencySymbol() string {
 
 const Precision = 4 // 小数位数
 
-func GetCurrencySymbol(ctx echo.Context) string {
-	currencySymbol := DefaultCurrencySymbol()
-	if currency := ctx.Internal().String(`currency`); len(currency) > 0 {
+func GetCurrencySymbol(ctx echo.Context, inputCurrency ...string) string {
+	var currency string
+	if len(inputCurrency) > 0 && len(inputCurrency[0]) > 0 {
+		currency = inputCurrency[0]
+	} else {
+		currency = ctx.Internal().String(`currency`)
+	}
+	var currencySymbol string
+	if len(currency) > 0 {
 		if symbol, ok := CurrencySymbols[currency]; ok {
 			currencySymbol = symbol
 		} else {
 			currencySymbol = currency
 		}
+	} else {
+		currencySymbol = DefaultCurrencySymbol()
 	}
 	return currencySymbol
 }
@@ -95,40 +103,53 @@ func SetCurrencyPrecision(ctx echo.Context, precision int32) {
 }
 
 // HTMLCurrency HTML模板函数：币种
+// amount: 金额
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
-func HTMLCurrency(ctx echo.Context, v float64, withFlags ...bool) template.HTML {
-	return HTMLCurrencyWithPrecision(ctx, v, GetCurrencyPrecision(ctx), withFlags...)
+func HTMLCurrency(ctx echo.Context, amount float64, withFlags ...bool) template.HTML {
+	return HTMLCurrencyWithPrecision(ctx, amount, GetCurrencyPrecision(ctx), withFlags...)
 }
 
 // CurrencyWithPrecision HTML模板函数：币种
+// amount: 金额
 // precision: 小数位数
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
-func CurrencyWithPrecision(ctx echo.Context, v float64, precision int32, withFlags ...bool) string {
-	currencySymbol := GetCurrencySymbol(ctx)
+func CurrencyWithPrecision(ctx echo.Context, amount float64, precision int32, withFlags ...bool) string {
+	return CurrencyWithCurrencyAndPrecision(ctx, amount, ``, precision, withFlags...)
+}
+
+// CurrencyWithPrecision HTML模板函数：币种
+// amount: 金额
+// currency: 币种
+// precision: 小数位数
+// withFlags[0]: 是否带货币符号
+// withFlags[1]: 是否清楚小数末尾的0
+func CurrencyWithCurrencyAndPrecision(ctx echo.Context, amount float64, currency string, precision int32, withFlags ...bool) string {
 	if len(withFlags) == 0 {
-		return fmt.Sprintf(`%.*f`, precision, v)
+		return fmt.Sprintf(`%.*f`, precision, amount)
 	}
 	var numberFormatted string
 	if len(withFlags) > 1 && withFlags[1] {
-		numberFormatted = com.NumberFormat(v, int(precision))
+		numberFormatted = com.NumberFormat(amount, int(precision))
 		numberFormatted = com.NumberTrimZero(numberFormatted)
 	} else {
-		numberFormatted = fmt.Sprintf(`%.*f`, precision, v)
+		numberFormatted = fmt.Sprintf(`%.*f`, precision, amount)
 	}
 	if withFlags[0] {
+		currencySymbol := GetCurrencySymbol(ctx, currency)
 		return currencySymbol + numberFormatted
 	}
 	return numberFormatted
 }
 
 // HTMLCurrencyWithPrecision HTML模板函数：币种
+// amount: 金额
 // precision: 小数位数
 // withFlags[0]: 是否带货币符号
 // withFlags[1]: 是否清楚小数末尾的0
-func HTMLCurrencyWithPrecision(ctx echo.Context, v float64, precision int32, withFlags ...bool) template.HTML {
-	return template.HTML(CurrencyWithPrecision(ctx, v, precision, withFlags...))
+func HTMLCurrencyWithPrecision(ctx echo.Context, amount float64, precision int32, withFlags ...bool) template.HTML {
+	return template.HTML(CurrencyWithPrecision(ctx, amount, precision, withFlags...))
 }
 
 // HTMLCurrencySymbol HTML模板函数：币种符号
@@ -149,10 +170,13 @@ func CalcPrice(price float64, exchangeRate float64, precision ...int32) float64 
 	return priceD.Mul(exchangeRateD).Round(_precision).InexactFloat64()
 }
 
-func HTMLPriceFormat(ctx echo.Context, price float64, exchangeRate float64, precision ...int32) template.HTML {
-	price = CalcPrice(price, exchangeRate, precision...)
+func HTMLPriceFormat(ctx echo.Context, price float64, currency string, exchangeRate float64, precision ...int32) template.HTML {
+	var _precision int32
 	if len(precision) == 0 {
-		return HTMLCurrency(ctx, price, true, true)
+		_precision = GetCurrencyPrecision(ctx)
+	} else {
+		_precision = precision[0]
 	}
-	return HTMLCurrencyWithPrecision(ctx, price, precision[0], true, true)
+	price = CalcPrice(price, exchangeRate, precision...)
+	return template.HTML(CurrencyWithCurrencyAndPrecision(ctx, price, currency, _precision, true, true))
 }

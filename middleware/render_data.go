@@ -150,12 +150,12 @@ func (r *RenderData) PriceFormat(price float64, precision ...int32) template.HTM
 	return template.HTML(conv.PriceFormat(r.ctx, price, precision...))
 }
 
-func (r *RenderData) PriceWithExchangeRate(price float64, exchangeRate float64, precision ...int32) float64 {
+func (r *RenderData) PriceWith(price float64, exchangeRate float64, precision ...int32) float64 {
 	return xcommon.CalcPrice(price, exchangeRate, precision...)
 }
 
-func (r *RenderData) PriceFormatWithExchangeRate(price float64, exchangeRate float64, precision ...int32) template.HTML {
-	return xcommon.HTMLPriceFormat(r.ctx, price, exchangeRate, precision...)
+func (r *RenderData) PriceFormatWith(price float64, currency string, exchangeRate float64, precision ...int32) template.HTML {
+	return xcommon.HTMLPriceFormat(r.ctx, price, currency, exchangeRate, precision...)
 }
 
 func (r *RenderData) Currency() string {
