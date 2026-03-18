@@ -47,6 +47,12 @@ func PriceFormatByInternal(ctx echo.Context, price float64, precision ...int32) 
 }
 
 func CalcPrice(price float64, exchangeRate float64, precision ...int32) float64 {
+	if exchangeRate == 1 {
+		if len(precision) > 0 {
+			return decimal.NewFromFloat(price).Round(precision[0]).InexactFloat64()
+		}
+		return price
+	}
 	var _precision int32
 	if len(precision) > 0 {
 		_precision = precision[0]
