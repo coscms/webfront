@@ -17,6 +17,11 @@ var OfflinePayStatusAll = []string{
 	OfflinePayStatusInvalid,
 }
 
+var OfflinePayStatuses = echo.NewKVData().
+	Add(OfflinePayStatusPending, echo.T(`待处理`)).
+	Add(OfflinePayStatusVerified, echo.T(`已核实`)).
+	Add(OfflinePayStatusInvalid, echo.T(`无效`))
+
 const (
 	OfflinePayTargetTypeRecharge = `recharge`
 )
