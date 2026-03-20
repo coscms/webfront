@@ -4,7 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/admpub/events"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -12,14 +11,6 @@ import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/offlinepay"
 )
-
-const (
-	OfflinePayStatusPending  = `pending`
-	OfflinePayStatusVerified = `verified`
-	OfflinePayStatusInvalid  = `invalid`
-)
-
-var OfflinePayStatusAll = []string{OfflinePayStatusPending, OfflinePayStatusVerified, OfflinePayStatusInvalid}
 
 func NewOfflinePay(ctx echo.Context) *OfflinePay {
 	m := &OfflinePay{
@@ -79,34 +70,35 @@ func (u *OfflinePay) SetVerified() error {
 		return err
 	}
 	u.Status = OfflinePayStatusVerified
-	if u.TargetType == `recharge` {
-		walletM := NewWallet(ctx)
-		walletM.Flow.CustomerId = u.CustomerId
-		walletM.Flow.AssetType = AssetTypeMoney
-		walletM.Flow.AmountType = AmountTypeBalance
-		walletM.Flow.Amount = u.PayAmount
-		walletM.Flow.SourceType = `recharge`
-		walletM.Flow.SourceTable = `official_customer_offline_pay`
-		walletM.Flow.SourceId = u.Id
-		walletM.Flow.TradeNo = u.PayTransactionNo
-		walletM.Flow.Status = FlowStatusConfirmed //状态(pending-待确认;confirmed-已确认;canceled-已取消)
-		walletM.Flow.Description = `线下转账充值`
-		err = walletM.AddFlow()
-	} else {
-		err = echo.FireByNameWithMap(`offlinePay.verified`, events.Map{
-			`row`: u.OfficialCustomerOfflinePay,
-			`ctx`: ctx,
-		})
-	}
+	err = FireVerifiedOfflinePayTargetType(ctx, u.OfficialCustomerOfflinePay)
 	ctx.End(err == nil)
 	return err
 }
 
 func (u *OfflinePay) SetInvalid() error {
-	return u.OfficialCustomerOfflinePay.UpdateFields(nil, echo.H{
+	ctx := u.Context()
+	if err := ctx.Begin(); err != nil {
+		return err
+	}
+	affected, err := u.OfficialCustomerOfflinePay.UpdatexFields(nil, echo.H{
 		`status`:  OfflinePayStatusInvalid,
 		`updated`: time.Now().Unix(),
-	}, `id`, u.Id)
+	}, db.And(
+		db.Cond{`id`: u.Id},
+		db.Cond{`status`: db.NotEq(OfflinePayStatusPending)},
+	))
+	if err != nil {
+		ctx.Rollback()
+		return err
+	}
+	if affected < 1 {
+		ctx.Commit()
+		return err
+	}
+	u.Status = OfflinePayStatusInvalid
+	err = FireInvalidOfflinePayTargetType(ctx, u.OfficialCustomerOfflinePay)
+	ctx.End(err == nil)
+	return err
 }
 
 func (u *OfflinePay) Add() (interface{}, error) {
