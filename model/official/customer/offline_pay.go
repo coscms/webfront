@@ -88,7 +88,7 @@ func (u *OfflinePay) SetInvalid() error {
 		`updated`: time.Now().Unix(),
 	}, db.And(
 		db.Cond{`id`: u.Id},
-		db.Cond{`status`: db.NotEq(OfflinePayStatusPending)},
+		db.Cond{`status`: OfflinePayStatusPending},
 	))
 	if err != nil {
 		ctx.Rollback()
