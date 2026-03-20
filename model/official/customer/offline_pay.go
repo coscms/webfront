@@ -108,5 +108,60 @@ func (u *OfflinePay) Add() (interface{}, error) {
 	if err := u.check(); err != nil {
 		return nil, err
 	}
-	return u.OfficialCustomerOfflinePay.Insert()
+	ctx := u.Context()
+	if err := ctx.Begin(); err != nil {
+		return nil, err
+	}
+	pk, err := u.OfficialCustomerOfflinePay.Insert()
+	if err != nil {
+		ctx.Rollback()
+		return pk, err
+	}
+	err = u.fireEvent(ctx)
+	ctx.End(err == nil)
+	return pk, err
+}
+
+func (u *OfflinePay) fireEvent(ctx echo.Context) error {
+	switch u.Status {
+	case OfflinePayStatusVerified:
+		return FireVerifiedOfflinePayTargetType(ctx, u.OfficialCustomerOfflinePay)
+	case OfflinePayStatusInvalid:
+		return FireInvalidOfflinePayTargetType(ctx, u.OfficialCustomerOfflinePay)
+	default:
+		return nil
+	}
+}
+
+func (u *OfflinePay) Edit(mw func(db.Result) db.Result, args ...interface{}) error {
+	if err := u.check(); err != nil {
+		return err
+	}
+	ctx := u.Context()
+	if err := ctx.Begin(); err != nil {
+		return err
+	}
+	old := dbschema.NewOfficialCustomerOfflinePay(ctx)
+	err := old.Get(nil, args...)
+	if err != nil {
+		ctx.Rollback()
+		if err == db.ErrNoMoreRows {
+			err = ctx.NewError(code.DataNotFound, ``)
+		}
+		return err
+	}
+	if old.Status == OfflinePayStatusVerified {
+		ctx.Rollback()
+		return ctx.NewError(code.DataUnavailable, `不能修改已经核实过的信息`).SetZone(`status`)
+	}
+	err = u.OfficialCustomerOfflinePay.Update(nil, args...)
+	if err != nil {
+		ctx.Rollback()
+		return err
+	}
+	if old.Status != u.Status {
+		err = u.fireEvent(ctx)
+	}
+	ctx.End(err == nil)
+	return err
 }
