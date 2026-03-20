@@ -19,6 +19,8 @@ const (
 	OfflinePayStatusInvalid  = `invalid`
 )
 
+var OfflinePayStatusAll = []string{OfflinePayStatusPending, OfflinePayStatusVerified, OfflinePayStatusInvalid}
+
 func NewOfflinePay(ctx echo.Context) *OfflinePay {
 	m := &OfflinePay{
 		OfficialCustomerOfflinePay: dbschema.NewOfficialCustomerOfflinePay(ctx),

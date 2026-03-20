@@ -31,6 +31,7 @@ type OfficialCustomerOfflinePay struct {
 	Id               uint64  `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	TargetType       string  `db:"target_type" bson:"target_type" comment:"目标类型" json:"target_type" xml:"target_type"`
 	TargetId         uint64  `db:"target_id" bson:"target_id" comment:"目标ID" json:"target_id" xml:"target_id"`
+	OwnershipId      uint64  `db:"ownership_id" bson:"ownership_id" comment:"所归属之ID" json:"ownership_id" xml:"ownership_id"`
 	CustomerId       uint64  `db:"customer_id" bson:"customer_id" comment:"客户ID" json:"customer_id" xml:"customer_id"`
 	PayMethod        string  `db:"pay_method" bson:"pay_method" comment:"付款方式" json:"pay_method" xml:"pay_method"`
 	PayAccount       string  `db:"pay_account" bson:"pay_account" comment:"付款账号" json:"pay_account" xml:"pay_account"`
@@ -327,6 +328,10 @@ func (a *OfficialCustomerOfflinePay) GetDiffColumns(old *OfficialCustomerOffline
 
 	if old.TargetId != a.TargetId {
 		changedCols = append(changedCols, `target_id`)
+	}
+
+	if old.OwnershipId != a.OwnershipId {
+		changedCols = append(changedCols, `ownership_id`)
 	}
 
 	if old.CustomerId != a.CustomerId {
@@ -645,6 +650,7 @@ func (a *OfficialCustomerOfflinePay) Reset() *OfficialCustomerOfflinePay {
 	a.Id = 0
 	a.TargetType = ``
 	a.TargetId = 0
+	a.OwnershipId = 0
 	a.CustomerId = 0
 	a.PayMethod = ``
 	a.PayAccount = ``
@@ -665,6 +671,7 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 		r["Id"] = a.Id
 		r["TargetType"] = a.TargetType
 		r["TargetId"] = a.TargetId
+		r["OwnershipId"] = a.OwnershipId
 		r["CustomerId"] = a.CustomerId
 		r["PayMethod"] = a.PayMethod
 		r["PayAccount"] = a.PayAccount
@@ -686,6 +693,8 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 			r["TargetType"] = a.TargetType
 		case "TargetId":
 			r["TargetId"] = a.TargetId
+		case "OwnershipId":
+			r["OwnershipId"] = a.OwnershipId
 		case "CustomerId":
 			r["CustomerId"] = a.CustomerId
 		case "PayMethod":
@@ -714,7 +723,7 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerOfflinePay) Clone() *OfficialCustomerOfflinePay {
-	cloned := OfficialCustomerOfflinePay{Id: a.Id, TargetType: a.TargetType, TargetId: a.TargetId, CustomerId: a.CustomerId, PayMethod: a.PayMethod, PayAccount: a.PayAccount, PayAmount: a.PayAmount, PayBankBranch: a.PayBankBranch, PayTransactionNo: a.PayTransactionNo, PayTime: a.PayTime, PayOwner: a.PayOwner, Status: a.Status, Created: a.Created, Updated: a.Updated}
+	cloned := OfficialCustomerOfflinePay{Id: a.Id, TargetType: a.TargetType, TargetId: a.TargetId, OwnershipId: a.OwnershipId, CustomerId: a.CustomerId, PayMethod: a.PayMethod, PayAccount: a.PayAccount, PayAmount: a.PayAmount, PayBankBranch: a.PayBankBranch, PayTransactionNo: a.PayTransactionNo, PayTime: a.PayTime, PayOwner: a.PayOwner, Status: a.Status, Created: a.Created, Updated: a.Updated}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -731,6 +740,8 @@ func (a *OfficialCustomerOfflinePay) FromRow(row map[string]interface{}) {
 			a.TargetType = param.AsString(value)
 		case "target_id":
 			a.TargetId = param.AsUint64(value)
+		case "ownership_id":
+			a.OwnershipId = param.AsUint64(value)
 		case "customer_id":
 			a.CustomerId = param.AsUint64(value)
 		case "pay_method":
@@ -765,6 +776,8 @@ func (a *OfficialCustomerOfflinePay) GetField(field string) interface{} {
 		return a.TargetType
 	case "TargetId":
 		return a.TargetId
+	case "OwnershipId":
+		return a.OwnershipId
 	case "CustomerId":
 		return a.CustomerId
 	case "PayMethod":
@@ -797,6 +810,7 @@ func (a *OfficialCustomerOfflinePay) GetAllFieldNames() []string {
 		"Id",
 		"TargetType",
 		"TargetId",
+		"OwnershipId",
 		"CustomerId",
 		"PayMethod",
 		"PayAccount",
@@ -818,6 +832,8 @@ func (a *OfficialCustomerOfflinePay) HasField(field string) bool {
 	case "TargetType":
 		return true
 	case "TargetId":
+		return true
+	case "OwnershipId":
 		return true
 	case "CustomerId":
 		return true
@@ -872,6 +888,8 @@ func (a *OfficialCustomerOfflinePay) Set(key interface{}, value ...interface{}) 
 			a.TargetType = param.AsString(vv)
 		case "TargetId":
 			a.TargetId = param.AsUint64(vv)
+		case "OwnershipId":
+			a.OwnershipId = param.AsUint64(vv)
 		case "CustomerId":
 			a.CustomerId = param.AsUint64(vv)
 		case "PayMethod":
@@ -904,6 +922,7 @@ func (a *OfficialCustomerOfflinePay) AsRow(onlyFields ...string) param.Store {
 		r["id"] = a.Id
 		r["target_type"] = a.TargetType
 		r["target_id"] = a.TargetId
+		r["ownership_id"] = a.OwnershipId
 		r["customer_id"] = a.CustomerId
 		r["pay_method"] = a.PayMethod
 		r["pay_account"] = a.PayAccount
@@ -925,6 +944,8 @@ func (a *OfficialCustomerOfflinePay) AsRow(onlyFields ...string) param.Store {
 			r["target_type"] = a.TargetType
 		case "target_id":
 			r["target_id"] = a.TargetId
+		case "ownership_id":
+			r["ownership_id"] = a.OwnershipId
 		case "customer_id":
 			r["customer_id"] = a.CustomerId
 		case "pay_method":

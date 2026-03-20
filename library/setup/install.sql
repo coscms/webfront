@@ -920,6 +920,7 @@ CREATE TABLE `official_customer_offline_pay` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `target_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'recharge' COMMENT '目标类型',
   `target_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '目标ID',
+  `ownership_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '所归属之ID',
   `customer_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '客户ID',
   `pay_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款方式',
   `pay_account` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款账号',
@@ -934,7 +935,8 @@ CREATE TABLE `official_customer_offline_pay` (
   PRIMARY KEY (`id`),
   KEY `customer_offline_pay_customer_id` (`customer_id`),
   KEY `customer_offline_pay_target` (`target_type`,`target_id`),
-  KEY `customer_offline_pay_status` (`status`)
+  KEY `customer_offline_pay_status` (`status`),
+  KEY `customer_offline_pay_ownership_id` (`ownership_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='客户线下转账信息';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1280,4 +1282,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-20  8:01:54
+-- Dump completed on 2026-03-20  9:12:32
