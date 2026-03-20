@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/RichardKnop/machinery/v1/backends/result"
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/RichardKnop/machinery/v2/backends/result"
+	"github.com/RichardKnop/machinery/v2/tasks"
 )
 
 // Send 发送到队列

@@ -1,7 +1,7 @@
 package machinery
 
 import (
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/RichardKnop/machinery/v2/tasks"
 
 	"github.com/admpub/log"
 )

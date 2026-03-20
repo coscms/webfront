@@ -1,6 +1,6 @@
 package machinery
 
-import "github.com/RichardKnop/machinery/v1/tasks"
+import "github.com/RichardKnop/machinery/v2/tasks"
 
 type (
 	Task     = tasks.Signature

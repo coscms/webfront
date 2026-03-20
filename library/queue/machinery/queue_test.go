@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/RichardKnop/machinery/v2/config"
+	"github.com/RichardKnop/machinery/v2/tasks"
 	"github.com/webx-top/echo/testing/test"
 
 	exampletasks "github.com/coscms/webfront/library/queue/machinery/example"
