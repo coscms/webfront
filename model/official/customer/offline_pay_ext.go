@@ -34,7 +34,7 @@ type OfflinePayTargetTypeX interface {
 var OfflinePayTargetTypes = echo.NewKVxData[OfflinePayTargetTypeX, any]().
 	Add(OfflinePayTargetTypeRecharge, echo.T(`钱包充值`), echo.KVxOptX[OfflinePayTargetTypeX, any](offlinePayTargetTypeRecharge{}))
 
-func RegisterOfflinePayTarget(k, v string, x OfflinePayTargetTypeX) {
+func RegisterOfflinePayTargetType(k, v string, x OfflinePayTargetTypeX) {
 	OfflinePayTargetTypes.Add(k, v, echo.KVxOptX[OfflinePayTargetTypeX, any](x))
 }
 
