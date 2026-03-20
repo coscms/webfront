@@ -67,6 +67,75 @@ func (f *Wallet) AddRepeatableFlow(flows ...*dbschema.OfficialCustomerWalletFlow
 	return f.AddFlow(flow)
 }
 
+func (f *Wallet) applyFlow(ctx echo.Context, flow *dbschema.OfficialCustomerWalletFlow) error {
+	cond := db.And(
+		db.Cond{`customer_id`: flow.CustomerId},
+		db.Cond{`asset_type`: flow.AssetType},
+	)
+	exists, err := f.Param(nil, cond).SetWrite().Exists()
+	if err != nil {
+		return err
+	}
+	if !exists {
+		f.Freeze = 0
+		f.Balance = 0
+		if flow.AmountType == `balance` { // 余额操作
+			if flow.Amount < 0 { // 扣款操作
+				return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
+			}
+			// 加款操作
+			f.Balance = flow.Amount
+			flow.WalletAmount = f.Balance
+			if !AssetTypeIsIgnoreAccumulated(flow.AssetType) {
+				f.Accumulated = flow.Amount
+			}
+		} else { // 冻结金额操作
+			if flow.Amount < 0 { // 扣除冻结
+				return ctx.NewError(code.BalanceNoEnough, `冻结额不能小于0`).SetZone(`freeze`)
+			}
+			// 增加冻结
+			f.Freeze = flow.Amount
+			flow.WalletAmount = f.Freeze
+		}
+		f.CustomerId = flow.CustomerId
+		f.AssetType = flow.AssetType
+		_, err = f.Insert()
+		return err
+	}
+	err = xdatabase.GetAndLock(f.OfficialCustomerWallet, cond)
+	if err != nil {
+		return err
+	}
+	incrAmount := param.AsString(flow.Amount)
+	kvset := echo.H{
+		flow.AmountType: db.Raw(flow.AmountType + `+` + incrAmount),
+		`updated`:       time.Now().Unix(),
+	}
+	var amount float64
+	if flow.AmountType == `balance` {
+		amount = f.Balance
+		if flow.Amount > 0 && !AssetTypeIsIgnoreAccumulated(flow.AssetType) { // 加款操作时增加累计加款金额
+			kvset.Set(`accumulated`, db.Raw(`accumulated+`+incrAmount))
+		}
+	} else {
+		amount = f.Freeze
+	}
+	//flow.WalletAmount = amount+flow.Amount
+	oldAmountDecimal := decimal.NewFromFloat(amount)
+	newAmountDecimal := decimal.NewFromFloat(flow.Amount)
+	newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(int32(xcommon.Precision))
+	flow.WalletAmount = newAmountDecimal.InexactFloat64()
+	if flow.WalletAmount < 0 { //处理flow.Amount为负数(即扣除余额)的情况。扣款操作时检查余额是否足够
+		ctx.Rollback()
+		if sessdata.User(ctx) != nil {
+			return ctx.NewError(code.BalanceNoEnough, `扣除余额(%v)失败！客户(ID:%d)的余额不足`, flow.Amount, flow.CustomerId).SetZone(`balance`)
+		}
+		return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
+	}
+	err = f.UpdateFields(nil, kvset, cond)
+	return err
+}
+
 // AddFlow 添加不允许重复的流水记录
 func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err error) {
 	flow := f.Flow
@@ -78,95 +147,26 @@ func (f *Wallet) AddFlow(flows ...*dbschema.OfficialCustomerWalletFlow) (err err
 	if err != nil {
 		return
 	}
-	cond := db.And(
-		db.Cond{`customer_id`: flow.CustomerId},
-		db.Cond{`asset_type`: flow.AssetType},
-	)
-	var exists bool
-	exists, err = f.Param(nil, cond).SetWrite().Exists()
-	if err != nil {
-		ctx.Rollback()
-		return err
-	}
-	if !exists {
-		f.Freeze = 0
-		f.Balance = 0
-		if flow.AmountType == `balance` { // 余额操作
-			if flow.Amount < 0 { // 扣款操作
-				ctx.Rollback()
-				return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
-			}
-			// 加款操作
-			f.Balance = flow.Amount
-			flow.WalletAmount = f.Balance
-			if !AssetTypeIsIgnoreAccumulated(flow.AssetType) {
-				f.Accumulated = flow.Amount
-			}
-		} else { // 冻结金额操作
-			if flow.Amount < 0 { // 扣除冻结
-				ctx.Rollback()
-				return ctx.NewError(code.BalanceNoEnough, `冻结额不能小于0`).SetZone(`freeze`)
-			}
-			// 增加冻结
-			f.Freeze = flow.Amount
-			flow.WalletAmount = f.Freeze
-		}
-		f.CustomerId = flow.CustomerId
-		f.AssetType = flow.AssetType
-		_, err = f.Insert()
-	} else {
-		err = xdatabase.GetAndLock(f.OfficialCustomerWallet, cond)
-		if err != nil {
-			ctx.Rollback()
-			return err
-		}
-		incrAmount := param.AsString(flow.Amount)
-		kvset := echo.H{
-			flow.AmountType: db.Raw(flow.AmountType + `+` + incrAmount),
-			`updated`:       time.Now().Unix(),
-		}
-		var amount float64
-		if flow.AmountType == `balance` {
-			amount = f.Balance
-			if flow.Amount > 0 && !AssetTypeIsIgnoreAccumulated(flow.AssetType) { // 加款操作时增加累计加款金额
-				kvset.Set(`accumulated`, db.Raw(`accumulated+`+incrAmount))
-			}
-		} else {
-			amount = f.Freeze
-		}
-		//flow.WalletAmount = amount+flow.Amount
-		oldAmountDecimal := decimal.NewFromFloat(amount)
-		newAmountDecimal := decimal.NewFromFloat(flow.Amount)
-		newAmountDecimal = oldAmountDecimal.Add(newAmountDecimal).Truncate(int32(xcommon.Precision))
-		flow.WalletAmount = newAmountDecimal.InexactFloat64()
-		if flow.WalletAmount < 0 { //处理flow.Amount为负数(即扣除余额)的情况。扣款操作时检查余额是否足够
-			ctx.Rollback()
-			if sessdata.User(ctx) != nil {
-				return ctx.NewError(code.BalanceNoEnough, `扣除余额(%v)失败！客户(ID:%d)的余额不足`, flow.Amount, flow.CustomerId).SetZone(`balance`)
-			}
-			return nerrors.ErrBalanceNoEnough.SetMessage(ctx.T(`%s余额不足`, ctx.T(AssetTypes.Get(f.AssetType)))).SetZone(`balance`)
-		}
-		err = f.UpdateFields(nil, kvset, cond)
-	}
+	err = f.applyFlow(ctx, flow)
 	if err != nil {
 		ctx.Rollback()
 		return
 	}
-	/*
-		flow := &dbschema.OfficialCustomerWalletFlow{
-			CustomerId:  0,
-			SourceCustomer: 0,
-			AssetType:  `money`,
-			AmountType: AmountTypeBalance, //金额类型(balance-余额;freeze-冻结额)
-			Amount:      0,
-			SourceType:  ``,
-			SourceTable: ``,
-			SourceId:    0,
-			TradeNo:     ``,
-			Status:      FlowStatusPending, //状态(pending-待确认;confirmed-已确认;canceled-已取消)
-			Description: ``,
-		}
-	*/
+	/*//
+	flow := &dbschema.OfficialCustomerWalletFlow{
+		CustomerId:  0,
+		SourceCustomer: 0,
+		AssetType:  `money`,
+		AmountType: AmountTypeBalance, //金额类型(balance-余额;freeze-冻结额)
+		Amount:      0,
+		SourceType:  ``,
+		SourceTable: ``,
+		SourceId:    0,
+		TradeNo:     ``,
+		Status:      FlowStatusPending, //状态(pending-待确认;confirmed-已确认;canceled-已取消)
+		Description: ``,
+	}
+	//*/
 	_, err = flow.Insert()
 	ctx.End(err == nil)
 	return

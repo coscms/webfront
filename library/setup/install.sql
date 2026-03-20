@@ -910,6 +910,35 @@ CREATE TABLE `official_customer_oauth` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `official_customer_offline_pay`
+--
+
+DROP TABLE IF EXISTS `official_customer_offline_pay`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `official_customer_offline_pay` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `target_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'recharge' COMMENT '目标类型',
+  `target_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '目标ID',
+  `customer_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '客户ID',
+  `pay_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款方式',
+  `pay_account` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款账号',
+  `pay_amount` decimal(12,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '付款金额',
+  `pay_bank_branch` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款银行支行',
+  `pay_transaction_no` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款交易订单号',
+  `pay_time` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`付款时间',
+  `pay_owner` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '户主名',
+  `status` enum('pending','verified','invalid') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pending' COMMENT '状态(pending-待处理;verified-已核实;invalid-无效)',
+  `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `customer_offline_pay_customer_id` (`customer_id`),
+  KEY `customer_offline_pay_target` (`target_type`,`target_id`),
+  KEY `customer_offline_pay_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='客户线下转账信息';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `official_customer_online`
 --
 
@@ -1251,4 +1280,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-12  3:31:05
+-- Dump completed on 2026-03-20  8:01:54
