@@ -208,8 +208,8 @@ func (f *OfflinePay) CustomerPendingTodayCount(customerID interface{}) (int64, e
 	))
 }
 
-func (f *OfflinePay) CheckCustomerAdd() error {
-	permission := CustomerPermission(f.Context())
+func (f *OfflinePay) CheckCustomerAdd(customer *dbschema.OfficialCustomer) error {
+	permission := CustomerPermission(f.Context(), customer)
 	return f.checkCustomerAdd(permission)
 }
 
