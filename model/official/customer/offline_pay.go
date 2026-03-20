@@ -78,6 +78,13 @@ func (u *OfflinePay) SetVerified() error {
 	return err
 }
 
+func (u *OfflinePay) SetPending() error {
+	return u.OfficialCustomerOfflinePay.UpdateFields(nil, echo.H{
+		`status`:  OfflinePayStatusPending,
+		`updated`: time.Now().Unix(),
+	}, `id`, u.Id)
+}
+
 func (u *OfflinePay) SetInvalid() error {
 	ctx := u.Context()
 	if err := ctx.Begin(); err != nil {
