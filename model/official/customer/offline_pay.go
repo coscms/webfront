@@ -30,6 +30,9 @@ func (u *OfflinePay) check() error {
 	if len(u.TargetType) == 0 {
 		return u.Context().NewError(code.InvalidParameter, `目标类型无效`).SetZone(`targetType`)
 	}
+	if !OfflinePayTargetTypes.Has(u.TargetType) {
+		return u.Context().NewError(code.InvalidParameter, `目标类型无效`).SetZone(`targetType`)
+	}
 	if len(u.PayAccount) == 0 {
 		return u.Context().NewError(code.InvalidParameter, `付款账号无效`).SetZone(`payAccount`)
 	}
