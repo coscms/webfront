@@ -210,11 +210,15 @@ func (f *OfflinePay) CustomerPendingTodayCount(customerID interface{}) (int64, e
 
 func (f *OfflinePay) CheckCustomerAdd(customer *dbschema.OfficialCustomer) error {
 	permission := CustomerPermission(f.Context(), customer)
-	return f.checkCustomerAdd(permission)
+	return f.checkCustomerAdd(permission, customer)
 }
 
-func (f *OfflinePay) checkCustomerAdd(permission *xrole.RolePermission) error {
-	err := xcommon.CheckRoleCustomerAdd(f.Context(), permission, OfflinePayBehaviorName, f.CustomerId, f)
+func (f *OfflinePay) checkCustomerAdd(permission *xrole.RolePermission, customer *dbschema.OfficialCustomer) error {
+	customerID := f.CustomerId
+	if customer != nil {
+		customerID = customer.Id
+	}
+	err := xcommon.CheckRoleCustomerAdd(f.Context(), permission, OfflinePayBehaviorName, customerID, f)
 	if err == nil {
 		return err
 	}
