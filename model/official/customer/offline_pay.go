@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -48,7 +49,11 @@ func (u *OfflinePay) check() error {
 		return u.Context().NewError(code.InvalidParameter, `付款时间无效`).SetZone(`payTime`)
 	}
 	u.PayOwner = strings.TrimSpace(u.PayOwner)
-	u.Status = OfflinePayStatusPending
+	if len(u.Status) == 0 {
+		u.Status = OfflinePayStatusPending
+	} else if !slices.Contains(OfflinePayStatusAll, u.Status) {
+		return u.Context().NewError(code.InvalidParameter, `状态无效`).SetZone(`status`)
+	}
 	return nil
 }
 
