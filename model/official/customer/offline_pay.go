@@ -203,7 +203,7 @@ func (f *OfflinePay) CustomerPendingTodayCount(customerID interface{}) (int64, e
 	startTs, endTs := top.TodayTimestamp()
 	return f.Count(nil, db.And(
 		db.Cond{`customer_id`: customerID},
-		db.Cond{`display`: OfflinePayStatusPending},
+		db.Cond{`status`: OfflinePayStatusPending},
 		db.Cond{`created`: db.Between(startTs, endTs)},
 	))
 }
