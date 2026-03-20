@@ -2,23 +2,6 @@ package offlinepay
 
 import "github.com/webx-top/echo"
 
-/*
-//
-中国银行 - BOC
-农业银行 - ABC
-工商银行 - ICBC
-建设银行 - CCB
-交通银行 - BOCOM
-招商银行 - CMB
-浦发银行 - SPDB
-光大银行 - CEB
-华夏银行 - HXB
-民生银行 - CMBC
-
-恒丰银行 - HFB
-汉口银行 - HKB
-//
-*/
 const (
 	OfflinePayMethodEBankAlipay   = `ebank.alipay`   // 支付宝
 	OfflinePayMethodEBankWechat   = `ebank.wechat`   // 微信
