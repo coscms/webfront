@@ -20,21 +20,23 @@ import "github.com/webx-top/echo"
 //
 */
 const (
-	OfflinePayMethodEBankAlipay = `ebank.alipay`
-	OfflinePayMethodEBankWechat = `ebank.wechat`
-	OfflinePayMethodEBankPaypal = `ebank.paypal`
-	OfflinePayMethodBankICBC    = `bank.icbc`  // 工商银行
-	OfflinePayMethodBankABC     = `bank.abc`   // 农业银行
-	OfflinePayMethodBankBOC     = `bank.boc`   // 中国银行
-	OfflinePayMethodBankCCB     = `bank.ccb`   // 建设银行
-	OfflinePayMethodBankBOCOM   = `bank.bocom` // 交通银行
-	OfflinePayMethodBankCMB     = `bank.cmb`   // 招商银行
-	OfflinePayMethodBankSPDB    = `bank.spdb`  // 浦发银行
-	OfflinePayMethodBankCEB     = `bank.ceb`   // 光大银行
-	OfflinePayMethodBankHXB     = `bank.hxb`   // 华夏银行
-	OfflinePayMethodBankCMBC    = `bank.cmbc`  // 民生银行
-	OfflinePayMethodBankHFB     = `bank.hfb`   // 恒丰银行
-	OfflinePayMethodBankHKB     = `bank.hfb`   // 汉口银行
+	OfflinePayMethodEBankAlipay   = `ebank.alipay`   // 支付宝
+	OfflinePayMethodEBankWechat   = `ebank.wechat`   // 微信
+	OfflinePayMethodEBankPaypal   = `ebank.paypal`   // Paypal
+	OfflinePayMethodEBankUnionPay = `ebank.unionpay` // 云闪付
+	OfflinePayMethodEBankBestPay  = `ebank.bestpay`  // 翼支付
+	OfflinePayMethodBankICBC      = `bank.icbc`      // 工商银行
+	OfflinePayMethodBankABC       = `bank.abc`       // 农业银行
+	OfflinePayMethodBankBOC       = `bank.boc`       // 中国银行
+	OfflinePayMethodBankCCB       = `bank.ccb`       // 建设银行
+	OfflinePayMethodBankBOCOM     = `bank.bocom`     // 交通银行
+	OfflinePayMethodBankCMB       = `bank.cmb`       // 招商银行
+	OfflinePayMethodBankSPDB      = `bank.spdb`      // 浦发银行
+	OfflinePayMethodBankCEB       = `bank.ceb`       // 光大银行
+	OfflinePayMethodBankHXB       = `bank.hxb`       // 华夏银行
+	OfflinePayMethodBankCMBC      = `bank.cmbc`      // 民生银行
+	OfflinePayMethodBankHFB       = `bank.hfb`       // 恒丰银行
+	OfflinePayMethodBankHKB       = `bank.hkb`       // 汉口银行
 )
 
 type MethodX struct {
@@ -54,6 +56,8 @@ func (a *MethodX) CopyFrom(s MethodOptions) {
 var methodsRegistry = echo.NewKVxData[MethodX, any]().
 	Add(OfflinePayMethodEBankAlipay, echo.T(`支付宝`)).
 	Add(OfflinePayMethodEBankWechat, echo.T(`微信`)).
+	Add(OfflinePayMethodEBankUnionPay, echo.T(`云闪付`)).
+	Add(OfflinePayMethodEBankBestPay, echo.T(`翼支付`)).
 	Add(OfflinePayMethodEBankPaypal, echo.T(`Paypal`)).
 	Add(OfflinePayMethodBankICBC, echo.T(`工商银行`)).
 	Add(OfflinePayMethodBankABC, echo.T(`农业银行`)).
