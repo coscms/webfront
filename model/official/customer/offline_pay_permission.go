@@ -1,4 +1,4 @@
-package article
+package customer
 
 import (
 	"github.com/coscms/webcore/library/perm"
@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	BehaviorName = `article`
+	OfflinePayBehaviorName = `offlinePay`
 )
 
 func init() {
-	xrole.Behaviors.Register(BehaviorName, echo.T(`文章投稿设置`),
-		perm.BehaviorOptFormHelpBlock(echo.T(`配置文章投稿频率。maxPerDay - 表示每天的最大发布数量(<=0代表禁止发布); maxPending - 表示待审核文章上限(<=0代表不限)`)),
+	xrole.Behaviors.Register(OfflinePayBehaviorName, echo.T(`线下转账设置`),
+		perm.BehaviorOptFormHelpBlock(echo.T(`配置线下转账提交频率。maxPerDay - 表示每天的最大发布数量(<=0代表禁止发布); maxPending - 表示待审核文章上限(<=0代表不限)`)),
 		perm.BehaviorOptValue(&xcommon.ConfigCustomerAdd{}),
 		perm.BehaviorOptValueInitor(func() interface{} {
 			return &xcommon.ConfigCustomerAdd{}

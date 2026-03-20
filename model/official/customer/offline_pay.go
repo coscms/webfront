@@ -11,6 +11,9 @@ import (
 
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/offlinepay"
+	"github.com/coscms/webfront/library/top"
+	"github.com/coscms/webfront/library/xcommon"
+	"github.com/coscms/webfront/library/xrole"
 )
 
 func NewOfflinePay(ctx echo.Context) *OfflinePay {
@@ -179,4 +182,52 @@ func (u *OfflinePay) Edit(mw func(db.Result) db.Result, args ...interface{}) err
 	}
 	ctx.End(err == nil)
 	return err
+}
+
+func (f *OfflinePay) CustomerTodayCount(customerID interface{}) (int64, error) {
+	startTs, endTs := top.TodayTimestamp()
+	return f.Count(nil, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`created`: db.Between(startTs, endTs)},
+	))
+}
+
+func (f *OfflinePay) CustomerPendingCount(customerID interface{}) (int64, error) {
+	return f.Count(nil, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`status`: OfflinePayStatusPending},
+	))
+}
+
+func (f *OfflinePay) CustomerPendingTodayCount(customerID interface{}) (int64, error) {
+	startTs, endTs := top.TodayTimestamp()
+	return f.Count(nil, db.And(
+		db.Cond{`customer_id`: customerID},
+		db.Cond{`display`: OfflinePayStatusPending},
+		db.Cond{`created`: db.Between(startTs, endTs)},
+	))
+}
+
+func (f *OfflinePay) CheckCustomerAdd() error {
+	permission := CustomerPermission(f.Context())
+	return f.checkCustomerAdd(permission)
+}
+
+func (f *OfflinePay) checkCustomerAdd(permission *xrole.RolePermission) error {
+	err := xcommon.CheckRoleCustomerAdd(f.Context(), permission, OfflinePayBehaviorName, f.CustomerId, f)
+	if err == nil {
+		return err
+	}
+	switch err {
+	case xcommon.ErrCustomerRoleDisabled:
+		return f.Context().E(`当前角色不支持线下转账`)
+	case xcommon.ErrCustomerAddClosed:
+		return f.Context().E(`线下转账功能已关闭`)
+	case xcommon.ErrCustomerAddMaxPerDay:
+		return f.Context().E(`提交线下转账信息失败。您的账号已达到今日最大提交数量`)
+	case xcommon.ErrCustomerAddMaxPending:
+		return f.Context().E(`提交线下转账信息失败。您的待核实信息数量已达上限，请等待审核通过后再提交`)
+	default:
+		return err
+	}
 }
