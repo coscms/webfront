@@ -27,14 +27,15 @@ const (
 )
 
 type OwnershipInfo struct {
-	Name string
-	URL  string
+	Name  string
+	URL   string
+	Extra echo.H
 }
 
 type OfflinePayTargetTypeX interface {
 	Verified(ctx echo.Context, row *dbschema.OfficialCustomerOfflinePay) error
 	Invalid(ctx echo.Context, row *dbschema.OfficialCustomerOfflinePay) error
-	OwnershipInfo(ctx echo.Context) OwnershipInfo
+	OwnershipInfo(ctx echo.Context, ownershipID uint64) OwnershipInfo
 }
 
 var OfflinePayTargetTypes = echo.NewKVxData[OfflinePayTargetTypeX, any]().
@@ -87,7 +88,7 @@ func (a offlinePayTargetTypeRecharge) Invalid(ctx echo.Context, row *dbschema.Of
 	return nil
 }
 
-func (a offlinePayTargetTypeRecharge) OwnershipInfo(ctx echo.Context) OwnershipInfo {
+func (a offlinePayTargetTypeRecharge) OwnershipInfo(ctx echo.Context, ownershipID uint64) OwnershipInfo {
 	return OwnershipInfo{
 		// Name:ctx.T(`名称`),
 	}

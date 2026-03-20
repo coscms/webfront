@@ -117,7 +117,9 @@ func (u *OfflinePay) Add() (interface{}, error) {
 		ctx.Rollback()
 		return pk, err
 	}
-	err = u.fireEvent(ctx)
+	if u.Id > 0 {
+		err = u.fireEvent(ctx)
+	}
 	ctx.End(err == nil)
 	return pk, err
 }
@@ -154,12 +156,13 @@ func (u *OfflinePay) Edit(mw func(db.Result) db.Result, args ...interface{}) err
 		ctx.Rollback()
 		return ctx.NewError(code.DataUnavailable, `不能修改已经核实过的信息`).SetZone(`status`)
 	}
-	err = u.OfficialCustomerOfflinePay.Update(nil, args...)
+	var affected int64
+	affected, err = u.OfficialCustomerOfflinePay.Updatex(nil, args...)
 	if err != nil {
 		ctx.Rollback()
 		return err
 	}
-	if old.Status != u.Status {
+	if old.Status != u.Status && affected > 0 {
 		err = u.fireEvent(ctx)
 	}
 	ctx.End(err == nil)
