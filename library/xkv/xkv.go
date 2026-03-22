@@ -35,7 +35,7 @@ func RemoveCache(kv *dbschema.NgingKv) error {
 
 var DefaultTTL int64 = 86400 * 7
 
-// GetValue 获取 key 的值
+// GetValue 从缓存中获取获取某个 key 的值
 // defaultValue: 0. 默认值; 1. 说明; 2. 帮助说明 (1 和 2 仅在自动创建时有用)
 func GetValue(ctx echo.Context, key string, defaultValue ...string) (string, error) {
 	var value string
@@ -46,13 +46,18 @@ func GetValue(ctx echo.Context, key string, defaultValue ...string) (string, err
 	return value, err
 }
 
+// GetValueNocache 从数据库获取某个 key 的值
+// defaultValue: 0. 默认值; 1. 说明; 2. 帮助说明 (1 和 2 仅在自动创建时有用)
 func GetValueNocache(ctx echo.Context, key string, defaultValue ...string) (string, error) {
 	kvM := model.NewKv(ctx)
 	return kvM.GetValue(key, defaultValue...)
 }
 
-func GetTypeValues(ctx echo.Context, typ string, defaultValue ...string) ([]string, error) {
-	var values []string
+// GetTypeValues 从缓存中获取某个类型下的所有键值
+// typ: "type|typeName"
+// defaultValue: {"key":"Value|Description|Help"}
+func GetTypeValues(ctx echo.Context, typ string, defaultValue ...map[string]string) (map[string]string, error) {
+	var values map[string]string
 	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values, func() (err error) {
 		values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
 		return
@@ -60,7 +65,10 @@ func GetTypeValues(ctx echo.Context, typ string, defaultValue ...string) ([]stri
 	return values, err
 }
 
-func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...string) ([]string, error) {
+// GetTypeValuesNocache 从数据库获取某个类型下的所有键值
+// typ: "type|typeName"
+// defaultValue: {"key":"Value|Description|Help"}
+func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...map[string]string) (map[string]string, error) {
 	kvM := model.NewKv(ctx)
 	return kvM.GetTypeValues(typ, defaultValue...)
 }
