@@ -2,11 +2,13 @@ package xkv
 
 import (
 	"context"
+	"sync/atomic"
 	"testing"
 
 	"github.com/coscms/webfront/library/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 )
 
 func TestCacheString(t *testing.T) {
@@ -31,4 +33,17 @@ func TestCacheString(t *testing.T) {
 	value, err = testFn()
 	assert.NoError(t, err)
 	assert.Equal(t, expected, value)
+
+	ctx := defaults.NewMockContext()
+	var i int32
+	f := func() (int, error) {
+		return int(atomic.AddInt32(&i, 1)), nil
+	}
+	resultN, err := GetOnce(ctx, ``, f)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, resultN)
+
+	resultN, err = GetOnce(ctx, ``, f)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, resultN)
 }

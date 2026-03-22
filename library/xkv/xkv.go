@@ -3,6 +3,8 @@ package xkv
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/admpub/events"
 	"github.com/coscms/webcore/dbschema"
@@ -28,8 +30,12 @@ func init() {
 }
 
 func RemoveCache(kv *dbschema.NgingKv) error {
-	err1 := cache.Delete(context.Background(), `nging.kv.key.`+kv.Key)
-	err2 := cache.Delete(context.Background(), `nging.kv.type.`+kv.Type)
+	var ctx context.Context = kv.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	err1 := cache.Delete(ctx, `nging.kv.key.`+kv.Key)
+	err2 := cache.Delete(ctx, `nging.kv.type.`+kv.Type)
 	return errors.Join(err1, err2)
 }
 
@@ -67,7 +73,7 @@ const (
 // defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
 func GetTypeValues(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	var values echo.KVList
-	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values,
+	err := cache.XFunc(ctx, `nging.kv.type.`+strings.SplitN(typ, `|`, 2)[0], &values,
 		func() (err error) {
 			values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
 			return
@@ -84,4 +90,19 @@ func GetTypeValues(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (
 func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	kvM := model.NewKv(ctx)
 	return kvM.GetTypeValues(typ, defaultValue...)
+}
+
+func GetOnce[T any](ctx echo.Context, key string, f func() (T, error)) (T, error) {
+	if len(key) == 0 {
+		key = `FUNC_ADDR_PTR_` + fmt.Sprintf(`%p`, f)
+	}
+	//println(key)
+	v, ok := ctx.Internal().Get(key).(T)
+	if ok {
+		return v, nil
+	}
+	var err error
+	v, err = f()
+	ctx.Internal().Set(key, v)
+	return v, err
 }
