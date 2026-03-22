@@ -53,6 +53,11 @@ func GetValueNocache(ctx echo.Context, key string, defaultValue ...string) (stri
 	return kvM.GetValue(key, defaultValue...)
 }
 
+const (
+	HKeyDescription = model.HKeyDescription
+	HKeyHelp        = model.HKeyHelp
+)
+
 // GetTypeValues 从缓存中获取某个类型下的所有键值
 // typ: "type|typeName"
 // defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
