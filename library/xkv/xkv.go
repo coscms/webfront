@@ -55,9 +55,9 @@ func GetValueNocache(ctx echo.Context, key string, defaultValue ...string) (stri
 
 // GetTypeValues 从缓存中获取某个类型下的所有键值
 // typ: "type|typeName"
-// defaultValue: {"key":"Value|Description|Help"}
-func GetTypeValues(ctx echo.Context, typ string, defaultValue ...map[string]string) (map[string]string, error) {
-	var values map[string]string
+// defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
+func GetTypeValues(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
+	var values echo.KVList
 	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values, func() (err error) {
 		values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
 		return
@@ -67,8 +67,8 @@ func GetTypeValues(ctx echo.Context, typ string, defaultValue ...map[string]stri
 
 // GetTypeValuesNocache 从数据库获取某个类型下的所有键值
 // typ: "type|typeName"
-// defaultValue: {"key":"Value|Description|Help"}
-func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...map[string]string) (map[string]string, error) {
+// defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
+func GetTypeValuesNocache(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	kvM := model.NewKv(ctx)
 	return kvM.GetTypeValues(typ, defaultValue...)
 }
