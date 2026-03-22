@@ -39,10 +39,14 @@ var DefaultTTL int64 = 86400 * 7
 // defaultValue: 0. 默认值; 1. 说明; 2. 帮助说明 (1 和 2 仅在自动创建时有用)
 func GetValue(ctx echo.Context, key string, defaultValue ...string) (string, error) {
 	var value string
-	err := cache.XFunc(ctx, `nging.kv.key.`+key, &value, func() (err error) {
-		value, err = GetValueNocache(ctx, key, defaultValue...)
-		return
-	}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)))
+	err := cache.XFunc(ctx, `nging.kv.key.`+key, &value,
+		func() (err error) {
+			value, err = GetValueNocache(ctx, key, defaultValue...)
+			return
+		},
+		cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)),
+		//cache.Fresh,
+	)
 	return value, err
 }
 
@@ -63,10 +67,14 @@ const (
 // defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
 func GetTypeValues(ctx echo.Context, typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	var values echo.KVList
-	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values, func() (err error) {
-		values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
-		return
-	}, cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)))
+	err := cache.XFunc(ctx, `nging.kv.type.`+typ, &values,
+		func() (err error) {
+			values, err = GetTypeValuesNocache(ctx, typ, defaultValue...)
+			return
+		},
+		cache.AdminRefreshable(ctx, sessdata.Customer(ctx), cache.TTL(DefaultTTL)),
+		//cache.Fresh,
+	)
 	return values, err
 }
 
