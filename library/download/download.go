@@ -143,7 +143,7 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 	readCloser := watermark.Bytes2file(b)
 	defer readCloser.Close()
 	// 保存文件
-	result.SavePath, result.FileURL, err = storer.Put(dstFile, readCloser, int64(len(b)))
+	result.SavePath, result.FileURL, err = storer.Put(ctx, dstFile, readCloser, int64(len(b)))
 	if err != nil {
 		return result, thumbURL, errors.WithMessage(err, fileURL)
 	}
@@ -155,7 +155,7 @@ func AdvanceDownload(ctx echo.Context, options ...Options) (*uploadClient.Result
 	// 记录到数据库
 	err = config.PrepareData.DBSaver(fileM, result, readCloser)
 	if err != nil {
-		if err := storer.Delete(result.SavePath); err != nil {
+		if err := storer.Delete(ctx, result.SavePath); err != nil {
 			log.Error(result.FileURL, `: `, err)
 		}
 		return result, thumbURL, err

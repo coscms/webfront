@@ -33,7 +33,10 @@ func SyncRemoteImage(
 	defer prepareData.Close()
 	cloudStorage := model.NewCloudStorage(ctx)
 	if len(storerInfo.ID) > 0 {
-		cloud := storerInfo.Cloud()
+		cloud, err := storerInfo.Cloud(ctx)
+		if err != nil {
+			return ``, err
+		}
 		if cloud.Id > 0 {
 			cloudStorage.NgingCloudStorage = cloud
 		}
