@@ -57,6 +57,7 @@ func (u *OfflinePay) check() error {
 	} else if !slices.Contains(OfflinePayStatusAll, u.Status) {
 		return u.Context().NewError(code.InvalidParameter, `状态无效`).SetZone(`status`)
 	}
+	u.Postscript = strings.TrimSpace(u.Postscript)
 	return nil
 }
 

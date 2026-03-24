@@ -929,6 +929,7 @@ CREATE TABLE `official_customer_offline_pay` (
   `pay_transaction_no` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '付款交易订单号',
   `pay_time` int unsigned NOT NULL DEFAULT '0' COMMENT '`timestamp`付款时间',
   `pay_owner` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '户主名',
+  `postscript` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '附言',
   `status` enum('pending','verified','invalid') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pending' COMMENT '状态(pending-待处理;verified-已核实;invalid-无效)',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -1282,4 +1283,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-20  9:12:32
+-- Dump completed on 2026-03-24  3:30:16

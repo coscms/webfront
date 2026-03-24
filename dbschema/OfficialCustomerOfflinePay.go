@@ -40,6 +40,7 @@ type OfficialCustomerOfflinePay struct {
 	PayTransactionNo string  `db:"pay_transaction_no" bson:"pay_transaction_no" comment:"付款交易订单号" json:"pay_transaction_no" xml:"pay_transaction_no"`
 	PayTime          uint    `db:"pay_time" bson:"pay_time" comment:"付款时间" json:"pay_time" xml:"pay_time" form_decoder:"time2unix" form_encoder:"unix2time"`
 	PayOwner         string  `db:"pay_owner" bson:"pay_owner" comment:"户主名" json:"pay_owner" xml:"pay_owner"`
+	Postscript       string  `db:"postscript" bson:"postscript" comment:"附言" json:"postscript" xml:"postscript"`
 	Status           string  `db:"status" bson:"status" comment:"状态(pending-待处理;verified-已核实;invalid-无效)" json:"status" xml:"status"`
 	Created          uint    `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	Updated          uint    `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
@@ -366,6 +367,10 @@ func (a *OfficialCustomerOfflinePay) GetDiffColumns(old *OfficialCustomerOffline
 		changedCols = append(changedCols, `pay_owner`)
 	}
 
+	if old.Postscript != a.Postscript {
+		changedCols = append(changedCols, `postscript`)
+	}
+
 	if old.Status != a.Status {
 		changedCols = append(changedCols, `status`)
 	}
@@ -659,6 +664,7 @@ func (a *OfficialCustomerOfflinePay) Reset() *OfficialCustomerOfflinePay {
 	a.PayTransactionNo = ``
 	a.PayTime = 0
 	a.PayOwner = ``
+	a.Postscript = ``
 	a.Status = ``
 	a.Created = 0
 	a.Updated = 0
@@ -680,6 +686,7 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 		r["PayTransactionNo"] = a.PayTransactionNo
 		r["PayTime"] = a.PayTime
 		r["PayOwner"] = a.PayOwner
+		r["Postscript"] = a.Postscript
 		r["Status"] = a.Status
 		r["Created"] = a.Created
 		r["Updated"] = a.Updated
@@ -711,6 +718,8 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 			r["PayTime"] = a.PayTime
 		case "PayOwner":
 			r["PayOwner"] = a.PayOwner
+		case "Postscript":
+			r["Postscript"] = a.Postscript
 		case "Status":
 			r["Status"] = a.Status
 		case "Created":
@@ -723,7 +732,7 @@ func (a *OfficialCustomerOfflinePay) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCustomerOfflinePay) Clone() *OfficialCustomerOfflinePay {
-	cloned := OfficialCustomerOfflinePay{Id: a.Id, TargetType: a.TargetType, TargetId: a.TargetId, OwnershipId: a.OwnershipId, CustomerId: a.CustomerId, PayMethod: a.PayMethod, PayAccount: a.PayAccount, PayAmount: a.PayAmount, PayBankBranch: a.PayBankBranch, PayTransactionNo: a.PayTransactionNo, PayTime: a.PayTime, PayOwner: a.PayOwner, Status: a.Status, Created: a.Created, Updated: a.Updated}
+	cloned := OfficialCustomerOfflinePay{Id: a.Id, TargetType: a.TargetType, TargetId: a.TargetId, OwnershipId: a.OwnershipId, CustomerId: a.CustomerId, PayMethod: a.PayMethod, PayAccount: a.PayAccount, PayAmount: a.PayAmount, PayBankBranch: a.PayBankBranch, PayTransactionNo: a.PayTransactionNo, PayTime: a.PayTime, PayOwner: a.PayOwner, Postscript: a.Postscript, Status: a.Status, Created: a.Created, Updated: a.Updated}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -758,6 +767,8 @@ func (a *OfficialCustomerOfflinePay) FromRow(row map[string]interface{}) {
 			a.PayTime = param.AsUint(value)
 		case "pay_owner":
 			a.PayOwner = param.AsString(value)
+		case "postscript":
+			a.Postscript = param.AsString(value)
 		case "status":
 			a.Status = param.AsString(value)
 		case "created":
@@ -794,6 +805,8 @@ func (a *OfficialCustomerOfflinePay) GetField(field string) interface{} {
 		return a.PayTime
 	case "PayOwner":
 		return a.PayOwner
+	case "Postscript":
+		return a.Postscript
 	case "Status":
 		return a.Status
 	case "Created":
@@ -819,6 +832,7 @@ func (a *OfficialCustomerOfflinePay) GetAllFieldNames() []string {
 		"PayTransactionNo",
 		"PayTime",
 		"PayOwner",
+		"Postscript",
 		"Status",
 		"Created",
 		"Updated",
@@ -850,6 +864,8 @@ func (a *OfficialCustomerOfflinePay) HasField(field string) bool {
 	case "PayTime":
 		return true
 	case "PayOwner":
+		return true
+	case "Postscript":
 		return true
 	case "Status":
 		return true
@@ -906,6 +922,8 @@ func (a *OfficialCustomerOfflinePay) Set(key interface{}, value ...interface{}) 
 			a.PayTime = param.AsUint(vv)
 		case "PayOwner":
 			a.PayOwner = param.AsString(vv)
+		case "Postscript":
+			a.Postscript = param.AsString(vv)
 		case "Status":
 			a.Status = param.AsString(vv)
 		case "Created":
@@ -931,6 +949,7 @@ func (a *OfficialCustomerOfflinePay) AsRow(onlyFields ...string) param.Store {
 		r["pay_transaction_no"] = a.PayTransactionNo
 		r["pay_time"] = a.PayTime
 		r["pay_owner"] = a.PayOwner
+		r["postscript"] = a.Postscript
 		r["status"] = a.Status
 		r["created"] = a.Created
 		r["updated"] = a.Updated
@@ -962,6 +981,8 @@ func (a *OfficialCustomerOfflinePay) AsRow(onlyFields ...string) param.Store {
 			r["pay_time"] = a.PayTime
 		case "pay_owner":
 			r["pay_owner"] = a.PayOwner
+		case "postscript":
+			r["postscript"] = a.Postscript
 		case "status":
 			r["status"] = a.Status
 		case "created":
