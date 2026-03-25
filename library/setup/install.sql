@@ -166,7 +166,8 @@ CREATE TABLE `official_common_area` (
   KEY `common_area_pid` (`pid`),
   KEY `common_area_pinyin` (`pinyin`),
   KEY `common_area_first` (`first`),
-  KEY `common_area_country_abbr` (`country_abbr`)
+  KEY `common_area_country_abbr` (`country_abbr`),
+  KEY `common_area_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='地区表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -189,7 +190,8 @@ CREATE TABLE `official_common_area_country` (
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否禁用',
   PRIMARY KEY (`id`),
   UNIQUE KEY `common_area_country_uniq` (`abbr`),
-  KEY `common_area_country_disabled` (`disabled`,`sort`)
+  KEY `common_area_country_disabled` (`disabled`,`sort`),
+  KEY `common_area_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='国家';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1283,4 +1285,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-24  3:30:16
+-- Dump completed on 2026-03-25  5:16:50
