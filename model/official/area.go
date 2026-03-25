@@ -59,7 +59,6 @@ func (f *Area) check() error {
 	if exists {
 		return ctx.NewError(code.DataAlreadyExists, `名称“%s”已存在`, f.Name).SetZone(`name`)
 	}
-	f.Merged = f.Name
 	f.Level = 1
 	if f.Pid > 0 {
 		if f.Pid == f.Id {
@@ -72,6 +71,8 @@ func (f *Area) check() error {
 		areas = append(areas, f.Name)
 		f.Merged = strings.Join(areas, `,`)
 		f.Level = uint(len(areas))
+	} else {
+		f.Merged = QueryCountryName(ctx, f.CountryAbbr) + `,` + f.Name
 	}
 	f.Pinyin = strings.TrimSpace(f.Pinyin)
 	if len(f.Pinyin) == 0 {

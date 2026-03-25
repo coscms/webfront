@@ -20,20 +20,24 @@ func QueryAreaNames(ctx echo.Context, areaID uint, areaM *Area) (areaNames []str
 	}
 	areaNames = make([]string, 0, len(parents)+1)
 	if len(parents) > 0 {
-		countryM := dbschema.NewOfficialCommonAreaCountry(ctx)
-		countryM.Get(func(r db.Result) db.Result {
-			return r.Select(`name`)
-		}, `abbr`, parents[0].CountryAbbr)
-		if len(countryM.Name) > 0 {
-			areaNames = append(areaNames, countryM.Name)
-		} else if parents[0].CountryAbbr == `CN` {
-			areaNames = append(areaNames, `中国`)
-		} else {
-			areaNames = append(areaNames, parents[0].CountryAbbr)
-		}
+		areaNames = append(areaNames, QueryCountryName(ctx, parents[0].CountryAbbr))
 	}
 	for _, parent := range parents {
 		areaNames = append(areaNames, parent.Name)
 	}
 	return
+}
+
+func QueryCountryName(ctx echo.Context, countryAbbr string) string {
+	countryM := dbschema.NewOfficialCommonAreaCountry(ctx)
+	countryM.Get(func(r db.Result) db.Result {
+		return r.Select(`name`)
+	}, `abbr`, countryAbbr)
+	if len(countryM.Name) > 0 {
+		return countryM.Name
+	} else if countryAbbr == `CN` {
+		return `中国`
+	} else {
+		return countryAbbr
+	}
 }
