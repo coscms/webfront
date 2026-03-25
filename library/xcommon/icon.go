@@ -4,11 +4,9 @@ import (
 	"regexp"
 	"slices"
 	"strings"
-
-	"github.com/webx-top/com"
 )
 
-func ParseIconFromCSS(content string, prefixes ...string) []string {
+func ParseIconFromCSS(content string, prefixes ...string) ([]string, error) {
 	if len(prefixes) == 0 {
 		prefixes = append(prefixes, `icon`, `fa`, `glyphicon`)
 	} else {
@@ -17,7 +15,10 @@ func ParseIconFromCSS(content string, prefixes ...string) []string {
 		}
 	}
 
-	r := regexp.MustCompile(`\.((?:` + strings.Join(prefixes, `|`) + `)-(?:[\w-]+))`)
+	r, err := regexp.Compile(`\.((?:` + strings.Join(prefixes, `|`) + `)-(?:[\w-]+))`)
+	if err != nil {
+		return nil, err
+	}
 	matches := r.FindAllStringSubmatch(content, -1)
 	var results []string
 	for _, match := range matches {
@@ -26,6 +27,5 @@ func ParseIconFromCSS(content string, prefixes ...string) []string {
 		}
 		results = append(results, match[1])
 	}
-	com.Dump(matches)
-	return results
+	return results, err
 }
