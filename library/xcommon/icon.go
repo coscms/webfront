@@ -1,0 +1,31 @@
+package xcommon
+
+import (
+	"regexp"
+	"slices"
+	"strings"
+
+	"github.com/webx-top/com"
+)
+
+func ParseIconFromCSS(content string, prefixes ...string) []string {
+	if len(prefixes) == 0 {
+		prefixes = append(prefixes, `icon`, `fa`, `glyphicon`)
+	} else {
+		for i, v := range prefixes {
+			prefixes[i] = regexp.QuoteMeta(v)
+		}
+	}
+
+	r := regexp.MustCompile(`\.((?:` + strings.Join(prefixes, `|`) + `)-(?:[\w-]+))`)
+	matches := r.FindAllStringSubmatch(content, -1)
+	var results []string
+	for _, match := range matches {
+		if slices.Contains(results, match[1]) {
+			continue
+		}
+		results = append(results, match[1])
+	}
+	com.Dump(matches)
+	return results
+}
