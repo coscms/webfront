@@ -65,13 +65,9 @@ func (f *Area) check() error {
 		if f.Pid == f.Id {
 			return f.Context().E(`不能选择当前地区数据作为上级地区`)
 		}
-		positions, err := f.Positions(f.Pid)
+		areas, err := QueryAreaNames(f.Context(), f.Pid, f)
 		if err != nil {
 			return err
-		}
-		areas := make([]string, len(positions))
-		for i, v := range positions {
-			areas[i] = v.Name
 		}
 		areas = append(areas, f.Name)
 		f.Merged = strings.Join(areas, `,`)
