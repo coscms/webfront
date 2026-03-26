@@ -249,17 +249,19 @@ func (f *Article) ListPageSimple(cond *db.Compounds, orderby ...interface{}) ([]
 }
 
 func (f *Article) ListByOffsetSimple(cond *db.Compounds, limit int, offset int, orderby ...interface{}) ([]*ArticleWithOwner, error) {
+	rows := []*ArticleWithOwner{}
+	err := f.ListByOffsetSimpleAs(&rows, cond, limit, offset, orderby...)
+	return rows, err
+}
+
+func (f *Article) ListByOffsetSimpleAs(recv interface{}, cond *db.Compounds, limit int, offset int, orderby ...interface{}) error {
 	if len(orderby) == 0 {
 		orderby = []interface{}{`-id`}
 	}
-	rows := []*ArticleWithOwner{}
-	_, err := f.OfficialCommonArticle.ListByOffset(&rows, func(r db.Result) db.Result {
+	_, err := f.OfficialCommonArticle.ListByOffset(recv, func(r db.Result) db.Result {
 		return r.Select(factory.DBIGet().OmitSelect(f.OfficialCommonArticle, `content`)...).OrderBy(orderby...)
 	}, offset, limit, cond.And())
-	if err != nil {
-		return nil, err
-	}
-	return rows, nil
+	return err
 }
 
 func (f *Article) ListPage(cond *db.Compounds, orderby ...interface{}) ([]*ArticleAndSourceInfo, error) {
@@ -328,6 +330,11 @@ func (f *Article) CommonQueryList(cond *db.Compounds, limit int, offset int, ord
 	cond.Add(db.Cond{`display`: `Y`})
 	rows, _ := f.ListByOffsetSimple(cond, limit, offset, orderby...)
 	return rows
+}
+
+func (f *Article) CommonQueryListAs(recv interface{}, cond *db.Compounds, limit int, offset int, orderby ...interface{}) error {
+	cond.Add(db.Cond{`display`: `Y`})
+	return f.ListByOffsetSimpleAs(recv, cond, limit, offset, orderby...)
 }
 
 func (f *Article) QueryList(query string, limit int, offset int, orderby ...interface{}) []*ArticleWithOwner {
