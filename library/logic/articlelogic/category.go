@@ -71,3 +71,31 @@ func GetSubCategories(c echo.Context, parentId int, limit int, categoryType ...s
 	c.Internal().Set(cacheKey, cates)
 	return cates, nil
 }
+
+func GetAllCategories(c echo.Context, categoryType ...string) ([]*dbschema.OfficialCommonCategory, error) {
+	var ctype string
+	if len(categoryType) > 0 {
+		ctype = categoryType[0]
+	}
+	if len(ctype) == 0 {
+		ctype = modelArticle.GroupName
+	}
+	cacheKey := `article.getAllCategories.` + ctype
+	cates, ok := c.Internal().Get(cacheKey).([]*dbschema.OfficialCommonCategory)
+	if ok {
+		return cates, nil
+	}
+	cond := db.NewCompounds()
+	cond.AddKV(`type`, ctype)
+	cond.AddKV(`disabled`, `N`)
+	cateM := official.NewCategory(c)
+	_, err := cateM.List(nil, func(r db.Result) db.Result {
+		return r.OrderBy(`sort`, `id`)
+	}, 0, -1, cond.And())
+	if err != nil {
+		return nil, err
+	}
+	cates = cateM.Objects()
+	c.Internal().Set(cacheKey, cates)
+	return cates, nil
+}
