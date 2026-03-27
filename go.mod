@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260323121148-fb55531ec463
+require github.com/coscms/webcore v0.13.3-0.20260327053059-2a8f8be4e416
 
 require (
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
@@ -43,9 +43,9 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.7
-	github.com/webx-top/com v1.4.1
+	github.com/webx-top/com v1.4.2
 	github.com/webx-top/db v1.30.8
-	github.com/webx-top/echo v1.23.5
+	github.com/webx-top/echo v1.23.6
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -122,7 +122,7 @@ require (
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.5.3 // indirect
+	github.com/admpub/i18n v0.5.5 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/ini v1.38.2 // indirect
@@ -218,7 +218,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
-	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
+	github.com/lufia/plan9stats v0.0.0-20260324052639-156f7da3f749 // indirect
 	github.com/markbates/going v1.0.3 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -291,7 +291,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
 	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
-	golang.org/x/image v0.37.0 // indirect
+	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
