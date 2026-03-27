@@ -69,6 +69,7 @@ require (
 	github.com/admpub/translate v0.0.0-20251210091442-a87b3fc63eda
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
+	github.com/coscms/tree v0.1.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20260217112301-37c66b85d6ab
 	github.com/martinlindhe/base36 v1.1.1
