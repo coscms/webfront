@@ -523,7 +523,7 @@ DROP TABLE IF EXISTS `official_common_navigate`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_common_navigate` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `type` enum('default','userCenter','backend','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'default' COMMENT '导航类型(default-前后默认;userCenter-用户中心;backend-后台)',
+  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'default' COMMENT '导航类型(default-前台默认菜单;userCenter-用户中心)',
   `link_type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'custom' COMMENT '菜单类型(category-分类;custom-自定义链接)',
   `parent_id` int unsigned NOT NULL DEFAULT '0' COMMENT '上级ID',
   `has_child` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否有子菜单',
@@ -541,7 +541,7 @@ CREATE TABLE `official_common_navigate` (
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='导航连接';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='前台导航连接';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1285,4 +1285,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-25  5:16:50
+-- Dump completed on 2026-03-28  5:01:09

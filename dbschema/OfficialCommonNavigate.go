@@ -23,13 +23,13 @@ func NewOfficialCommonNavigate(ctx echo.Context) *OfficialCommonNavigate {
 	return m
 }
 
-// OfficialCommonNavigate 导航连接
+// OfficialCommonNavigate 前台导航连接
 type OfficialCommonNavigate struct {
 	base    factory.Base
 	objects []*OfficialCommonNavigate
 
 	Id        uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Type      string `db:"type" bson:"type" comment:"导航类型(default-前后默认;userCenter-用户中心;backend-后台)" json:"type" xml:"type"`
+	Type      string `db:"type" bson:"type" comment:"导航类型(default-前台默认菜单;userCenter-用户中心)" json:"type" xml:"type"`
 	LinkType  string `db:"link_type" bson:"link_type" comment:"菜单类型(category-分类;custom-自定义链接)" json:"link_type" xml:"link_type"`
 	ParentId  uint   `db:"parent_id" bson:"parent_id" comment:"上级ID" json:"parent_id" xml:"parent_id"`
 	HasChild  string `db:"has_child" bson:"has_child" comment:"是否有子菜单" json:"has_child" xml:"has_child"`
