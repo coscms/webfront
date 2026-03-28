@@ -562,7 +562,9 @@ CREATE TABLE `official_common_remark` (
   `source_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '来源ID',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '简短描述',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `common_remark_source` (`source_type`,`source_id`),
+  KEY `common_remark_owner` (`owner_type`,`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='备注';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1287,4 +1289,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-28  5:07:19
+-- Dump completed on 2026-03-28  5:08:55
