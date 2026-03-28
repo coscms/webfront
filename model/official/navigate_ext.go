@@ -179,9 +179,8 @@ func (f *NavigateExt) checkActive() bool {
 }
 
 func (f *NavigateExt) checkInsidePath() bool {
-	navURL := f.Url
-	return navURL == f.Context().Request().URL().Path() ||
-		navURL == f.Context().DispatchPath()
+	return f.Url == f.Context().Request().URL().Path() ||
+		f.Url == f.Context().DispatchPath()
 }
 
 func (f *NavigateExt) checkIdent() bool {
