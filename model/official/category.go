@@ -21,8 +21,8 @@ var (
 )
 
 func init() {
-	CategoryTypes.AddItem(&echo.KV{K: `article`, V: `文章`})
-	CategoryTypes.AddItem(&echo.KV{K: `friendlink`, V: `友情链接`})
+	CategoryTypes.AddItem(&echo.KV{K: `article`, V: echo.T(`文章`)})
+	CategoryTypes.AddItem(&echo.KV{K: `friendlink`, V: echo.T(`友情链接`)})
 }
 
 // AddCategoryType 登记新的类别

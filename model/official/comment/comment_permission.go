@@ -4,6 +4,7 @@ import (
 	"github.com/coscms/webcore/library/perm"
 	"github.com/coscms/webfront/library/xcommon"
 	"github.com/coscms/webfront/library/xrole"
+	"github.com/webx-top/echo"
 )
 
 const (
@@ -11,8 +12,8 @@ const (
 )
 
 func init() {
-	xrole.Behaviors.Register(BehaviorName, `评论设置`,
-		perm.BehaviorOptFormHelpBlock(`配置评论发布频率。maxPerDay - 表示每天的最大发布数量(<=0代表禁止发布); maxPending - 表示待审核评论上限(<=0代表不限)`),
+	xrole.Behaviors.Register(BehaviorName, echo.T(`评论设置`),
+		perm.BehaviorOptFormHelpBlock(echo.T(`配置评论发布频率。maxPerDay - 表示每天的最大发布数量(<=0代表禁止发布); maxPending - 表示待审核评论上限(<=0代表不限)`)),
 		perm.BehaviorOptValue(&xcommon.ConfigCustomerAdd{}),
 		perm.BehaviorOptValueInitor(func() interface{} {
 			return &xcommon.ConfigCustomerAdd{}

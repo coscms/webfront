@@ -23,7 +23,7 @@ func init() {
 			return m.UpdateField(nil, field, db.Raw(field+official.MakeOperator(isCancel...)+`1`), db.Cond{`id`: id})
 		}, nil, nil
 	}))
-	modelArticle.ContentHideDetectorRegister(`comment`, `评论后才能查看`, func(params *modelArticle.ContentHideParams) bool {
+	modelArticle.ContentHideDetectorRegister(`comment`, echo.T(`评论后才能查看`), func(params *modelArticle.ContentHideParams) bool {
 		if params.Customer == nil {
 			return true
 		}
@@ -38,5 +38,5 @@ func init() {
 			db.Cond{`owner_id`: params.Customer.Id},
 		))
 		return !exists
-	}, `此处内容需要评论后方可阅读`)
+	}, echo.T(`此处内容需要评论后方可阅读`))
 }
