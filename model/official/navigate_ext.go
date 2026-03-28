@@ -8,8 +8,10 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/null"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/xkv"
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/coscms/webfront/model/i18nm"
+	"github.com/coscms/webfront/model/official"
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -26,42 +28,45 @@ func init() {
 
 func queryArticleCategory(c context.Context) interface{} {
 	ctx := c.(echo.Context)
-	m := NewCategory(ctx)
-	categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.And(
-		db.Cond{`show_on_menu`: `Y`},
-		db.Cond{`disabled`: `N`},
-	))
-	var (
-		list     []*NavigateExt
-		children = map[uint][]*NavigateExt{}
-		ext      = ctx.DefaultExtension()
-	)
-	i18nm.GetModelsTranslations(ctx, categories)
-	for _, category := range categories {
-		navExt := &NavigateExt{
-			OfficialCommonNavigate: &dbschema.OfficialCommonNavigate{
-				Id:       category.Id,
-				ParentId: category.ParentId,
-				Title:    category.Name,
-				Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + param.AsString(category.Id)),
-			},
-			Extra: echo.H{
-				`object`: category,
-			},
-			isActive: GenActiveDetector(`categoryId`, category.Id),
+	list, _ := xkv.GetOnce(ctx, `navigate.article-category`, func() ([]*official.NavigateExt, error) {
+		m := NewCategory(ctx)
+		categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.And(
+			db.Cond{`show_on_menu`: `Y`},
+			db.Cond{`disabled`: `N`},
+		))
+		var (
+			list     []*NavigateExt
+			children = map[uint][]*NavigateExt{}
+			ext      = ctx.DefaultExtension()
+		)
+		i18nm.GetModelsTranslations(ctx, categories)
+		for _, category := range categories {
+			navExt := &NavigateExt{
+				OfficialCommonNavigate: &dbschema.OfficialCommonNavigate{
+					Id:       category.Id,
+					ParentId: category.ParentId,
+					Title:    category.Name,
+					Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + param.AsString(category.Id)),
+				},
+				Extra: echo.H{
+					`object`: category,
+				},
+				isActive: GenActiveDetector(`categoryId`, category.Id),
+			}
+			navExt.SetInsideURL(navExt.Url)
+			navExt.Init().SetContext(ctx)
+			if category.ParentId < 1 {
+				list = append(list, navExt)
+				continue
+			}
+			if _, ok := children[category.ParentId]; !ok {
+				children[category.ParentId] = []*NavigateExt{}
+			}
+			children[category.ParentId] = append(children[category.ParentId], navExt)
 		}
-		navExt.SetInsideURL(navExt.Url)
-		navExt.Init().SetContext(ctx)
-		if category.ParentId < 1 {
-			list = append(list, navExt)
-			continue
-		}
-		if _, ok := children[category.ParentId]; !ok {
-			children[category.ParentId] = []*NavigateExt{}
-		}
-		children[category.ParentId] = append(children[category.ParentId], navExt)
-	}
-	FillChildrenNavigate(&list, children)
+		FillChildrenNavigate(&list, children)
+		return list, nil
+	})
 	return list
 }
 
