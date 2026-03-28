@@ -1,3 +1,5 @@
+//go:build cgo
+
 /*
 
    Copyright 2016 Wenhui Shen <www.webx.top>
