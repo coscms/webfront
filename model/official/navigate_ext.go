@@ -161,29 +161,29 @@ func (f *NavigateExt) IsActive() bool {
 		return f.checkActive()
 	}
 	if len(f.Ident) > 0 {
-		return f.checkIdent() && f.isActive(f.Context())
+		return f._checkIdent() && f.isActive(f.Context())
 	}
 	return f.isActive(f.Context())
 }
 
 func (f *NavigateExt) checkActive() bool {
 	if f.IsInside() {
-		if f.checkInsidePath() {
+		if f._checkInsidePath() {
 			return true
 		}
 	}
 	if len(f.Ident) > 0 {
-		return f.checkIdent()
+		return f._checkIdent()
 	}
 	return false
 }
 
-func (f *NavigateExt) checkInsidePath() bool {
+func (f *NavigateExt) _checkInsidePath() bool {
 	return f.Url == f.Context().Request().URL().Path() ||
 		f.Url == f.Context().DispatchPath()
 }
 
-func (f *NavigateExt) checkIdent() bool {
+func (f *NavigateExt) _checkIdent() bool {
 	err := f.initIdentRegexp()
 	if err != nil {
 		return false
