@@ -30,6 +30,8 @@ type OfficialPageBlock struct {
 
 	Id          uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	Name        string `db:"name" bson:"name" comment:"区块名称" json:"name" xml:"name"`
+	Ident       string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
+	Type        string `db:"type" bson:"type" comment:"区块类型(config-配置;html-自定义HTML)" json:"type" xml:"type"`
 	Style       string `db:"style" bson:"style" comment:"区块自定义样式" json:"style" xml:"style"`
 	WithItems   string `db:"with_items" bson:"with_items" comment:"包含项目" json:"with_items" xml:"with_items"`
 	ItemConfigs string `db:"item_configs" bson:"item_configs" comment:"项目配置" json:"item_configs" xml:"item_configs"`
@@ -264,6 +266,9 @@ func (a *OfficialPageBlock) ListByOffset(recv interface{}, mw func(db.Result) db
 func (a *OfficialPageBlock) Insert() (pk interface{}, err error) {
 	a.Created = uint(time.Now().Unix())
 	a.Id = 0
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -289,6 +294,9 @@ func (a *OfficialPageBlock) Insert() (pk interface{}, err error) {
 
 func (a *OfficialPageBlock) Update(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -312,6 +320,14 @@ func (a *OfficialPageBlock) GetDiffColumns(old *OfficialPageBlock) (changedCols 
 
 	if old.Name != a.Name {
 		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Ident != a.Ident {
+		changedCols = append(changedCols, `ident`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
 	}
 
 	if old.Style != a.Style {
@@ -347,6 +363,9 @@ func (a *OfficialPageBlock) GetDiffColumns(old *OfficialPageBlock) (changedCols 
 
 func (a *OfficialPageBlock) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -365,6 +384,9 @@ func (a *OfficialPageBlock) Updatex(mw func(db.Result) db.Result, args ...interf
 
 func (a *OfficialPageBlock) Save(old *OfficialPageBlock, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -387,6 +409,9 @@ func (a *OfficialPageBlock) Save(old *OfficialPageBlock, args ...interface{}) (a
 
 func (a *OfficialPageBlock) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -409,6 +434,9 @@ func (a *OfficialPageBlock) UpdateByFields(mw func(db.Result) db.Result, fields 
 
 func (a *OfficialPageBlock) UpdatexByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "config"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -443,6 +471,11 @@ func (a *OfficialPageBlock) UpdatexField(mw func(db.Result) db.Result, field str
 
 func (a *OfficialPageBlock) UpdateFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (err error) {
 
+	if val, ok := kvset["type"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["type"] = "config"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -468,6 +501,11 @@ func (a *OfficialPageBlock) UpdateFields(mw func(db.Result) db.Result, kvset map
 
 func (a *OfficialPageBlock) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
 
+	if val, ok := kvset["type"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["type"] = "config"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -510,6 +548,9 @@ func (a *OfficialPageBlock) UpdateValues(mw func(db.Result) db.Result, keysValue
 func (a *OfficialPageBlock) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
 	pk, err = a.Param(mw, args...).SetSend(a).Upsert(func() error {
 		a.Updated = uint(time.Now().Unix())
+		if len(a.Type) == 0 {
+			a.Type = "config"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -520,6 +561,9 @@ func (a *OfficialPageBlock) Upsert(mw func(db.Result) db.Result, args ...interfa
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
+		if len(a.Type) == 0 {
+			a.Type = "config"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -585,6 +629,8 @@ func (a *OfficialPageBlock) Exists(mw func(db.Result) db.Result, args ...interfa
 func (a *OfficialPageBlock) Reset() *OfficialPageBlock {
 	a.Id = 0
 	a.Name = ``
+	a.Ident = ``
+	a.Type = ``
 	a.Style = ``
 	a.WithItems = ``
 	a.ItemConfigs = ``
@@ -600,6 +646,8 @@ func (a *OfficialPageBlock) AsMap(onlyFields ...string) param.Store {
 	if len(onlyFields) == 0 {
 		r["Id"] = a.Id
 		r["Name"] = a.Name
+		r["Ident"] = a.Ident
+		r["Type"] = a.Type
 		r["Style"] = a.Style
 		r["WithItems"] = a.WithItems
 		r["ItemConfigs"] = a.ItemConfigs
@@ -615,6 +663,10 @@ func (a *OfficialPageBlock) AsMap(onlyFields ...string) param.Store {
 			r["Id"] = a.Id
 		case "Name":
 			r["Name"] = a.Name
+		case "Ident":
+			r["Ident"] = a.Ident
+		case "Type":
+			r["Type"] = a.Type
 		case "Style":
 			r["Style"] = a.Style
 		case "WithItems":
@@ -635,7 +687,7 @@ func (a *OfficialPageBlock) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialPageBlock) Clone() *OfficialPageBlock {
-	cloned := OfficialPageBlock{Id: a.Id, Name: a.Name, Style: a.Style, WithItems: a.WithItems, ItemConfigs: a.ItemConfigs, Template: a.Template, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
+	cloned := OfficialPageBlock{Id: a.Id, Name: a.Name, Ident: a.Ident, Type: a.Type, Style: a.Style, WithItems: a.WithItems, ItemConfigs: a.ItemConfigs, Template: a.Template, Disabled: a.Disabled, Created: a.Created, Updated: a.Updated}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -650,6 +702,10 @@ func (a *OfficialPageBlock) FromRow(row map[string]interface{}) {
 			a.Id = param.AsUint(value)
 		case "name":
 			a.Name = param.AsString(value)
+		case "ident":
+			a.Ident = param.AsString(value)
+		case "type":
+			a.Type = param.AsString(value)
 		case "style":
 			a.Style = param.AsString(value)
 		case "with_items":
@@ -674,6 +730,10 @@ func (a *OfficialPageBlock) GetField(field string) interface{} {
 		return a.Id
 	case "Name":
 		return a.Name
+	case "Ident":
+		return a.Ident
+	case "Type":
+		return a.Type
 	case "Style":
 		return a.Style
 	case "WithItems":
@@ -697,6 +757,8 @@ func (a *OfficialPageBlock) GetAllFieldNames() []string {
 	return []string{
 		"Id",
 		"Name",
+		"Ident",
+		"Type",
 		"Style",
 		"WithItems",
 		"ItemConfigs",
@@ -712,6 +774,10 @@ func (a *OfficialPageBlock) HasField(field string) bool {
 	case "Id":
 		return true
 	case "Name":
+		return true
+	case "Ident":
+		return true
+	case "Type":
 		return true
 	case "Style":
 		return true
@@ -756,6 +822,10 @@ func (a *OfficialPageBlock) Set(key interface{}, value ...interface{}) {
 			a.Id = param.AsUint(vv)
 		case "Name":
 			a.Name = param.AsString(vv)
+		case "Ident":
+			a.Ident = param.AsString(vv)
+		case "Type":
+			a.Type = param.AsString(vv)
 		case "Style":
 			a.Style = param.AsString(vv)
 		case "WithItems":
@@ -779,6 +849,8 @@ func (a *OfficialPageBlock) AsRow(onlyFields ...string) param.Store {
 	if len(onlyFields) == 0 {
 		r["id"] = a.Id
 		r["name"] = a.Name
+		r["ident"] = a.Ident
+		r["type"] = a.Type
 		r["style"] = a.Style
 		r["with_items"] = a.WithItems
 		r["item_configs"] = a.ItemConfigs
@@ -794,6 +866,10 @@ func (a *OfficialPageBlock) AsRow(onlyFields ...string) param.Store {
 			r["id"] = a.Id
 		case "name":
 			r["name"] = a.Name
+		case "ident":
+			r["ident"] = a.Ident
+		case "type":
+			r["type"] = a.Type
 		case "style":
 			r["style"] = a.Style
 		case "with_items":

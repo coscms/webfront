@@ -1158,7 +1158,9 @@ DROP TABLE IF EXISTS `official_page_block`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `official_page_block` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '区块名称',
+  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '区块名称',
+  `ident` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '唯一标识',
+  `type` enum('config','html') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'config' COMMENT '区块类型(config-配置;html-自定义HTML)',
   `style` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '区块自定义样式',
   `with_items` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '包含项目',
   `item_configs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '项目配置',
@@ -1167,7 +1169,9 @@ CREATE TABLE `official_page_block` (
   `created` int unsigned NOT NULL COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   PRIMARY KEY (`id`),
-  KEY `page_block_disabled` (`disabled`)
+  KEY `page_block_disabled` (`disabled`),
+  KEY `page_block_ident` (`ident`),
+  KEY `page_block_type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='页面区块';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1289,4 +1293,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-28  5:08:55
+-- Dump completed on 2026-03-28  9:22:12
