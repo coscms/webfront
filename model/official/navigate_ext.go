@@ -27,7 +27,10 @@ func init() {
 func queryArticleCategory(c context.Context) interface{} {
 	ctx := c.(echo.Context)
 	m := NewCategory(ctx)
-	categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.Cond{`show_on_menu`: `Y`})
+	categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.And(
+		db.Cond{`show_on_menu`: `Y`},
+		db.Cond{`disabled`: `N`},
+	))
 	var (
 		list     []*NavigateExt
 		children = map[uint][]*NavigateExt{}
