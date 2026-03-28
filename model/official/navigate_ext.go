@@ -2,7 +2,6 @@ package official
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 )
 
 var NavigateLinkType = echo.NewKVData()
@@ -27,7 +27,7 @@ func init() {
 func queryArticleCategory(c context.Context) interface{} {
 	ctx := c.(echo.Context)
 	m := NewCategory(ctx)
-	categories := m.ListAllParentByType(`article`, 0, 2, db.Cond{`show_on_menu`: `Y`})
+	categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.Cond{`show_on_menu`: `Y`})
 	var (
 		list     []*NavigateExt
 		children = map[uint][]*NavigateExt{}
@@ -40,7 +40,7 @@ func queryArticleCategory(c context.Context) interface{} {
 				Id:       category.Id,
 				ParentId: category.ParentId,
 				Title:    category.Name,
-				Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + fmt.Sprint(category.Id)),
+				Url:      sessdata.URLFor(`/articles` + ext + `?categoryId=` + param.AsString(category.Id)),
 			},
 			Extra: echo.H{
 				`object`: category,
@@ -58,11 +58,11 @@ func queryArticleCategory(c context.Context) interface{} {
 		}
 		children[category.ParentId] = append(children[category.ParentId], navExt)
 	}
-	fillArticleChildrenCategory(&list, children)
+	FillChildrenNavigate(&list, children)
 	return list
 }
 
-func fillArticleChildrenCategory(list *[]*NavigateExt, children map[uint][]*NavigateExt) {
+func FillChildrenNavigate(list *[]*NavigateExt, children map[uint][]*NavigateExt) {
 	if len(children) == 0 {
 		return
 	}
@@ -73,7 +73,7 @@ func fillArticleChildrenCategory(list *[]*NavigateExt, children map[uint][]*Navi
 		}
 		item.Children = &subItems
 		delete(children, item.Id)
-		fillArticleChildrenCategory(item.Children, children)
+		FillChildrenNavigate(item.Children, children)
 	}
 }
 

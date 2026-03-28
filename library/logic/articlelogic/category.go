@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/model/i18nm"
 	"github.com/coscms/webfront/model/official"
 	modelArticle "github.com/coscms/webfront/model/official/article"
 	"github.com/webx-top/db"
@@ -29,7 +30,9 @@ func GetCategoriesWithLevel(c echo.Context, level int, limit int, categoryType .
 	}
 	cond := db.NewCompounds()
 	cond.AddKV(`type`, ctype)
-	cond.AddKV(`level`, level)
+	if level >= 0 {
+		cond.AddKV(`level`, level)
+	}
 	cond.AddKV(`disabled`, `N`)
 	cateM := official.NewCategory(c)
 	_, err := cateM.List(nil, func(r db.Result) db.Result {
@@ -39,6 +42,7 @@ func GetCategoriesWithLevel(c echo.Context, level int, limit int, categoryType .
 		return nil, err
 	}
 	cates = cateM.Objects()
+	i18nm.GetModelsTranslations(c, cates)
 	c.Internal().Set(cacheKey, cates)
 	return cates, nil
 }
@@ -68,6 +72,7 @@ func GetSubCategories(c echo.Context, parentId int, limit int, categoryType ...s
 		return nil, err
 	}
 	cates = cateM.Objects()
+	i18nm.GetModelsTranslations(c, cates)
 	c.Internal().Set(cacheKey, cates)
 	return cates, nil
 }
@@ -96,6 +101,7 @@ func GetAllCategories(c echo.Context, categoryType ...string) ([]*dbschema.Offic
 		return nil, err
 	}
 	cates = cateM.Objects()
+	i18nm.GetModelsTranslations(c, cates)
 	c.Internal().Set(cacheKey, cates)
 	return cates, nil
 }
