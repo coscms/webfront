@@ -157,27 +157,42 @@ func (f *NavigateExt) IsValidURL() bool {
 }
 
 func (f *NavigateExt) IsActive() bool {
-	if f.isActive != nil {
-		return f.isActive(f.Context())
+	if f.isActive == nil {
+		return f.checkActive()
 	}
+	if len(f.Ident) > 0 {
+		return f.checkIdent() && f.isActive(f.Context())
+	}
+	return f.isActive(f.Context())
+}
+
+func (f *NavigateExt) checkActive() bool {
 	if f.IsInside() {
-		navURL := f.Url
-		if navURL == f.Context().Request().URL().Path() ||
-			navURL == f.Context().DispatchPath() {
+		if f.checkInsidePath() {
 			return true
 		}
 	}
 	if len(f.Ident) > 0 {
-		err := f.initIdentRegexp()
-		if err != nil {
-			return false
-		}
-		if f.identRegexp != nil {
-			return f.identRegexp.MatchString(f.Context().DispatchPath())
-		}
-		return strings.HasSuffix(f.Context().DispatchPath(), f.Ident)
+		return f.checkIdent()
 	}
 	return false
+}
+
+func (f *NavigateExt) checkInsidePath() bool {
+	navURL := f.Url
+	return navURL == f.Context().Request().URL().Path() ||
+		navURL == f.Context().DispatchPath()
+}
+
+func (f *NavigateExt) checkIdent() bool {
+	err := f.initIdentRegexp()
+	if err != nil {
+		return false
+	}
+	if f.identRegexp != nil {
+		return f.identRegexp.MatchString(f.Context().DispatchPath())
+	}
+	return strings.HasSuffix(f.Context().DispatchPath(), f.Ident)
 }
 
 func (f *NavigateExt) SetActiveDetector(fn func(echo.Context) bool) *NavigateExt {
