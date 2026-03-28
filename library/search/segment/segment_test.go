@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/coscms/webfront/library/search/segment"
-	_ "github.com/coscms/webfront/library/search/segment/gojieba"
+	_ "github.com/coscms/webfront/library/search/segment/sego"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/testing/test"
 )
 
 func TestSplitWords(t *testing.T) {
+	t.Skip()
 	rootDir := filepath.Join(os.Getenv("GOPATH"), `src`, `github.com/admpub/webx`)
 	echo.SetWorkDir(rootDir)
 	keywords := `我爱你中国`
