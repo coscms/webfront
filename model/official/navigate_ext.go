@@ -11,7 +11,6 @@ import (
 	"github.com/coscms/webfront/library/xkv"
 	"github.com/coscms/webfront/middleware/sessdata"
 	"github.com/coscms/webfront/model/i18nm"
-	"github.com/coscms/webfront/model/official"
 	"github.com/phuslu/lru"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -28,7 +27,7 @@ func init() {
 
 func queryArticleCategory(c context.Context) interface{} {
 	ctx := c.(echo.Context)
-	list, _ := xkv.GetOnce(ctx, `navigate.article-category`, func() ([]*official.NavigateExt, error) {
+	list, _ := xkv.GetOnce(ctx, `navigate.article-category`, func() ([]*NavigateExt, error) {
 		m := NewCategory(ctx)
 		categories := m.ListAllParentByType(`article`, 0, m.maxLevel, db.And(
 			db.Cond{`show_on_menu`: `Y`},
