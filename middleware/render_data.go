@@ -63,11 +63,15 @@ func (r *RenderData) Friendlink(limit int, categoryIds ...uint) []*dbschema.Offi
 }
 
 func (r *RenderData) FrontendNav(parentIDs ...uint) []*official.NavigateExt {
-	return NavigateList(r.ctx, dbschema.NewOfficialCommonNavigate(r.ctx), `default`, parentIDs...)
+	return r.FrontendNavByType(`default`, parentIDs...)
+}
+
+func (r *RenderData) FrontendNavByType(navType string, parentIDs ...uint) []*official.NavigateExt {
+	return NavigateList(r.ctx, dbschema.NewOfficialCommonNavigate(r.ctx), navType, parentIDs...)
 }
 
 func (r *RenderData) CustomerNav(parentIDs ...uint) []*official.NavigateExt {
-	return NavigateList(r.ctx, dbschema.NewOfficialCommonNavigate(r.ctx), `userCenter`, parentIDs...)
+	return r.FrontendNavByType(`userCenter`, parentIDs...)
 }
 
 func (r *RenderData) SQLQuery() *nsql.SQLQuery {
