@@ -540,7 +540,9 @@ CREATE TABLE `official_common_navigate` (
   `badge` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '`i18n`徽标文本',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `common_navigate_filter` (`disabled`,`type`),
+  KEY `common_navigate_sort` (`level`,`sort`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='前台导航连接';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1285,4 +1287,4 @@ CREATE TABLE `official_short_url_visit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-28  5:01:09
+-- Dump completed on 2026-03-28  5:07:19
