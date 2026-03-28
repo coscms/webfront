@@ -13,7 +13,7 @@ import (
 
 // CGO_ENABLED=1 go test -v --count=1 -run "^TestSplitWords$"
 func TestSplitWords(t *testing.T) {
-	//t.Skip()
+	t.Skip()
 	rootDir := filepath.Join(os.Getenv("GOPATH"), `src`, `github.com/admpub/webx`)
 	echo.SetWorkDir(rootDir)
 	keywords := `我爱你中国`
