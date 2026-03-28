@@ -37,7 +37,7 @@ func Render(v Adverter) string {
 	return ``
 }
 
-func genStyle(p Adverter) string {
+func GenStyle(p Adverter) string {
 	if p == nil {
 		return ``
 	}
@@ -58,25 +58,33 @@ func genStyle(p Adverter) string {
 	return style
 }
 
+func GenLink(v Adverter, content string) string {
+	url := v.GetURL()
+	if len(url) == 0 {
+		return content
+	}
+	return `<a href="` + url + `" target="_blank" title="` + v.GetTitle() + `">` + content + `</a>`
+}
+
 func init() {
-	Contype.AddItem(echo.NewKV(`text`, `文字广告`).SetHKV(`description`, `输入广告文字`).SetFn(func(c context.Context) interface{} {
+	Contype.AddItem(echo.NewKV(`text`, echo.T(`文字广告`)).SetHKV(`description`, echo.T(`输入广告文字`)).SetFn(func(c context.Context) interface{} {
 		return ContentRenderer(func(v Adverter) string {
-			return `<a href="` + v.GetURL() + `" target="_blank">` + v.GetContent() + `</a>`
+			return GenLink(v, v.GetContent())
 		})
 	}))
-	Contype.AddItem(echo.NewKV(`image`, `图片广告`).SetHKV(`description`, `输入图片文件网址`).SetFn(func(c context.Context) interface{} {
+	Contype.AddItem(echo.NewKV(`image`, echo.T(`图片广告`)).SetHKV(`description`, echo.T(`输入图片文件网址`)).SetFn(func(c context.Context) interface{} {
 		return ContentRenderer(func(v Adverter) string {
-			return `<a href="` + v.GetURL() + `" target="_blank" title="` + v.GetTitle() + `"><img rel="` + v.GetContent() + `" class="previewable" src="` + v.GetContent() + `"` + genStyle(v) + ` /></a>`
+			return GenLink(v, `<img rel="`+v.GetContent()+`" class="previewable" src="`+v.GetContent()+`"`+GenStyle(v)+` />`)
 		})
 	}))
-	Contype.AddItem(echo.NewKV(`video`, `视频广告`).SetHKV(`description`, `输入视频文件网址`).SetFn(func(c context.Context) interface{} {
+	Contype.AddItem(echo.NewKV(`video`, echo.T(`视频广告`)).SetHKV(`description`, echo.T(`输入视频文件网址`)).SetFn(func(c context.Context) interface{} {
 		return ContentRenderer(func(v Adverter) string {
-			return `<a href="` + v.GetURL() + `" target="_blank" title="` + v.GetTitle() + `"><video src="` + v.GetContent() + `" controls="controls"` + genStyle(v) + `></video></a>`
+			return GenLink(v, `<video src="`+v.GetContent()+`" controls="controls"`+GenStyle(v)+`></video>`)
 		})
 	}))
-	Contype.AddItem(echo.NewKV(`audio`, `音频广告`).SetHKV(`description`, `输入音频文件网址`).SetFn(func(c context.Context) interface{} {
+	Contype.AddItem(echo.NewKV(`audio`, echo.T(`音频广告`)).SetHKV(`description`, echo.T(`输入音频文件网址`)).SetFn(func(c context.Context) interface{} {
 		return ContentRenderer(func(v Adverter) string {
-			return `<a href="` + v.GetURL() + `" target="_blank" title="` + v.GetTitle() + `"><audio src="` + v.GetContent() + `" controls="controls"` + genStyle(v) + `></audio></a>`
+			return GenLink(v, `<audio src="`+v.GetContent()+`" controls="controls"`+GenStyle(v)+`></audio>`)
 		})
 	}))
 
