@@ -4,7 +4,7 @@ go 1.25.3
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260327053059-2a8f8be4e416
+require github.com/coscms/webcore v0.13.3-0.20260329073539-bc0e71ce2de7
 
 require (
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
@@ -43,9 +43,9 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/wangbin/jiebago v0.3.2
 	github.com/webx-top/client v0.9.7
-	github.com/webx-top/com v1.4.2
+	github.com/webx-top/com v1.5.0
 	github.com/webx-top/db v1.30.8
-	github.com/webx-top/echo v1.23.6
+	github.com/webx-top/echo v1.23.7
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
