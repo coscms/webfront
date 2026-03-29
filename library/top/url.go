@@ -24,6 +24,13 @@ func RelativeURLByName(name string, params ...interface{}) string {
 	return subdomains.Default.RelativeURLByName(name, params...)
 }
 
+func AbsoluteURL(purl string) string {
+	if !com.IsFullURL(purl) {
+		return URLFor(purl)
+	}
+	return purl
+}
+
 // - Specific -
 
 func BackendURLFor(purl string) string {
@@ -48,11 +55,4 @@ func BackendURLByName(name string, params ...interface{}) string {
 
 func BackendRelativeURLByName(name string, params ...interface{}) string {
 	return subdomains.Default.RelativeURLByNamex(httpserver.KindBackend, name, params...)
-}
-
-func AbsoluteURL(purl string) string {
-	if !com.IsFullURL(purl) {
-		return URLFor(purl)
-	}
-	return purl
 }
