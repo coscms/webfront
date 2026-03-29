@@ -6,6 +6,8 @@ import (
 	"github.com/webx-top/echo/subdomains"
 )
 
+// - Default -
+
 func URLFor(purl string) string {
 	return subdomains.Default.URL(purl, httpserver.KindFrontend)
 }
@@ -21,6 +23,8 @@ func URLByName(name string, params ...interface{}) string {
 func RelativeURLByName(name string, params ...interface{}) string {
 	return subdomains.Default.RelativeURLByName(name, params...)
 }
+
+// - Specific -
 
 func BackendURLFor(purl string) string {
 	return subdomains.Default.URL(purl, httpserver.KindBackend)
