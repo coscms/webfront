@@ -39,9 +39,6 @@ func (f *AreaCountry) check() error {
 		return f.Context().NewError(code.InvalidParameter, `请输入国家名称`).SetZone(`name`)
 	}
 	f.Short = strings.TrimSpace(f.Short)
-	if len(f.Short) == 0 {
-		return f.Context().NewError(code.InvalidParameter, `请输入国家简称`).SetZone(`short`)
-	}
 	f.Abbr = strings.TrimSpace(f.Abbr)
 	if len(f.Abbr) == 0 {
 		return f.Context().NewError(code.InvalidParameter, `请输入国家缩写`).SetZone(`abbr`)

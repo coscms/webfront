@@ -37,9 +37,6 @@ func (f *Area) check() error {
 		return ctx.NewError(code.InvalidParameter, `请输入地区名称`).SetZone(`name`)
 	}
 	f.Short = strings.TrimSpace(f.Short)
-	if len(f.Short) == 0 {
-		return ctx.NewError(code.InvalidParameter, `请输入地区简称`).SetZone(`short`)
-	}
 	if len(f.CountryAbbr) != 2 || !com.StrIsAlpha(f.CountryAbbr) {
 		return ctx.NewError(code.InvalidParameter, `请输入两个字母的国家码`).SetZone(`countryAbbr`)
 	}
