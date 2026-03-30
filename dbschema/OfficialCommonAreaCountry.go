@@ -26,15 +26,18 @@ type OfficialCommonAreaCountry struct {
 	base    factory.Base
 	objects []*OfficialCommonAreaCountry
 
-	Id       uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Abbr     string `db:"abbr" bson:"abbr" comment:"国家缩写" json:"abbr" xml:"abbr"`
-	Name     string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
-	Short    string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
-	Code     string `db:"code" bson:"code" comment:"国家码" json:"code" xml:"code"`
-	Lng      string `db:"lng" bson:"lng" comment:"经度" json:"lng" xml:"lng"`
-	Lat      string `db:"lat" bson:"lat" comment:"纬度" json:"lat" xml:"lat"`
-	Sort     int    `db:"sort" bson:"sort" comment:"序号" json:"sort" xml:"sort"`
-	Disabled string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
+	Id             uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Abbr           string `db:"abbr" bson:"abbr" comment:"国家缩写" json:"abbr" xml:"abbr"`
+	Name           string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
+	Short          string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
+	Code           string `db:"code" bson:"code" comment:"国家码" json:"code" xml:"code"`
+	Currency       string `db:"currency" bson:"currency" comment:"币种" json:"currency" xml:"currency"`
+	CurrencySymbol string `db:"currency_symbol" bson:"currency_symbol" comment:"货币符号" json:"currency_symbol" xml:"currency_symbol"`
+	Emoji          string `db:"emoji" bson:"emoji" comment:"EMOJI" json:"emoji" xml:"emoji"`
+	Lng            string `db:"lng" bson:"lng" comment:"经度" json:"lng" xml:"lng"`
+	Lat            string `db:"lat" bson:"lat" comment:"纬度" json:"lat" xml:"lat"`
+	Sort           int    `db:"sort" bson:"sort" comment:"序号" json:"sort" xml:"sort"`
+	Disabled       string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
 }
 
 // - base function
@@ -333,6 +336,18 @@ func (a *OfficialCommonAreaCountry) GetDiffColumns(old *OfficialCommonAreaCountr
 
 	if old.Code != a.Code {
 		changedCols = append(changedCols, `code`)
+	}
+
+	if old.Currency != a.Currency {
+		changedCols = append(changedCols, `currency`)
+	}
+
+	if old.CurrencySymbol != a.CurrencySymbol {
+		changedCols = append(changedCols, `currency_symbol`)
+	}
+
+	if old.Emoji != a.Emoji {
+		changedCols = append(changedCols, `emoji`)
 	}
 
 	if old.Lng != a.Lng {
@@ -651,6 +666,9 @@ func (a *OfficialCommonAreaCountry) Reset() *OfficialCommonAreaCountry {
 	a.Name = ``
 	a.Short = ``
 	a.Code = ``
+	a.Currency = ``
+	a.CurrencySymbol = ``
+	a.Emoji = ``
 	a.Lng = ``
 	a.Lat = ``
 	a.Sort = 0
@@ -666,6 +684,9 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 		r["Name"] = a.Name
 		r["Short"] = a.Short
 		r["Code"] = a.Code
+		r["Currency"] = a.Currency
+		r["CurrencySymbol"] = a.CurrencySymbol
+		r["Emoji"] = a.Emoji
 		r["Lng"] = a.Lng
 		r["Lat"] = a.Lat
 		r["Sort"] = a.Sort
@@ -684,6 +705,12 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 			r["Short"] = a.Short
 		case "Code":
 			r["Code"] = a.Code
+		case "Currency":
+			r["Currency"] = a.Currency
+		case "CurrencySymbol":
+			r["CurrencySymbol"] = a.CurrencySymbol
+		case "Emoji":
+			r["Emoji"] = a.Emoji
 		case "Lng":
 			r["Lng"] = a.Lng
 		case "Lat":
@@ -698,7 +725,7 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonAreaCountry) Clone() *OfficialCommonAreaCountry {
-	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Lng: a.Lng, Lat: a.Lat, Sort: a.Sort, Disabled: a.Disabled}
+	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Currency: a.Currency, CurrencySymbol: a.CurrencySymbol, Emoji: a.Emoji, Lng: a.Lng, Lat: a.Lat, Sort: a.Sort, Disabled: a.Disabled}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -719,6 +746,12 @@ func (a *OfficialCommonAreaCountry) FromRow(row map[string]interface{}) {
 			a.Short = param.AsString(value)
 		case "code":
 			a.Code = param.AsString(value)
+		case "currency":
+			a.Currency = param.AsString(value)
+		case "currency_symbol":
+			a.CurrencySymbol = param.AsString(value)
+		case "emoji":
+			a.Emoji = param.AsString(value)
 		case "lng":
 			a.Lng = param.AsString(value)
 		case "lat":
@@ -743,6 +776,12 @@ func (a *OfficialCommonAreaCountry) GetField(field string) interface{} {
 		return a.Short
 	case "Code":
 		return a.Code
+	case "Currency":
+		return a.Currency
+	case "CurrencySymbol":
+		return a.CurrencySymbol
+	case "Emoji":
+		return a.Emoji
 	case "Lng":
 		return a.Lng
 	case "Lat":
@@ -763,6 +802,9 @@ func (a *OfficialCommonAreaCountry) GetAllFieldNames() []string {
 		"Name",
 		"Short",
 		"Code",
+		"Currency",
+		"CurrencySymbol",
+		"Emoji",
 		"Lng",
 		"Lat",
 		"Sort",
@@ -781,6 +823,12 @@ func (a *OfficialCommonAreaCountry) HasField(field string) bool {
 	case "Short":
 		return true
 	case "Code":
+		return true
+	case "Currency":
+		return true
+	case "CurrencySymbol":
+		return true
+	case "Emoji":
 		return true
 	case "Lng":
 		return true
@@ -825,6 +873,12 @@ func (a *OfficialCommonAreaCountry) Set(key interface{}, value ...interface{}) {
 			a.Short = param.AsString(vv)
 		case "Code":
 			a.Code = param.AsString(vv)
+		case "Currency":
+			a.Currency = param.AsString(vv)
+		case "CurrencySymbol":
+			a.CurrencySymbol = param.AsString(vv)
+		case "Emoji":
+			a.Emoji = param.AsString(vv)
 		case "Lng":
 			a.Lng = param.AsString(vv)
 		case "Lat":
@@ -845,6 +899,9 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 		r["name"] = a.Name
 		r["short"] = a.Short
 		r["code"] = a.Code
+		r["currency"] = a.Currency
+		r["currency_symbol"] = a.CurrencySymbol
+		r["emoji"] = a.Emoji
 		r["lng"] = a.Lng
 		r["lat"] = a.Lat
 		r["sort"] = a.Sort
@@ -863,6 +920,12 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 			r["short"] = a.Short
 		case "code":
 			r["code"] = a.Code
+		case "currency":
+			r["currency"] = a.Currency
+		case "currency_symbol":
+			r["currency_symbol"] = a.CurrencySymbol
+		case "emoji":
+			r["emoji"] = a.Emoji
 		case "lng":
 			r["lng"] = a.Lng
 		case "lat":
