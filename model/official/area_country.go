@@ -49,6 +49,10 @@ func (f *AreaCountry) check() error {
 	if len(f.Abbr) != 2 || !com.StrIsAlpha(f.Abbr) {
 		return f.Context().NewError(code.InvalidParameter, `请输入两个字母的国家缩写`).SetZone(`abbr`)
 	}
+	f.Currency = strings.TrimSpace(f.Currency)
+	f.CurrencySymbol = strings.TrimSpace(f.CurrencySymbol)
+	f.Emoji = strings.TrimSpace(f.Emoji)
+	f.Native = strings.TrimSpace(f.Native)
 	f.Lng = strings.TrimSpace(f.Lng)
 	f.Lat = strings.TrimSpace(f.Lat)
 	f.Abbr = strings.ToUpper(f.Abbr)

@@ -31,6 +31,7 @@ type OfficialCommonArea struct {
 	Short       string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
 	Name        string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
 	Merged      string `db:"merged" bson:"merged" comment:"全称" json:"merged" xml:"merged"`
+	Native      string `db:"native" bson:"native" comment:"国内名称" json:"native" xml:"native"`
 	Level       uint   `db:"level" bson:"level" comment:"层级(1,2,3-省,市,区县)" json:"level" xml:"level"`
 	Pinyin      string `db:"pinyin" bson:"pinyin" comment:"拼音" json:"pinyin" xml:"pinyin"`
 	Code        string `db:"code" bson:"code" comment:"长途区号" json:"code" xml:"code"`
@@ -327,6 +328,10 @@ func (a *OfficialCommonArea) GetDiffColumns(old *OfficialCommonArea) (changedCol
 		changedCols = append(changedCols, `merged`)
 	}
 
+	if old.Native != a.Native {
+		changedCols = append(changedCols, `native`)
+	}
+
 	if old.Level != a.Level {
 		changedCols = append(changedCols, `level`)
 	}
@@ -603,6 +608,7 @@ func (a *OfficialCommonArea) Reset() *OfficialCommonArea {
 	a.Short = ``
 	a.Name = ``
 	a.Merged = ``
+	a.Native = ``
 	a.Level = 0
 	a.Pinyin = ``
 	a.Code = ``
@@ -622,6 +628,7 @@ func (a *OfficialCommonArea) AsMap(onlyFields ...string) param.Store {
 		r["Short"] = a.Short
 		r["Name"] = a.Name
 		r["Merged"] = a.Merged
+		r["Native"] = a.Native
 		r["Level"] = a.Level
 		r["Pinyin"] = a.Pinyin
 		r["Code"] = a.Code
@@ -644,6 +651,8 @@ func (a *OfficialCommonArea) AsMap(onlyFields ...string) param.Store {
 			r["Name"] = a.Name
 		case "Merged":
 			r["Merged"] = a.Merged
+		case "Native":
+			r["Native"] = a.Native
 		case "Level":
 			r["Level"] = a.Level
 		case "Pinyin":
@@ -666,7 +675,7 @@ func (a *OfficialCommonArea) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonArea) Clone() *OfficialCommonArea {
-	cloned := OfficialCommonArea{Id: a.Id, Pid: a.Pid, Short: a.Short, Name: a.Name, Merged: a.Merged, Level: a.Level, Pinyin: a.Pinyin, Code: a.Code, Zip: a.Zip, First: a.First, Lng: a.Lng, Lat: a.Lat, CountryAbbr: a.CountryAbbr}
+	cloned := OfficialCommonArea{Id: a.Id, Pid: a.Pid, Short: a.Short, Name: a.Name, Merged: a.Merged, Native: a.Native, Level: a.Level, Pinyin: a.Pinyin, Code: a.Code, Zip: a.Zip, First: a.First, Lng: a.Lng, Lat: a.Lat, CountryAbbr: a.CountryAbbr}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -687,6 +696,8 @@ func (a *OfficialCommonArea) FromRow(row map[string]interface{}) {
 			a.Name = param.AsString(value)
 		case "merged":
 			a.Merged = param.AsString(value)
+		case "native":
+			a.Native = param.AsString(value)
 		case "level":
 			a.Level = param.AsUint(value)
 		case "pinyin":
@@ -719,6 +730,8 @@ func (a *OfficialCommonArea) GetField(field string) interface{} {
 		return a.Name
 	case "Merged":
 		return a.Merged
+	case "Native":
+		return a.Native
 	case "Level":
 		return a.Level
 	case "Pinyin":
@@ -747,6 +760,7 @@ func (a *OfficialCommonArea) GetAllFieldNames() []string {
 		"Short",
 		"Name",
 		"Merged",
+		"Native",
 		"Level",
 		"Pinyin",
 		"Code",
@@ -769,6 +783,8 @@ func (a *OfficialCommonArea) HasField(field string) bool {
 	case "Name":
 		return true
 	case "Merged":
+		return true
+	case "Native":
 		return true
 	case "Level":
 		return true
@@ -821,6 +837,8 @@ func (a *OfficialCommonArea) Set(key interface{}, value ...interface{}) {
 			a.Name = param.AsString(vv)
 		case "Merged":
 			a.Merged = param.AsString(vv)
+		case "Native":
+			a.Native = param.AsString(vv)
 		case "Level":
 			a.Level = param.AsUint(vv)
 		case "Pinyin":
@@ -849,6 +867,7 @@ func (a *OfficialCommonArea) AsRow(onlyFields ...string) param.Store {
 		r["short"] = a.Short
 		r["name"] = a.Name
 		r["merged"] = a.Merged
+		r["native"] = a.Native
 		r["level"] = a.Level
 		r["pinyin"] = a.Pinyin
 		r["code"] = a.Code
@@ -871,6 +890,8 @@ func (a *OfficialCommonArea) AsRow(onlyFields ...string) param.Store {
 			r["name"] = a.Name
 		case "merged":
 			r["merged"] = a.Merged
+		case "native":
+			r["native"] = a.Native
 		case "level":
 			r["level"] = a.Level
 		case "pinyin":

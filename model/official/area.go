@@ -44,6 +44,7 @@ func (f *Area) check() error {
 		return ctx.NewError(code.InvalidParameter, `请输入两个字母的国家码`).SetZone(`countryAbbr`)
 	}
 	f.CountryAbbr = strings.ToUpper(f.CountryAbbr)
+	f.Native = strings.TrimSpace(f.Native)
 	var (
 		exists bool
 		err    error

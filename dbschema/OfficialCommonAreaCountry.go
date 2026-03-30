@@ -30,6 +30,7 @@ type OfficialCommonAreaCountry struct {
 	Abbr           string `db:"abbr" bson:"abbr" comment:"国家缩写" json:"abbr" xml:"abbr"`
 	Name           string `db:"name" bson:"name" comment:"名称" json:"name" xml:"name"`
 	Short          string `db:"short" bson:"short" comment:"简称" json:"short" xml:"short"`
+	Native         string `db:"native" bson:"native" comment:"国内名称" json:"native" xml:"native"`
 	Code           string `db:"code" bson:"code" comment:"国家码" json:"code" xml:"code"`
 	Currency       string `db:"currency" bson:"currency" comment:"币种" json:"currency" xml:"currency"`
 	CurrencySymbol string `db:"currency_symbol" bson:"currency_symbol" comment:"货币符号" json:"currency_symbol" xml:"currency_symbol"`
@@ -332,6 +333,10 @@ func (a *OfficialCommonAreaCountry) GetDiffColumns(old *OfficialCommonAreaCountr
 
 	if old.Short != a.Short {
 		changedCols = append(changedCols, `short`)
+	}
+
+	if old.Native != a.Native {
+		changedCols = append(changedCols, `native`)
 	}
 
 	if old.Code != a.Code {
@@ -665,6 +670,7 @@ func (a *OfficialCommonAreaCountry) Reset() *OfficialCommonAreaCountry {
 	a.Abbr = ``
 	a.Name = ``
 	a.Short = ``
+	a.Native = ``
 	a.Code = ``
 	a.Currency = ``
 	a.CurrencySymbol = ``
@@ -683,6 +689,7 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 		r["Abbr"] = a.Abbr
 		r["Name"] = a.Name
 		r["Short"] = a.Short
+		r["Native"] = a.Native
 		r["Code"] = a.Code
 		r["Currency"] = a.Currency
 		r["CurrencySymbol"] = a.CurrencySymbol
@@ -703,6 +710,8 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 			r["Name"] = a.Name
 		case "Short":
 			r["Short"] = a.Short
+		case "Native":
+			r["Native"] = a.Native
 		case "Code":
 			r["Code"] = a.Code
 		case "Currency":
@@ -725,7 +734,7 @@ func (a *OfficialCommonAreaCountry) AsMap(onlyFields ...string) param.Store {
 }
 
 func (a *OfficialCommonAreaCountry) Clone() *OfficialCommonAreaCountry {
-	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Code: a.Code, Currency: a.Currency, CurrencySymbol: a.CurrencySymbol, Emoji: a.Emoji, Lng: a.Lng, Lat: a.Lat, Sort: a.Sort, Disabled: a.Disabled}
+	cloned := OfficialCommonAreaCountry{Id: a.Id, Abbr: a.Abbr, Name: a.Name, Short: a.Short, Native: a.Native, Code: a.Code, Currency: a.Currency, CurrencySymbol: a.CurrencySymbol, Emoji: a.Emoji, Lng: a.Lng, Lat: a.Lat, Sort: a.Sort, Disabled: a.Disabled}
 	cloned.CtxFrom(a)
 	return &cloned
 }
@@ -744,6 +753,8 @@ func (a *OfficialCommonAreaCountry) FromRow(row map[string]interface{}) {
 			a.Name = param.AsString(value)
 		case "short":
 			a.Short = param.AsString(value)
+		case "native":
+			a.Native = param.AsString(value)
 		case "code":
 			a.Code = param.AsString(value)
 		case "currency":
@@ -774,6 +785,8 @@ func (a *OfficialCommonAreaCountry) GetField(field string) interface{} {
 		return a.Name
 	case "Short":
 		return a.Short
+	case "Native":
+		return a.Native
 	case "Code":
 		return a.Code
 	case "Currency":
@@ -801,6 +814,7 @@ func (a *OfficialCommonAreaCountry) GetAllFieldNames() []string {
 		"Abbr",
 		"Name",
 		"Short",
+		"Native",
 		"Code",
 		"Currency",
 		"CurrencySymbol",
@@ -821,6 +835,8 @@ func (a *OfficialCommonAreaCountry) HasField(field string) bool {
 	case "Name":
 		return true
 	case "Short":
+		return true
+	case "Native":
 		return true
 	case "Code":
 		return true
@@ -871,6 +887,8 @@ func (a *OfficialCommonAreaCountry) Set(key interface{}, value ...interface{}) {
 			a.Name = param.AsString(vv)
 		case "Short":
 			a.Short = param.AsString(vv)
+		case "Native":
+			a.Native = param.AsString(vv)
 		case "Code":
 			a.Code = param.AsString(vv)
 		case "Currency":
@@ -898,6 +916,7 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 		r["abbr"] = a.Abbr
 		r["name"] = a.Name
 		r["short"] = a.Short
+		r["native"] = a.Native
 		r["code"] = a.Code
 		r["currency"] = a.Currency
 		r["currency_symbol"] = a.CurrencySymbol
@@ -918,6 +937,8 @@ func (a *OfficialCommonAreaCountry) AsRow(onlyFields ...string) param.Store {
 			r["name"] = a.Name
 		case "short":
 			r["short"] = a.Short
+		case "native":
+			r["native"] = a.Native
 		case "code":
 			r["code"] = a.Code
 		case "currency":
