@@ -1,6 +1,7 @@
 package asynq
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/hibiken/asynq"
@@ -16,18 +17,18 @@ import (
 // - asynq.Unique - errors.Is(err, asynq.ErrDuplicateTask)
 // - asynq.ProcessAt - 指定处理时间
 // - asynq.ProcessIn - 指定延后时长
-func (a *Asynq) Send(task *asynq.Task, options ...asynq.Option) (*asynq.TaskInfo, error) {
-	return a.Client().Enqueue(task, options...)
+func (a *Asynq) Send(ctx context.Context, task *asynq.Task, options ...asynq.Option) (*asynq.TaskInfo, error) {
+	return a.Client().EnqueueContext(ctx, task, options...)
 }
 
-func (a *Asynq) SendBy(typeName string, payload []byte, options ...asynq.Option) (*asynq.TaskInfo, error) {
-	return a.Send(NewTask(typeName, payload), options...)
+func (a *Asynq) SendBy(ctx context.Context, typeName string, payload []byte, options ...asynq.Option) (*asynq.TaskInfo, error) {
+	return a.Send(ctx, NewTask(typeName, payload), options...)
 }
 
-func (a *Asynq) SendJSON(typeName string, payload interface{}, options ...asynq.Option) (*asynq.TaskInfo, error) {
+func (a *Asynq) SendJSON(ctx context.Context, typeName string, payload interface{}, options ...asynq.Option) (*asynq.TaskInfo, error) {
 	b, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	return a.Send(NewTask(typeName, b), options...)
+	return a.Send(ctx, NewTask(typeName, b), options...)
 }

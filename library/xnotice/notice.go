@@ -97,12 +97,12 @@ func OnlineStatusDBUpdater(c echo.Context, customer *dbschema.OfficialCustomer) 
 func OnlineStatusQueueUpdater(c echo.Context, customer *dbschema.OfficialCustomer) (func(), <-chan *notice.Message, error) {
 	sessionID := c.Session().ID()
 	if len(sessionID) > 0 || customer != nil {
-		err := SendOnlineStatusToQueue(sessionID, customer.Id, true)
+		err := SendOnlineStatusToQueue(c, sessionID, customer.Id, true)
 		if err != nil {
 			return nil, nil, err
 		}
 		return func() {
-			SendOnlineStatusToQueue(sessionID, customer.Id, false)
+			SendOnlineStatusToQueue(c, sessionID, customer.Id, false)
 		}, nil, nil
 	}
 	return nil, nil, nil

@@ -70,9 +70,9 @@ func RegisterCmder(startup ...bool) {
 	}
 }
 
-func SendOnlineStatusToQueue(sessionId string, customerID uint64, online bool) error {
+func SendOnlineStatusToQueue(ctx context.Context, sessionId string, customerID uint64, online bool) error {
 	qonce.Do(initialize)
-	_, err := asynq.SendJSON(`customer:online`, CustomerOnline{
+	_, err := asynq.SendJSON(ctx, `customer:online`, CustomerOnline{
 		SessionID:  sessionId,
 		CustomerID: customerID,
 		Online:     online,

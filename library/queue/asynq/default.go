@@ -32,28 +32,28 @@ func Default() *Asynq {
 
 // ------- producer -------
 
-func Send(task *Task, options ...asynq.Option) (*asynq.TaskInfo, error) {
+func Send(ctx context.Context, task *Task, options ...asynq.Option) (*asynq.TaskInfo, error) {
 	q := Default()
 	if q == nil {
 		return nil, errors.New(`failed to initialize queue`)
 	}
-	return queue.Send(task, options...)
+	return q.Send(ctx, task, options...)
 }
 
-func SendBy(typeName string, payload []byte, options ...asynq.Option) (*asynq.TaskInfo, error) {
+func SendBy(ctx context.Context, typeName string, payload []byte, options ...asynq.Option) (*asynq.TaskInfo, error) {
 	q := Default()
 	if q == nil {
 		return nil, errors.New(`failed to initialize queue`)
 	}
-	return q.SendBy(typeName, payload, options...)
+	return q.SendBy(ctx, typeName, payload, options...)
 }
 
-func SendJSON(typeName string, payload interface{}, options ...asynq.Option) (*asynq.TaskInfo, error) {
+func SendJSON(ctx context.Context, typeName string, payload interface{}, options ...asynq.Option) (*asynq.TaskInfo, error) {
 	q := Default()
 	if q == nil {
 		return nil, errors.New(`failed to initialize queue`)
 	}
-	return q.SendJSON(typeName, payload, options...)
+	return q.SendJSON(ctx, typeName, payload, options...)
 }
 
 // ------- consumer -------

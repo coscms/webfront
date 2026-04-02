@@ -71,6 +71,7 @@ func TestQueue(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	ctx := context.Background()
 	for i := 0; i < 20; i++ {
 		var typename string
 		if i%2 == 0 {
@@ -83,7 +84,7 @@ func TestQueue(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		result, err := c.Send(asynq.NewTask(typename, payload))
+		result, err := c.Send(ctx, asynq.NewTask(typename, payload))
 		if err != nil {
 			fmt.Println(err)
 		}
