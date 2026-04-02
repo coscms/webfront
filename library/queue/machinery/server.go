@@ -50,6 +50,7 @@ type Server struct {
 	broker  brokersiface.Broker
 	backend backendsiface.Backend
 	lock    locksiface.Lock
+	worker  *machinery.Worker
 	*machinery.Server
 }
 
@@ -138,4 +139,11 @@ func (s *Server) newServer() (err error) {
 	}
 	s.Server = machinery.NewServer(s.config, broker, backend, lock)
 	return
+}
+
+func (s *Server) Close() error {
+	if s.worker != nil {
+		s.worker.Quit()
+	}
+	return nil
 }

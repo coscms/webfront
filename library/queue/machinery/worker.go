@@ -75,6 +75,6 @@ func (s *Server) StartWorker(options ...WorkerOption) error {
 	worker.SetPostTaskHandler(c.postTaskHandler)
 	worker.SetErrorHandler(c.errorHandler)
 	worker.SetPreTaskHandler(c.preTaskHandler)
-
+	s.worker = worker
 	return worker.Launch()
 }
