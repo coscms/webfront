@@ -1,4 +1,4 @@
-package machinery
+package machinery_test
 
 import (
 	"context"
@@ -10,11 +10,13 @@ import (
 	"github.com/RichardKnop/machinery/v2/tasks"
 	"github.com/webx-top/echo/testing/test"
 
+	. "github.com/coscms/webfront/library/queue/machinery"
+	_ "github.com/coscms/webfront/library/queue/machinery/engine/redis"
 	exampletasks "github.com/coscms/webfront/library/queue/machinery/example"
 )
 
 func TestQueue(t *testing.T) {
-	cfg := &config.Config{
+	cfg := config.Config{
 		//Broker:`amqp://guest:guest@localhost:5672/`,
 		Broker: `redis://localhost:6379`,
 		//Broker: `https://sqs.us-west-2.amazonaws.com/123456789012`,
