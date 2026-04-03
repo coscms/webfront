@@ -23,6 +23,7 @@ func TestQueue(t *testing.T) {
 		//Broker: `amqp://guest:guest@localhost:5672/`,
 		DefaultQueue:  `machinery_tasks`,
 		ResultBackend: `redis://localhost:6379`,
+		Lock:          `redis://localhost:6379`,
 		//ResultBackend:`memcache://localhost:11211`,
 		//ResultBackend:`mongodb://localhost:27017`,
 		ResultsExpireIn: 3600000,
