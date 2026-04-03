@@ -2,6 +2,7 @@ package machinery
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 
 	"github.com/RichardKnop/machinery/v2"
@@ -112,6 +113,8 @@ func (s *Server) ParseConfig(configPaths ...interface{}) (err error) {
 		case *config.Config:
 			s.config = c
 			return
+		default:
+			log.Printf("unsupported config type: %T => %+v\n", configPaths[0], configPaths[0])
 		}
 	}
 	if len(configPath) > 0 {
