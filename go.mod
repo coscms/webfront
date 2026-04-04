@@ -1,10 +1,10 @@
 module github.com/coscms/webfront
 
-go 1.25.3
+go 1.26.1
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260329073539-bc0e71ce2de7
+require github.com/coscms/webcore v0.13.3-0.20260404014637-c7815b845eeb
 
 require (
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
@@ -42,10 +42,10 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	github.com/wangbin/jiebago v0.3.2
-	github.com/webx-top/client v0.9.7
+	github.com/webx-top/client v0.9.10
 	github.com/webx-top/com v1.5.0
 	github.com/webx-top/db v1.30.8
-	github.com/webx-top/echo v1.23.7
+	github.com/webx-top/echo v1.23.9
 	github.com/webx-top/echo-prometheus v1.1.3
 	github.com/webx-top/echo-socket.io v1.3.2
 	github.com/webx-top/image v0.1.2
@@ -146,15 +146,15 @@ require (
 	github.com/admpub/timeago v1.3.0 // indirect
 	github.com/admpub/xencoding v0.0.3 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
-	github.com/andybalholm/brotli v1.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.41.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.20 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.20 // indirect
+	github.com/andybalholm/brotli v1.2.1 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.41.5 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.21 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.21 // indirect
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.56.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.20 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.24 // indirect
-	github.com/aws/smithy-go v1.24.2 // indirect
+	github.com/aws/smithy-go v1.24.3 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.1.0 // indirect
@@ -163,7 +163,7 @@ require (
 	github.com/caddyserver/zerossl v0.1.5 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/coscms/go-imgparse v0.0.1 // indirect
+	github.com/coscms/go-imgparse v0.0.3 // indirect
 	github.com/coscms/session-boltstore v0.0.0-20260203210304-79c433bb1621 // indirect
 	github.com/coscms/session-mysqlstore v0.0.0-20260127080438-1856d3685966 // indirect
 	github.com/coscms/session-redisstore v0.0.0-20260127080202-3c5732ae77b4 // indirect
@@ -187,7 +187,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.1 // indirect
+	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-redsync/redsync/v4 v4.16.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.3 // indirect
@@ -209,7 +209,7 @@ require (
 	github.com/h2non/go-is-svg v0.0.0-20160927212452-35e8c4b0612c // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-version v1.8.0 // indirect
+	github.com/hashicorp/go-version v1.9.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
@@ -218,13 +218,13 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
-	github.com/lufia/plan9stats v0.0.0-20260324052639-156f7da3f749 // indirect
+	github.com/lufia/plan9stats v0.0.0-20260330125221-c963978e514e // indirect
 	github.com/markbates/going v1.0.3 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.21 // indirect
-	github.com/mattn/go-sqlite3 v1.14.37 // indirect
+	github.com/mattn/go-runewidth v0.0.22 // indirect
+	github.com/mattn/go-sqlite3 v1.14.40 // indirect
 	github.com/mholt/acmez/v3 v3.1.6 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/miekg/dns v1.1.72 // indirect
@@ -237,7 +237,7 @@ require (
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/phuslu/iploc v1.0.20260315 // indirect
+	github.com/phuslu/iploc v1.0.20260401 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
@@ -250,7 +250,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
-	github.com/shirou/gopsutil/v4 v4.26.2 // indirect
+	github.com/shirou/gopsutil/v4 v4.26.3 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
@@ -310,6 +310,6 @@ require (
 	modernc.org/libc v1.70.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.47.0 // indirect
+	modernc.org/sqlite v1.48.1 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
