@@ -25,6 +25,7 @@ func NewOptions(ctx echo.Context, typ Type, generators ...URLValuesGenerator) *O
 type AppInfo interface {
 	GetAppSecret() string
 	GetAppId() string
+	IsOfficial() bool
 }
 
 type Options struct {
