@@ -37,15 +37,20 @@ var AppInfoDefaultGetter = func(ctx echo.Context, cond db.Compound) (appInfo App
 
 func (o *Options) getApp(cond db.Cond) (err error) {
 	var appInfo AppInfo
-	if o.appInfoGetter == nil {
-		appInfo, err = AppInfoDefaultGetter(o.ctx, cond)
-	} else {
-		appInfo, err = o.appInfoGetter(o.ctx, cond)
-	}
+	appInfo, err = o.onlyGetApp(cond)
 	if err != nil {
 		return
 	}
 	o.App = appInfo
 	o.URLPrefix = xcommon.SiteURL(o.ctx)
+	return
+}
+
+func (o *Options) onlyGetApp(cond db.Cond) (appInfo AppInfo, err error) {
+	if o.appInfoGetter == nil {
+		appInfo, err = AppInfoDefaultGetter(o.ctx, cond)
+	} else {
+		appInfo, err = o.appInfoGetter(o.ctx, cond)
+	}
 	return
 }

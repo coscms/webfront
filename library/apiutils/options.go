@@ -89,6 +89,18 @@ func (o *Options) GetAppID() string {
 	return ``
 }
 
+func (o *Options) GetAppInfo() AppInfo {
+	if o.App != nil {
+		return o.App
+	}
+	appID := o.GetAppID()
+	if len(appID) == 0 {
+		return nil
+	}
+	o.App, _ = o.onlyGetApp(db.Cond{`app_id`: appID})
+	return o.App
+}
+
 func (o *Options) GetAppSecret() string {
 	if o.Account != nil {
 		return o.Account.AppSecret
