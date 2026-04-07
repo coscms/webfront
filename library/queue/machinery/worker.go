@@ -69,7 +69,7 @@ func (s *Server) StartWorker(options ...WorkerOption) error {
 	}
 	server := s.Server
 
-	// The second argument is a consumer tag
+	// The first argument is a consumer tag
 	// Ideally, each worker should have a unique tag (worker1, worker2 etc)
 	worker := server.NewWorker(c.ConsumerTag, c.Concurrency)
 	worker.SetPostTaskHandler(c.postTaskHandler)
