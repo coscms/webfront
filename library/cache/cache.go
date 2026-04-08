@@ -13,7 +13,7 @@ import (
 	"github.com/webx-top/echo"
 	"golang.org/x/sync/singleflight"
 
-	_ "github.com/admpub/cache/redis5" // redis
+	_ "github.com/admpub/cache/redis"  // redis
 	_ "github.com/admpub/cache/sqlite" // sqlite
 
 	"github.com/coscms/webcore/library/common"

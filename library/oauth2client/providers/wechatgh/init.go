@@ -24,11 +24,18 @@ func initWechat() {
 		wc.SetCache(cache.NewMemory())
 	} else {
 		wc.SetCache(cache.NewRedis(context.Background(), &cache.RedisOpts{
-			Host:     ro.Addr,
-			Password: ro.Password,
-			Database: ro.DB,
-			//MaxIdle   :ro.MinIdleConns,
-			IdleTimeout: int(ro.IdleTimeout.Seconds()),
+			Host:         ro.Addr,
+			Username:     ro.Username,
+			Password:     ro.Password,
+			Database:     ro.DB,
+			MinIdleConns: ro.MinIdleConns,
+			PoolSize:     ro.PoolSize,
+			MaxRetries:   ro.MaxRetries,
+			DialTimeout:  int(ro.DialTimeout.Seconds()),
+			ReadTimeout:  int(ro.ReadTimeout.Seconds()),
+			WriteTimeout: int(ro.WriteTimeout.Seconds()),
+			PoolTimeout:  int(ro.PoolTimeout.Seconds()),
+			IdleTimeout:  int(ro.ConnMaxIdleTime.Seconds()),
 		}))
 	}
 }

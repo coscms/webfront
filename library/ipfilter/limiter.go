@@ -1,16 +1,17 @@
 package ipfilter
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
 	"github.com/admpub/color"
 	"github.com/admpub/log"
+	goredislib "github.com/redis/go-redis/v9"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/middleware/ratelimiter"
 	"github.com/webx-top/echo/param"
-	"gopkg.in/redis.v5"
 
 	dbschemaDBMgr "github.com/nging-plugins/dbmanager/application/dbschema"
 )
@@ -72,7 +73,7 @@ func (o *RateLimiterConfig) Apply(opts *ratelimiter.RateLimiterConfig) *RateLimi
 			RedisPassword(o.RedisPassword),
 			RedisDB(o.RedisDB),
 		)
-		if err := client.Ping().Err(); err != nil {
+		if err := client.Ping(context.Background()).Err(); err != nil {
 			log.Error(color.RedString(`[rateLimiter]`), ` `, err.Error())
 		} else {
 			opts.Client = client
@@ -81,92 +82,80 @@ func (o *RateLimiterConfig) Apply(opts *ratelimiter.RateLimiterConfig) *RateLimi
 	return o
 }
 
-func RedisAddr(addr string) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisAddr(addr string) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.Addr = addr
 	}
 }
 
-func RedisMaxRetries(maxRetries int) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisMaxRetries(maxRetries int) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.MaxRetries = maxRetries
 	}
 }
 
-func RedisNetwork(network string) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisNetwork(network string) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.Network = network
 	}
 }
 
-func RedisPassword(password string) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisPassword(password string) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.Password = password
 	}
 }
 
-func RedisDB(db int) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisDB(db int) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.DB = db
 	}
 }
 
-func RedisPoolSize(poolSize int) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisPoolSize(poolSize int) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.PoolSize = poolSize
 	}
 }
 
-func RedisDialTimeout(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisDialTimeout(timeout time.Duration) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.DialTimeout = timeout
 	}
 }
 
-func RedisReadTimeout(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisReadTimeout(timeout time.Duration) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.ReadTimeout = timeout
 	}
 }
 
-func RedisWriteTimeout(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisWriteTimeout(timeout time.Duration) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.WriteTimeout = timeout
 	}
 }
 
-func RedisPoolTimeout(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisPoolTimeout(timeout time.Duration) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.PoolTimeout = timeout
 	}
 }
 
-func RedisIdleTimeout(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
-		opts.IdleTimeout = timeout
+func RedisIdleTimeout(timeout time.Duration) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
+		opts.ConnMaxIdleTime = timeout
 	}
 }
 
-func RedisIdleCheckFrequency(timeout time.Duration) func(*redis.Options) {
-	return func(opts *redis.Options) {
-		opts.IdleCheckFrequency = timeout
-	}
-}
-
-func RedisReadOnly(readOnly bool) func(*redis.Options) {
-	return func(opts *redis.Options) {
-		opts.ReadOnly = readOnly
-	}
-}
-
-func RedisTLSConfig(config *tls.Config) func(*redis.Options) {
-	return func(opts *redis.Options) {
+func RedisTLSConfig(config *tls.Config) func(*goredislib.Options) {
+	return func(opts *goredislib.Options) {
 		opts.TLSConfig = config
 	}
 }
 
-func NewRedisClient(settings ...func(*redis.Options)) *RedisClient {
-	options := redis.Options{
+func NewRedisClient(settings ...func(*goredislib.Options)) *RedisClient {
+	options := goredislib.Options{
 		Network: "tcp",
 		Addr:    "127.0.0.1:6379",
 	}
@@ -174,24 +163,24 @@ func NewRedisClient(settings ...func(*redis.Options)) *RedisClient {
 		option(&options)
 	}
 	c := &RedisClient{
-		Client: redis.NewClient(&options),
+		Client: goredislib.NewClient(&options),
 	}
 	return c
 }
 
-// RedisClient Implements RedisClient for redis.Client
+// RedisClient Implements RedisClient for goredislib.Client
 type RedisClient struct {
-	*redis.Client
+	*goredislib.Client
 }
 
-func (c *RedisClient) DeleteKey(key string) error {
-	return c.Del(key).Err()
+func (c *RedisClient) DeleteKey(ctx context.Context, key string) error {
+	return c.Del(ctx, key).Err()
 }
 
-func (c *RedisClient) EvalulateSha(sha1 string, keys []string, args ...interface{}) (interface{}, error) {
-	return c.EvalSha(sha1, keys, args...).Result()
+func (c *RedisClient) EvalulateSha(ctx context.Context, sha1 string, keys []string, args ...interface{}) (interface{}, error) {
+	return c.EvalSha(ctx, sha1, keys, args...).Result()
 }
 
-func (c *RedisClient) LuaScriptLoad(script string) (string, error) {
-	return c.ScriptLoad(script).Result()
+func (c *RedisClient) LuaScriptLoad(ctx context.Context, script string) (string, error) {
+	return c.ScriptLoad(ctx, script).Result()
 }

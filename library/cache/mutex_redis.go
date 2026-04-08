@@ -7,8 +7,8 @@ import (
 
 	"github.com/admpub/once"
 	"github.com/admpub/redsync/v4"
-	goredis "github.com/admpub/redsync/v4/redis/goredis/v5"
-	"gopkg.in/redis.v5"
+	goredis "github.com/admpub/redsync/v4/redis/goredis/v9"
+	goredislib "github.com/redis/go-redis/v9"
 )
 
 var (
@@ -21,7 +21,7 @@ func resetRedsync() {
 }
 
 func initRedsync() {
-	client, _ := Cache(cacheRootContext, `locker`).Client().(*redis.Client)
+	client, _ := Cache(cacheRootContext, `locker`).Client().(*goredislib.Client)
 	if client == nil {
 		client = RedisClient()
 	}

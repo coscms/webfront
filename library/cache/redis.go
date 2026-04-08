@@ -2,12 +2,12 @@ package cache
 
 import (
 	"github.com/admpub/once"
+	goredislib "github.com/redis/go-redis/v9"
 	"github.com/webx-top/echo"
-	"gopkg.in/redis.v5"
 )
 
 var (
-	redisClient *redis.Client
+	redisClient *goredislib.Client
 	redisOnce   once.Once
 )
 
@@ -24,12 +24,12 @@ func resetRedisClient() {
 
 func initRedisClient() {
 	defer resetRedsync()
-	rc, ok := Cache(cacheRootContext, `default`).Client().(*redis.Client)
+	rc, ok := Cache(cacheRootContext, `default`).Client().(*goredislib.Client)
 	if ok {
 		redisClient = rc
 		return
 	}
-	rc, _ = Cache(cacheRootContext, `fallback`).Client().(*redis.Client)
+	rc, _ = Cache(cacheRootContext, `fallback`).Client().(*goredislib.Client)
 	redisClient = rc
 }
 
@@ -37,12 +37,12 @@ func onceInitRedisClient() {
 	initRedisClient()
 }
 
-func RedisClient() *redis.Client {
+func RedisClient() *goredislib.Client {
 	redisOnce.Do(onceInitRedisClient)
 	return redisClient
 }
 
-func RedisOptions() *redis.Options {
+func RedisOptions() *goredislib.Options {
 	opt, ok := Cache(cacheRootContext, `default`).(redisOptions)
 	if ok {
 		return opt.Options()
@@ -55,5 +55,5 @@ func RedisOptions() *redis.Options {
 }
 
 type redisOptions interface {
-	Options() *redis.Options
+	Options() *goredislib.Options
 }
