@@ -13,51 +13,39 @@ var (
 
 type mutexMemory struct{}
 
-func (*mutexMemory) Lock(key string) (unlock UnlockFunc, err error) {
+func (*mutexMemory) Lock(ctx context.Context, key string) (unlock UnlockFunc, err error) {
 	mutexGroup.Lock(key)
-	unlock = func() error {
+	unlock = func(ctx context.Context) error {
 		mutexGroup.UnlockAndFree(key)
 		return nil
 	}
 	return
 }
 
-func (*mutexMemory) TryLock(key string) (unlock UnlockFunc, err error) {
+func (*mutexMemory) TryLock(ctx context.Context, key string) (unlock UnlockFunc, err error) {
 	if !mutexGroup.TryLock(key) {
 		err = ErrFailedToAcquireLock
 		return
 	}
-	unlock = func() error {
+	unlock = func(ctx context.Context) error {
 		mutexGroup.UnlockAndFree(key)
 		return nil
 	}
 	return
 }
 
-func (*mutexMemory) TryLockWithTimeout(key string, timeout time.Duration) (unlock UnlockFunc, err error) {
+func (*mutexMemory) TryLockWithTimeout(ctx context.Context, key string, timeout time.Duration) (unlock UnlockFunc, err error) {
 	if !mutexGroup.TryLockWithTimeout(key, timeout) {
 		err = ErrFailedToAcquireLock
 		return
 	}
-	unlock = func() error {
+	unlock = func(ctx context.Context) error {
 		mutexGroup.UnlockAndFree(key)
 		return nil
 	}
 	return
 }
 
-func (*mutexMemory) TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error) {
-	if !mutexGroup.TryLockWithContext(key, ctx) {
-		err = ErrFailedToAcquireLock
-		return
-	}
-	unlock = func() error {
-		mutexGroup.UnlockAndFree(key)
-		return nil
-	}
-	return
-}
-
-func (*mutexMemory) Forget(key string) {
+func (*mutexMemory) Forget(ctx context.Context, key string) {
 	mutexGroup.UnlockAndFree(key)
 }

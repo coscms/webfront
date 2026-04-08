@@ -1,26 +1,26 @@
 package cache
 
 import (
+	"context"
+
 	"golang.org/x/sync/singleflight"
 )
 
 type SinglefightResult = singleflight.Result
 
-var _ Singleflighter = (*singleflight.Group)(nil)
-
 type Singleflighter interface {
-	Do(key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool)
-	DoChan(key string, fn func() (interface{}, error)) <-chan SinglefightResult
-	Forget(key string)
+	Do(ctx context.Context, key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool)
+	DoChan(ctx context.Context, key string, fn func() (interface{}, error)) <-chan SinglefightResult
+	Forget(ctx context.Context, key string)
 }
 
 type singleflightLock struct {
 	mutex TryLocker
 }
 
-func (s *singleflightLock) Do(key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool) {
+func (s *singleflightLock) Do(ctx context.Context, key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool) {
 	var unlock UnlockFunc
-	unlock, err = s.mutex.TryLock(key)
+	unlock, err = s.mutex.TryLock(ctx, key)
 	if err != nil {
 		if err == ErrFailedToAcquireLock {
 			err = nil
@@ -28,15 +28,15 @@ func (s *singleflightLock) Do(key string, fn func() (interface{}, error)) (v int
 		}
 		return
 	}
-	defer unlock()
+	defer unlock(ctx)
 	v, err = fn()
 	return
 }
 
-func (s *singleflightLock) DoChan(key string, fn func() (interface{}, error)) <-chan SinglefightResult {
+func (s *singleflightLock) DoChan(ctx context.Context, key string, fn func() (interface{}, error)) <-chan SinglefightResult {
 	ch := make(chan SinglefightResult, 1)
 	var unlock UnlockFunc
-	unlock, err := s.mutex.TryLock(key)
+	unlock, err := s.mutex.TryLock(ctx, key)
 	if err != nil {
 		r := SinglefightResult{}
 		if err == ErrFailedToAcquireLock {
@@ -48,7 +48,7 @@ func (s *singleflightLock) DoChan(key string, fn func() (interface{}, error)) <-
 		return ch
 	}
 	go func() {
-		defer unlock()
+		defer unlock(ctx)
 		r := SinglefightResult{}
 		r.Val, r.Err = fn()
 		ch <- r
@@ -56,8 +56,8 @@ func (s *singleflightLock) DoChan(key string, fn func() (interface{}, error)) <-
 	return ch
 }
 
-func (s *singleflightLock) Forget(key string) {
-	s.mutex.Forget(key)
+func (s *singleflightLock) Forget(ctx context.Context, key string) {
+	s.mutex.Forget(ctx, key)
 }
 
 func NewSingleflight(mu TryLocker) Singleflighter {

@@ -1,15 +1,27 @@
 package cache
 
-var defaultSingleflight = Singleflight()
+import (
+	"context"
 
-func SingleflightDo(key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool) {
-	return defaultSingleflight.Do(key, fn)
+	"github.com/admpub/once"
+)
+
+var defaultSG, cancelDefaultSG = once.OnceValue(func() Singleflighter {
+	return Singleflight()
+})
+
+func SingleflightDo(ctx context.Context, key string, fn func() (interface{}, error)) (v interface{}, err error, shared bool) {
+	return defaultSG().Do(ctx, key, fn)
 }
 
-func SingleflightDoChan(key string, fn func() (interface{}, error)) <-chan SinglefightResult {
-	return defaultSingleflight.DoChan(key, fn)
+func SingleflightDoChan(ctx context.Context, key string, fn func() (interface{}, error)) <-chan SinglefightResult {
+	return defaultSG().DoChan(ctx, key, fn)
 }
 
-func SingleflightForget(key string) {
-	defaultSingleflight.Forget(key)
+func SingleflightForget(ctx context.Context, key string) {
+	defaultSG().Forget(ctx, key)
+}
+
+func ResetSingleflight() {
+	cancelDefaultSG()
 }

@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -66,7 +67,7 @@ type mutexRedis struct {
 	maxLockDuration time.Duration
 }
 
-func (r *mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) Lock(ctx context.Context, key string) (unlock UnlockFunc, err error) {
 	delay := 100 * time.Millisecond
 	m := RedisMutex(key,
 		redsync.WithExpiry(r.maxLockDuration),
@@ -77,15 +78,15 @@ func (r *mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
 		redsync.WithRetryDelay(delay),
 	)
 
-	err = m.Lock()
+	err = m.LockContext(ctx)
 	if err != nil {
 		if err == redsync.ErrFailed {
 			err = ErrFailedToAcquireLock
 		}
 		return
 	}
-	unlock = func() error {
-		ok, err := m.Unlock()
+	unlock = func(ctx context.Context) error {
+		ok, err := m.UnlockContext(ctx)
 		if !ok || err != nil {
 			return fmt.Errorf("unlock unsuccessful: %w", err)
 		}
@@ -94,15 +95,24 @@ func (r *mutexRedis) Lock(key string) (unlock UnlockFunc, err error) {
 	return
 }
 
-func (r *mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
+func isRedsyncErrTaken(err error) bool {
+	_, ok := errors.AsType[*redsync.ErrTaken](err)
+	if ok {
+		return ok
+	}
+	_, ok = errors.AsType[*redsync.ErrNodeTaken](err)
+	return ok
+}
+
+func (r *mutexRedis) TryLock(ctx context.Context, key string) (unlock UnlockFunc, err error) {
 	m := RedisMutex(key,
 		redsync.WithExpiry(r.maxLockDuration),
 		redsync.WithTries(1),
 		redsync.WithRetryDelay(50*time.Millisecond),
 	)
-	err = m.Lock()
+	err = m.LockContext(ctx)
 	if err != nil {
-		if err == redsync.ErrFailed {
+		if isRedsyncErrTaken(err) {
 			err = ErrFailedToAcquireLock
 		}
 		return
@@ -116,14 +126,14 @@ func (r *mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 			case <-done:
 				return
 			case <-ticker.C:
-				m.Extend()
+				m.ExtendContext(ctx)
 			}
 		}
 	}()
 
-	unlock = func() error {
+	unlock = func(ctx context.Context) error {
 		close(done)
-		ok, err := m.Unlock()
+		ok, err := m.UnlockContext(ctx)
 		if !ok || err != nil {
 			return fmt.Errorf("unlock unsuccessful: %w", err)
 		}
@@ -132,15 +142,11 @@ func (r *mutexRedis) TryLock(key string) (unlock UnlockFunc, err error) {
 	return
 }
 
-func (r *mutexRedis) TryLockWithTimeout(key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
-	return r.tryLockWithContext(key, context.Background(), maxLockDuration)
+func (r *mutexRedis) TryLockWithTimeout(ctx context.Context, key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
+	return r.tryLockWithContext(ctx, key, maxLockDuration)
 }
 
-func (r *mutexRedis) TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error) {
-	return r.tryLockWithContext(key, ctx, r.maxLockDuration)
-}
-
-func (r *mutexRedis) tryLockWithContext(key string, ctx context.Context, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
+func (r *mutexRedis) tryLockWithContext(ctx context.Context, key string, maxLockDuration time.Duration) (unlock UnlockFunc, err error) {
 	m := RedisMutex(key,
 		redsync.WithExpiry(maxLockDuration),
 		redsync.WithTries(1),
@@ -148,7 +154,7 @@ func (r *mutexRedis) tryLockWithContext(key string, ctx context.Context, maxLock
 	)
 	err = m.LockContext(ctx)
 	if err != nil {
-		if err == redsync.ErrFailed {
+		if isRedsyncErrTaken(err) {
 			err = ErrFailedToAcquireLock
 		}
 		return
@@ -167,9 +173,9 @@ func (r *mutexRedis) tryLockWithContext(key string, ctx context.Context, maxLock
 		}
 	}()
 
-	unlock = func() error {
+	unlock = func(ctx context.Context) error {
 		close(done)
-		ok, err := m.Unlock()
+		ok, err := m.UnlockContext(ctx)
 		if !ok || err != nil {
 			return fmt.Errorf("unlock unsuccessful: %w", err)
 		}
@@ -178,6 +184,6 @@ func (r *mutexRedis) tryLockWithContext(key string, ctx context.Context, maxLock
 	return
 }
 
-func (*mutexRedis) Forget(key string) {
-	RedisMutex(key).Unlock()
+func (*mutexRedis) Forget(ctx context.Context, key string) {
+	RedisMutex(key).UnlockContext(ctx)
 }

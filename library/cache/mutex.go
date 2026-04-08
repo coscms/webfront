@@ -37,13 +37,12 @@ func RegisterTryLocker(t LockType, fn TryLocker) {
 	tryLockers[t] = fn
 }
 
-type UnlockFunc func() error
+type UnlockFunc func(context.Context) error
 type TryLocker interface {
-	Lock(key string) (unlock UnlockFunc, err error)
-	TryLock(key string) (unlock UnlockFunc, err error)
-	TryLockWithTimeout(key string, timeout time.Duration) (unlock UnlockFunc, err error)
-	TryLockWithContext(key string, ctx context.Context) (unlock UnlockFunc, err error)
-	Forget(key string)
+	Lock(ctx context.Context, key string) (unlock UnlockFunc, err error)
+	TryLock(ctx context.Context, key string) (unlock UnlockFunc, err error)
+	TryLockWithTimeout(ctx context.Context, key string, timeout time.Duration) (unlock UnlockFunc, err error)
+	Forget(ctx context.Context, key string)
 }
 
 func GetLocker(types ...LockType) TryLocker {
@@ -59,22 +58,18 @@ func GetLocker(types ...LockType) TryLocker {
 	return tryLockers[LockTypeMemory]
 }
 
-func Lock(key string, types ...LockType) (unlock UnlockFunc, err error) {
-	return GetLocker(types...).Lock(key)
+func Lock(ctx context.Context, key string, types ...LockType) (unlock UnlockFunc, err error) {
+	return GetLocker(types...).Lock(ctx, key)
 }
 
-func TryLock(key string, types ...LockType) (unlock UnlockFunc, err error) {
-	return GetLocker(types...).TryLock(key)
+func TryLock(ctx context.Context, key string, types ...LockType) (unlock UnlockFunc, err error) {
+	return GetLocker(types...).TryLock(ctx, key)
 }
 
-func TryLockWithTimeout(key string, timeout time.Duration, types ...LockType) (unlock UnlockFunc, err error) {
-	return GetLocker(types...).TryLockWithTimeout(key, timeout)
+func TryLockWithTimeout(ctx context.Context, key string, timeout time.Duration, types ...LockType) (unlock UnlockFunc, err error) {
+	return GetLocker(types...).TryLockWithTimeout(ctx, key, timeout)
 }
 
-func TryLockWithContext(key string, ctx context.Context, types ...LockType) (unlock UnlockFunc, err error) {
-	return GetLocker(types...).TryLockWithContext(key, ctx)
-}
-
-func ForgetLock(key string, types ...LockType) {
-	GetLocker(types...).Forget(key)
+func ForgetLock(ctx context.Context, key string, types ...LockType) {
+	GetLocker(types...).Forget(ctx, key)
 }

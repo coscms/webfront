@@ -19,29 +19,29 @@ func init() {
 }
 
 func TestMutex(t *testing.T) {
-	unlock, err := TryLock(`test`)
+	unlock, err := TryLock(context.Background(), `test`)
 	assert.NoError(t, err)
-	err = unlock()
+	err = unlock(context.Background())
 	assert.NoError(t, err)
 }
 
 func TestMutex2(t *testing.T) {
-	unlock, err := TryLock(`test`)
+	unlock, err := TryLock(context.Background(), `test`)
 	assert.NoError(t, err)
-	_, err2 := TryLock(`test`)
+	_, err2 := TryLock(context.Background(), `test`)
 	assert.Equal(t, ErrFailedToAcquireLock, err2)
-	_, err3 := TryLock(`test`)
+	_, err3 := TryLock(context.Background(), `test`)
 	assert.Equal(t, ErrFailedToAcquireLock, err3)
-	err = unlock()
+	err = unlock(context.Background())
 	assert.NoError(t, err)
 
 	TestMutex(t)
 }
 
 func TestMutexRedis(t *testing.T) {
-	unlock, err := TryLock(`test`, LockTypeRedis)
+	unlock, err := TryLock(context.Background(), `test`, LockTypeRedis)
 	if err == nil {
-		err = unlock()
+		err = unlock(context.Background())
 		assert.NoError(t, err)
 	}
 }
@@ -55,12 +55,12 @@ func TestMutexRedisLock(t *testing.T) {
 		go func(i int) {
 			defer wg.Done()
 
-			unlock, err := Lock(`test`, LockTypeRedis)
+			unlock, err := Lock(context.Background(), `test`, LockTypeRedis)
 			assert.NoError(t, err)
 			time.Sleep(1 * time.Second)
 			fmt.Printf("TestMutexRedisLock ================>%d\n", i)
 			n++
-			err = unlock()
+			err = unlock(context.Background())
 			assert.NoError(t, err)
 		}(i)
 	}
@@ -69,13 +69,13 @@ func TestMutexRedisLock(t *testing.T) {
 }
 
 func TestMutexRedis2(t *testing.T) {
-	unlock, err := TryLock(`test`, LockTypeRedis)
+	unlock, err := TryLock(context.Background(), `test`, LockTypeRedis)
 	assert.NoError(t, err)
-	_, err2 := TryLock(`test`, LockTypeRedis)
+	_, err2 := TryLock(context.Background(), `test`, LockTypeRedis)
 	assert.Equal(t, ErrFailedToAcquireLock, err2)
-	_, err3 := TryLock(`test`, LockTypeRedis)
+	_, err3 := TryLock(context.Background(), `test`, LockTypeRedis)
 	assert.Equal(t, ErrFailedToAcquireLock, err3)
-	err = unlock()
+	err = unlock(context.Background())
 	assert.NoError(t, err)
 
 	TestMutexRedis(t)
@@ -86,14 +86,14 @@ func BenchmarkMutex(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			unlock, err := TryLock(`test`)
+			unlock, err := TryLock(context.Background(), `test`)
 			if err != nil {
 				if err == ErrFailedToAcquireLock {
 					continue
 				}
 				panic(err)
 			}
-			err = unlock()
+			err = unlock(context.Background())
 			if err != nil {
 				panic(err)
 			}
@@ -106,14 +106,14 @@ func BenchmarkMutexRedis(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			unlock, err := TryLock(`test`, LockTypeRedis)
+			unlock, err := TryLock(context.Background(), `test`, LockTypeRedis)
 			if err != nil {
 				if err == ErrFailedToAcquireLock {
 					continue
 				}
 				panic(err)
 			}
-			err = unlock()
+			err = unlock(context.Background())
 			if err != nil {
 				panic(err)
 			}
