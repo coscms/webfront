@@ -65,7 +65,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.1
-	github.com/admpub/translate v0.0.0-20260413080824-0226244dd8a7
+	github.com/admpub/translate v0.0.0-20260413081133-08d837444849
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/tree v0.1.0
@@ -113,6 +113,7 @@ require (
 	github.com/admpub/go-captcha/v2 v2.0.7 // indirect
 	github.com/admpub/go-figure v0.1.0 // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
+	github.com/admpub/go-ollama v0.0.0-20260413043901-9877e7baaacd // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
 	github.com/admpub/go-pretty/v6 v6.0.4 // indirect
 	github.com/admpub/go-ps v0.0.1 // indirect
