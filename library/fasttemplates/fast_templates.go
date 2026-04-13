@@ -18,16 +18,18 @@ type FastTemplates struct {
 	l sync.RWMutex
 }
 
-func (f *FastTemplates) Set(key string, t *fasttemplate.Template) {
+func (f *FastTemplates) Set(key string, t *fasttemplate.Template) *FastTemplates {
 	f.l.Lock()
 	f.m[key] = t
 	f.l.Unlock()
+	return f
 }
 
-func (f *FastTemplates) SetBy(content, startTag, endTag string) {
+func (f *FastTemplates) SetBy(content, startTag, endTag string) *FastTemplates {
 	k := content + `,` + startTag + endTag
 	t := fasttemplate.New(content, startTag, endTag)
 	f.Set(k, t)
+	return f
 }
 
 func (f *FastTemplates) Get(key string) (t *fasttemplate.Template) {
