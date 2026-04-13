@@ -13,7 +13,7 @@ require (
 	github.com/admpub/copier v0.1.1
 	github.com/admpub/decimal v1.3.2
 	github.com/admpub/errors v0.8.2
-	github.com/admpub/fasttemplate v0.0.2
+	github.com/admpub/fasttemplate v0.0.3
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/go-hashids v2.0.1+incompatible
 	github.com/admpub/go-shortid v0.0.0-20140827050853-24d054c393fe
@@ -65,7 +65,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.1
-	github.com/admpub/translate v0.0.0-20251210091442-a87b3fc63eda
+	github.com/admpub/translate v0.0.0-20260413080824-0226244dd8a7
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/tree v0.1.0
