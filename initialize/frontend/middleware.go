@@ -1,8 +1,8 @@
 package frontend
 
 import (
-	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/ntemplate"
+	"github.com/coscms/webfront/library/xtheme"
 	"github.com/webx-top/echo"
 )
 
@@ -16,8 +16,13 @@ func FrontendURLFuncMW() echo.MiddlewareFunc {
 }
 
 func FrontendURLFunc(c echo.Context) error {
+	var themeInfo *ntemplate.ThemeInfo
 	c.SetFunc(`ThemeInfo`, func() *ntemplate.ThemeInfo {
-		return httpserver.Frontend.Template.ThemeInfo(c)
+		if themeInfo != nil {
+			return themeInfo
+		}
+		themeInfo = xtheme.GetThemeInfo(c)
+		return themeInfo
 	})
 	return nil
 }

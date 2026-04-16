@@ -5,13 +5,13 @@ import (
 
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/captcha/captchabiz"
-	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webcore/library/nsql"
 	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/logic/articlelogic"
 	"github.com/coscms/webfront/library/xcommon"
+	"github.com/coscms/webfront/library/xtheme"
 	"github.com/coscms/webfront/model/official"
 	modelAdvert "github.com/coscms/webfront/model/official/advert"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
@@ -132,7 +132,7 @@ func (r *RenderData) Advert(idents ...string) interface{} {
 }
 
 func (r *RenderData) ThemeInfo() *ntemplate.ThemeInfo {
-	return httpserver.Frontend.Template.ThemeInfo(r.ctx)
+	return xtheme.GetThemeInfo(r.ctx)
 }
 
 func (r *RenderData) Price(price float64, precision ...int32) float64 {
