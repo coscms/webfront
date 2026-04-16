@@ -4,7 +4,7 @@ go 1.26.1
 
 exclude github.com/gomodule/redigo v2.0.0+incompatible
 
-require github.com/coscms/webcore v0.13.3-0.20260416053520-42870dc8463e
+require github.com/coscms/webcore v0.13.3-0.20260416131326-e6f24139e59d
 
 require (
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
