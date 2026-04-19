@@ -81,7 +81,8 @@ func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, err
 	if len(sorts) == 0 {
 		sorts = append(sorts, `-id`)
 	}
-	columns := make([]any, 0, len(resourceFields))
+	columns := make([]any, 0, len(resourceFields)+1)
+	columns = append(columns, `id`)
 	for _, column := range resourceFields {
 		columns = append(columns, column)
 	}
@@ -89,8 +90,8 @@ func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, err
 		return r.Select(columns...).OrderBy(sorts...)
 	}
 	pr := factory.ParamPoolGet()
-	ls := pr.SetCollection(table).SetMW(smw).SetRecv(&list).NewLister()
-	err = pagination.ListPageByOffset(ls, cnd)
+	ls := pr.SetCollection(table).SetRecv(&list).NewLister()
+	err = pagination.ListPageByOffset(ls, cnd, smw)
 	pr.Release()
 	if err != nil {
 		return list, err
