@@ -31,7 +31,7 @@ func List(ctx echo.Context, query ListQuery) ([]*ListItem, error) {
 	if query.RowID > 0 {
 		cond.AddKV(`T.row_id`, query.RowID)
 	}
-	pr := tM.NewParam().SetAlias(`T`).SetArgs(cond.And()).AddJoin(`INNER`, rM.Name_(), `R`, `R.id=T.resource_id`)
+	pr := tM.NewParam().SetAlias(`T`).SetArgs(cond.And()).AddJoin(`INNER`, rM.Name_(), `R`, `R.id=T.resource_id`).SetContext(ctx)
 	tM.SetParam(pr)
 	err := tM.ListPageByOffsetAs(&list, cond)
 	if err != nil {
@@ -89,7 +89,7 @@ func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, err
 	smw := func(r db.Result) db.Result {
 		return r.Select(columns...).OrderBy(sorts...)
 	}
-	pr := factory.ParamPoolGet()
+	pr := factory.ParamPoolGet().SetContext(ctx)
 	ls := pr.SetCollection(table).SetRecv(&list).NewLister()
 	err = pagination.ListPageByOffset(ls, cnd, smw)
 	pr.Release()
