@@ -6,6 +6,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 )
 
@@ -39,4 +40,8 @@ func ListenTable() {
 	}
 	sort.Strings(tables)
 	log.Infof(`[i18nm.ListenTable] %v`, strings.Join(tables, `, `))
+	for _, table := range tables {
+		structName := com.PascalCase(table)
+		TableTitles.Add(table, dbschema.DBI.Models[structName].Comment)
+	}
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-var TableTitles = echo.NewKVData()
+var TableTitles = echo.NewKVxData[[]string, any]()
 
 type ListItem struct {
 	*dbschema.OfficialI18nTranslation
