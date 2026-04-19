@@ -8,30 +8,6 @@ import (
 	"github.com/webx-top/echo"
 )
 
-var TableTitles = echo.NewKVxData[[]string, any]()
-
-func RegisterTableTitle(table string, title string, columns []string, editURL ...string) {
-	item := TableTitles.GetItem(table)
-	if item == nil {
-		item = echo.NewKVx[[]string, any](table, title)
-		item.X = columns
-		if len(editURL) > 0 {
-			item.SetHKV(`editURL`, editURL[0])
-		}
-		TableTitles.AddItem(item)
-		return
-	}
-	if len(item.V) == 0 && len(title) > 0 {
-		item.V = title
-	}
-	if len(item.X) == 0 && len(columns) > 0 {
-		item.X = columns
-	}
-	if len(editURL) > 0 {
-		item.SetHKV(`editURL`, editURL[0])
-	}
-}
-
 type ListItem struct {
 	*dbschema.OfficialI18nTranslation
 	*dbschema.OfficialI18nResource
