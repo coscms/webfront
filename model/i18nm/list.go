@@ -41,13 +41,21 @@ func List(ctx echo.Context, query ListQuery) ([]*ListItem, error) {
 	return list, err
 }
 
-func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowID uint64, lang string, translatedText string) error {
-	resourceIDs, _, err := getResourceIDs(ctx, table, column)
+func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowID uint64, lang string, translatedText string) (affected int64, err error) {
+	if len(lang) == 0 || LangIsDefault(lang) {
+		pr := factory.NewParam().SetContext(ctx)
+		affected, err = pr.SetCollection(table).SetSend(echo.H{
+			column: translatedText,
+		}).SetArgs(`id`, rowID).Updatex()
+		return
+	}
+	var resourceIDs []uint
+	resourceIDs, _, err = getResourceIDs(ctx, table, column)
 	if err != nil {
-		return err
+		return
 	}
 	if len(resourceIDs) == 0 {
-		return nil
+		return
 	}
 
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
@@ -55,12 +63,11 @@ func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowI
 	cnd.AddKV(`lang`, lang)
 	cnd.AddKV(`row_id`, rowID)
 	cnd.AddKV(`resource_id`, resourceIDs[0])
-	var affected int64
 	affected, err = tM.UpdatexFields(nil, echo.H{
 		`text`: translatedText,
 	}, cnd.And())
 	if err != nil {
-		return err
+		return
 	}
 	if affected < 1 {
 		tM.Lang = lang
@@ -68,8 +75,12 @@ func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowI
 		tM.RowId = rowID
 		tM.Text = translatedText
 		_, err = tM.Insert()
+		if err != nil {
+			return
+		}
+		affected = 1
 	}
-	return err
+	return
 }
 
 func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, error) {
