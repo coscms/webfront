@@ -18,6 +18,7 @@ type ListItem struct {
 type ListQuery struct {
 	Table string
 	RowID uint64
+	Lang  string
 }
 
 func List(ctx echo.Context, query ListQuery) ([]*ListItem, error) {
@@ -71,13 +72,16 @@ func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowI
 	return err
 }
 
-func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, error) {
+func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, error) {
 	var list []echo.H
-	resourceIDs, resourceFields, err := getResourceIDs(ctx, table)
+	resourceIDs, resourceFields, err := getResourceIDs(ctx, query.Table)
 	if err != nil {
 		return list, err
 	}
 	cnd := db.NewCompounds()
+	if query.RowID > 0 {
+		cnd.AddKV(`id`, query.RowID)
+	}
 	if len(sorts) == 0 {
 		sorts = append(sorts, `-id`)
 	}
@@ -90,7 +94,7 @@ func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, err
 		return r.Select(columns...).OrderBy(sorts...)
 	}
 	pr := factory.ParamPoolGet().SetContext(ctx)
-	ls := pr.SetCollection(table).SetRecv(&list).NewLister()
+	ls := pr.SetCollection(query.Table).SetRecv(&list).NewLister()
 	err = pagination.ListPageByOffset(ls, cnd, smw)
 	pr.Release()
 	if err != nil {
@@ -110,6 +114,9 @@ func ListByResource(ctx echo.Context, table string, sorts ...any) ([]echo.H, err
 	cnd.Reset()
 	cnd.AddKV(`resource_id`, db.In(resourceIDs))
 	cnd.AddKV(`row_id`, db.In(rowIDs))
+	if len(query.Lang) > 0 {
+		cnd.AddKV(`lang`, query.Lang)
+	}
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	_, err = tM.ListByOffset(nil, nil, 0, -1, cnd)
 	if err != nil {
