@@ -8,7 +8,6 @@ import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
-	"github.com/webx-top/echo"
 )
 
 // ListenTable listen table
@@ -47,6 +46,6 @@ func ListenTable() {
 	log.Infof(`[i18nm.ListenTable] %v`, strings.Join(tables, `, `))
 	for _, table := range tables {
 		structName := com.PascalCase(table)
-		TableTitles.Add(table, dbschema.DBI.Models[structName].Comment, echo.KVxOptX[[]string, any](tableFields[table]))
+		RegisterTableTitle(table, dbschema.DBI.Models[structName].Comment, tableFields[table])
 	}
 }
