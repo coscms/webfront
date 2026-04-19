@@ -8,11 +8,13 @@ import (
 	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
+	"github.com/webx-top/echo"
 )
 
 // ListenTable listen table
 func ListenTable() {
 	var tables []string
+	tableFields := map[string][]string{}
 	for table, fieldInfo := range dbschema.DBI.Fields {
 		var hasMultilingual bool
 		for _, info := range fieldInfo {
@@ -20,7 +22,10 @@ func ListenTable() {
 				continue
 			}
 			hasMultilingual = true
-			break
+			if _, ok := tableFields[table]; !ok {
+				tableFields[table] = []string{}
+			}
+			tableFields[table] = append(tableFields[table], info.Name)
 		}
 		if !hasMultilingual {
 			continue
@@ -42,6 +47,6 @@ func ListenTable() {
 	log.Infof(`[i18nm.ListenTable] %v`, strings.Join(tables, `, `))
 	for _, table := range tables {
 		structName := com.PascalCase(table)
-		TableTitles.Add(table, dbschema.DBI.Models[structName].Comment)
+		TableTitles.Add(table, dbschema.DBI.Models[structName].Comment, echo.KVxOptX[[]string, any](tableFields[table]))
 	}
 }
