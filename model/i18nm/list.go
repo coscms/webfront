@@ -264,17 +264,18 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						np.Failure(err.Error())
 						return nil, err
 					}
+					cond := db.And(
+						db.Cond{`row_id`: tM.RowId},
+						db.Cond{`resource_id`: tM.ResourceId},
+						db.Cond{`lang`: tM.Lang},
+					)
 					tM.RowId = rowID
 					tM.ResourceId = resourceID
 					tM.Lang = langCode
 					tM.Text = translatedText
 					affected, err := tM.UpdatexFields(nil, echo.H{
 						`text`: tM.Text,
-					}, db.And(
-						db.Cond{`row_id`: tM.RowId},
-						db.Cond{`resource_id`: tM.ResourceId},
-						db.Cond{`lang`: tM.Lang},
-					))
+					}, cond)
 					if err != nil {
 						np.Failure(err.Error())
 						return nil, err
@@ -283,12 +284,19 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						np.Success(ctx.T(`更新成功`))
 						continue
 					}
-					_, err = tM.Insert()
-					if err != nil {
+					if exists, err := tM.Exists(nil, cond); err != nil {
 						np.Failure(err.Error())
 						return nil, err
+					} else if !exists {
+						_, err = tM.Insert()
+						if err != nil {
+							np.Failure(err.Error())
+							return nil, err
+						}
+						np.Success(ctx.T(`创建成功`))
+					} else {
+						np.Success(ctx.T(`已存在相同翻译，跳过`))
 					}
-					np.Success(ctx.T(`创建成功`))
 				}
 			}
 
