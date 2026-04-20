@@ -253,17 +253,15 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 				} else {
 					langList = langCfg.AllList
 				}
-				nMsg := ctx.T(`开始翻译“%s”`, originalText)
-				np.Send(nMsg, notice.StateSuccess)
+				np.Success(ctx.T(`开始翻译“%s”...`, originalText))
 				for _, langCode := range langList {
 					if LangIsDefault(langCode) {
 						continue
 					}
-					msg := ctx.T(`正在翻译成 %s ...`, langCode)
-					np.Send(msg, notice.StateSuccess)
+					np.Success(ctx.T(`正在翻译成 %s ...`, langCode))
 					translatedText, err := translateText(ctx, `string`, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
-						np.Send(err.Error(), notice.StateFailure)
+						np.Failure(err.Error())
 						return nil, err
 					}
 					tM.RowId = rowID
@@ -278,19 +276,19 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						db.Cond{`lang`: tM.Lang},
 					))
 					if err != nil {
-						np.Send(err.Error(), notice.StateFailure)
+						np.Failure(err.Error())
 						return nil, err
 					}
 					if affected > 0 {
-						np.Send(ctx.T(`更新成功`), notice.StateSuccess)
+						np.Success(ctx.T(`更新成功`))
 						continue
 					}
 					_, err = tM.Insert()
 					if err != nil {
-						np.Send(err.Error(), notice.StateFailure)
+						np.Failure(err.Error())
 						return nil, err
 					}
-					np.Send(ctx.T(`创建成功`), notice.StateSuccess)
+					np.Success(ctx.T(`创建成功`))
 				}
 			}
 
