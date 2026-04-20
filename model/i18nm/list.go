@@ -314,6 +314,6 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 		return db.Cond{`id`: db.Gt(lastID)}, nil
 	}, 100)
 	pr.Release()
-	np.Success(ctx.T(`处理完成`))
+	np.Success(ctx.T(`翻译结束`))
 	return err
 }
