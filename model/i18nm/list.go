@@ -222,7 +222,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 	err = offsetLister.ChunkListNoOffset(func() (db.Compound, error) {
 		_lastID := lastID
 		for _, row := range list {
-			np.OnlyAdd(1)
+			np.Done(1)
 			rowID := row.Uint64(`id`)
 			if rowID == 0 {
 				continue
