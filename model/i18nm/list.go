@@ -210,6 +210,7 @@ func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
 	translate := cfg.Translate
 	langCfg := config.FromFile().Language
 	err = offsetLister.ChunkListNoOffset(func() (db.Compound, error) {
+		_lastID := lastID
 		for _, row := range list {
 			rowID := row.Uint64(`id`)
 			if rowID == 0 {
@@ -280,6 +281,9 @@ func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
 			if err != nil {
 				return nil, err
 			}
+		}
+		if _lastID == lastID {
+			return nil, db.ErrNoMoreRows
 		}
 		return db.Cond{`id`: db.Gt(lastID)}, nil
 	}, 100)
