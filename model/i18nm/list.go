@@ -264,15 +264,15 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						np.Failure(err.Error())
 						return nil, err
 					}
+					tM.RowId = rowID
+					tM.ResourceId = resourceID
+					tM.Lang = langCode
+					tM.Text = translatedText
 					cond := db.And(
 						db.Cond{`row_id`: tM.RowId},
 						db.Cond{`resource_id`: tM.ResourceId},
 						db.Cond{`lang`: tM.Lang},
 					)
-					tM.RowId = rowID
-					tM.ResourceId = resourceID
-					tM.Lang = langCode
-					tM.Text = translatedText
 					affected, err := tM.UpdatexFields(nil, echo.H{
 						`text`: tM.Text,
 					}, cond)
