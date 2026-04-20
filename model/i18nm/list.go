@@ -1,7 +1,11 @@
 package i18nm
 
 import (
+	"errors"
+
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/cache"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/db/lib/factory/pagination"
@@ -17,6 +21,7 @@ type ListQuery struct {
 	Table string
 	RowID uint64
 	Lang  string
+	Sorts []any
 }
 
 func List(ctx echo.Context, query ListQuery) ([]*ListItem, error) {
@@ -81,7 +86,7 @@ func UpdateColumnTranslation(ctx echo.Context, table string, column string, rowI
 	return
 }
 
-func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, error) {
+func ListByResource(ctx echo.Context, query ListQuery) ([]echo.H, error) {
 	var list []echo.H
 	resourceIDs, resourceFields, err := getResourceIDs(ctx, query.Table)
 	if err != nil {
@@ -91,8 +96,8 @@ func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, 
 	if query.RowID > 0 {
 		cnd.AddKV(`id`, query.RowID)
 	}
-	if len(sorts) == 0 {
-		sorts = append(sorts, `-id`)
+	if len(query.Sorts) == 0 {
+		query.Sorts = append(query.Sorts, `-id`)
 	}
 	columns := make([]any, 0, len(resourceFields)+1)
 	columns = append(columns, `id`)
@@ -100,7 +105,7 @@ func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, 
 		columns = append(columns, column)
 	}
 	smw := func(r db.Result) db.Result {
-		return r.Select(columns...).OrderBy(sorts...)
+		return r.Select(columns...).OrderBy(query.Sorts...)
 	}
 	pr := factory.ParamPoolGet().SetContext(ctx)
 	ls := pr.SetCollection(query.Table).SetRecv(&list).NewLister()
@@ -152,4 +157,132 @@ func ListByResource(ctx echo.Context, query ListQuery, sorts ...any) ([]echo.H, 
 		translations[row.Lang].(echo.H)[field] = row.Text
 	}
 	return list, err
+}
+
+func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
+	cfg := DefaultSaveModelTranslationsOptions
+	if cfg.AllowForceTranslate == nil {
+		return errors.New("AllowForceTranslate function is not set in configuration")
+	}
+	forceTranslate := cfg.AllowForceTranslate(ctx)
+	if cfg.translator == nil {
+		return errors.New("Translator function is not set in configuration")
+	}
+
+	var list []echo.H
+	_, resourceFields, err := getResourceIDs(ctx, query.Table)
+	if err != nil {
+		return err
+	}
+	cacheKey := `translation.` + query.Table
+	var cacheExpire int64 = 86400 * 365 * 10
+	var lastID uint64
+	cnd := db.NewCompounds()
+	if query.RowID > 0 {
+		cnd.AddKV(`id`, query.RowID)
+	} else if len(restartID) > 0 {
+		lastID = restartID[0]
+		cnd.AddKV(`id`, db.Gte(lastID))
+	} else {
+		err = cache.Get(ctx, cacheKey, &lastID)
+		if err != nil && !cache.IsNotExist(err) {
+			return err
+		}
+		cnd.AddKV(`id`, db.Gt(lastID))
+	}
+	if len(query.Sorts) == 0 {
+		query.Sorts = append(query.Sorts, `id`)
+	}
+	columnsResourceID := map[string]uint{}
+	columns := make([]any, 0, len(resourceFields)+1)
+	columns = append(columns, `id`)
+	for resourceID, column := range resourceFields {
+		columns = append(columns, column)
+		columnsResourceID[column] = resourceID
+	}
+	smw := func(r db.Result) db.Result {
+		return r.Select(columns...).OrderBy(query.Sorts...)
+	}
+	pr := factory.ParamPoolGet().SetContext(ctx)
+	ls := pr.SetCollection(query.Table).SetRecv(&list).NewLister()
+	offsetLister := pagination.NewOffsetLister(ls, &list, smw, cnd.And())
+	tM := dbschema.NewOfficialI18nTranslation(ctx)
+	translate := cfg.Translate
+	langCfg := config.FromFile().Language
+	err = offsetLister.ChunkListNoOffset(func() (db.Compound, error) {
+		for _, row := range list {
+			rowID := row.Uint64(`id`)
+			if rowID == 0 {
+				continue
+			}
+			lastID = rowID
+			for column, value := range row {
+				if column == `id` {
+					continue
+				}
+				if value == nil {
+					continue
+				}
+				originalText, ok := value.(string)
+				if !ok {
+					continue
+				}
+				resourceID, ok := columnsResourceID[column]
+				if !ok {
+					continue
+				}
+				var restoreFunc func(translatedText string) string
+				if cfg.originalTextPickout != nil {
+					originalText, restoreFunc = cfg.originalTextPickout(query.Table, column, originalText)
+				}
+				var langList []string
+				if len(query.Lang) > 0 {
+					langList = []string{query.Lang}
+				} else {
+					langList = langCfg.AllList
+				}
+				for _, langCode := range langList {
+					if LangIsDefault(langCode) {
+						continue
+					}
+					translatedText, err := translateText(ctx, `string`, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
+					if err != nil {
+						return nil, err
+					}
+					tM.RowId = rowID
+					tM.ResourceId = resourceID
+					tM.Lang = langCode
+					tM.Text = translatedText
+					affected, err := tM.UpdatexFields(nil, echo.H{
+						`text`: tM.Text,
+					}, db.And(
+						db.Cond{`row_id`: tM.RowId},
+						db.Cond{`resource_id`: tM.ResourceId},
+						db.Cond{`lang`: tM.Lang},
+					))
+					if err != nil {
+						return nil, err
+					}
+					if affected > 0 {
+						continue
+					}
+					_, err = tM.Insert()
+					if err != nil {
+						return nil, err
+					}
+					if query.RowID == 0 {
+						continue
+					}
+				}
+			}
+
+			err = cache.Put(ctx, cacheKey, lastID, cacheExpire)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return db.Cond{`id`: db.Gt(lastID)}, nil
+	}, 100)
+	pr.Release()
+	return err
 }

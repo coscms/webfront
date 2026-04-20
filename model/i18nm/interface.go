@@ -1,5 +1,10 @@
 package i18nm
 
+import (
+	"github.com/coscms/webcore/library/common"
+	"github.com/webx-top/echo"
+)
+
 // Model is an interface for model instances.
 type Model interface {
 	Short_() string
@@ -24,4 +29,30 @@ func GetRowID(mdl Model) uint64 {
 	default:
 	}
 	return id
+}
+
+func translateText(ctx echo.Context, contentType string, translate Translator, restoreFunc func(string) string,
+	forceTranslate bool, autoTranslate bool, field string, originalText string, translatedText string,
+	langCode string, langDefault string) (string, error) {
+	if len(contentType) == 0 {
+		contentType = `string` // 默认string类型(单行文本)
+	}
+	if !common.CanTranslateContent(contentType) {
+		return translatedText, nil
+	}
+	var err error
+	if forceTranslate {
+		translatedText, err = translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
+	} else if len(translatedText) == 0 && autoTranslate {
+		translatedText, err = translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
+	} else {
+		return translatedText, nil
+	}
+	if err != nil {
+		return translatedText, err
+	}
+	if restoreFunc != nil {
+		translatedText = restoreFunc(translatedText)
+	}
+	return translatedText, nil
 }

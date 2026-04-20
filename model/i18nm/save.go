@@ -158,24 +158,9 @@ func SaveModelTranslations(ctx echo.Context, mdl Model, id uint64, options ...fu
 			if len(contentType) == 0 {
 				contentType = `string` // 默认string类型(单行文本)
 			}
-			if common.CanTranslateContent(contentType) {
-				if forceTranslate {
-					translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
-					if err != nil {
-						return err
-					}
-					if restoreFunc != nil {
-						translatedText = restoreFunc(translatedText)
-					}
-				} else if len(translatedText) == 0 && autoTranslate {
-					translatedText, err = cfg.Translate(ctx, field, translatedText, originalText, contentType, langCode, langDefault)
-					if err != nil {
-						return err
-					}
-					if restoreFunc != nil {
-						translatedText = restoreFunc(translatedText)
-					}
-				}
+			translatedText, err = translateText(ctx, contentType, cfg.Translate, restoreFunc, forceTranslate, autoTranslate, field, originalText, translatedText, langCode, langDefault)
+			if err != nil {
+				return err
 			}
 			if len(translatedText) == 0 {
 				if hasUpload(field) {
