@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/webx-top/db"
@@ -159,7 +160,7 @@ func ListByResource(ctx echo.Context, query ListQuery) ([]echo.H, error) {
 	return list, err
 }
 
-func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
+func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID ...uint64) error {
 	cfg := DefaultSaveModelTranslationsOptions
 	if cfg.AllowForceTranslate == nil {
 		return errors.New("AllowForceTranslate function is not set in configuration")
@@ -206,12 +207,22 @@ func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
 	pr := factory.ParamPoolGet().SetContext(ctx)
 	ls := pr.SetCollection(query.Table).SetRecv(&list).NewLister()
 	offsetLister := pagination.NewOffsetLister(ls, &list, smw, cnd.And())
+	np.Reset()
+	var initedNP bool
+	offsetLister.SetProg(func(offset, total int64) {
+		if initedNP {
+			return
+		}
+		np.Add(total)
+		initedNP = true
+	})
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	translate := cfg.Translate
 	langCfg := config.FromFile().Language
 	err = offsetLister.ChunkListNoOffset(func() (db.Compound, error) {
 		_lastID := lastID
 		for _, row := range list {
+			np.OnlyAdd(1)
 			rowID := row.Uint64(`id`)
 			if rowID == 0 {
 				continue
@@ -242,12 +253,17 @@ func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
 				} else {
 					langList = langCfg.AllList
 				}
+				nMsg := ctx.T(`开始翻译“%s”`, originalText)
+				np.Send(nMsg, notice.StateSuccess)
 				for _, langCode := range langList {
 					if LangIsDefault(langCode) {
 						continue
 					}
+					msg := ctx.T(`正在翻译成 %s ...`, langCode)
+					np.Send(msg, notice.StateSuccess)
 					translatedText, err := translateText(ctx, `string`, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
+						np.Send(err.Error(), notice.StateFailure)
 						return nil, err
 					}
 					tM.RowId = rowID
@@ -262,21 +278,25 @@ func Batch(ctx echo.Context, query ListQuery, restartID ...uint64) error {
 						db.Cond{`lang`: tM.Lang},
 					))
 					if err != nil {
+						np.Send(err.Error(), notice.StateFailure)
 						return nil, err
 					}
 					if affected > 0 {
+						np.Send(ctx.T(`更新成功`), notice.StateSuccess)
 						continue
 					}
 					_, err = tM.Insert()
 					if err != nil {
+						np.Send(err.Error(), notice.StateFailure)
 						return nil, err
 					}
-					if query.RowID == 0 {
-						continue
-					}
+					np.Send(ctx.T(`创建成功`), notice.StateSuccess)
 				}
 			}
 
+			if query.RowID == 0 {
+				continue
+			}
 			err = cache.Put(ctx, cacheKey, lastID, cacheExpire)
 			if err != nil {
 				return nil, err
