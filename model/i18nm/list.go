@@ -229,7 +229,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 			}
 			lastID = rowID
 			for column, value := range row {
-				if column == `id` {
+				if column == `id` || column == `contype` {
 					continue
 				}
 				if value == nil {
@@ -309,6 +309,9 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 			}
 		}
 		if _lastID == lastID {
+			return nil, db.ErrNoMoreRows
+		}
+		if query.RowID > 0 {
 			return nil, db.ErrNoMoreRows
 		}
 		return db.Cond{`id`: db.Gt(lastID)}, nil
