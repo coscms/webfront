@@ -1,12 +1,31 @@
-package translate
+package i18nm
 
-import "github.com/coscms/webcore/library/config"
+import (
+	"errors"
+
+	"github.com/coscms/webcore/library/config"
+)
 
 // Config 配置
 type Config struct {
 	Providers           []ProviderConfig `json:"providers"`           // 翻译提供商
 	On                  bool             `json:"on"`                  // 是否开启翻译
 	AllowForceTranslate bool             `json:"allowForceTranslate"` // 是否允许强制翻译
+}
+
+var ErrTranslationOff = errors.New(`translation is turned off`)
+var ErrNoTranslationProviders = errors.New(`no translation providers configured`)
+
+// Check validates the translation configuration and returns an error if the configuration is invalid.
+// It checks if translation is enabled and if there are any translation providers configured.
+func (c *Config) Check() error {
+	if !c.On {
+		return ErrTranslationOff
+	}
+	if len(c.Providers) == 0 {
+		return ErrNoTranslationProviders
+	}
+	return nil
 }
 
 // ProviderConfig 配置

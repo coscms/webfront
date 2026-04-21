@@ -21,11 +21,11 @@ import (
 func init() {
 	i18nm.DefaultSaveModelTranslationsOptions.SetTranslator(Translate)
 	i18nm.DefaultSaveModelTranslationsOptions.SetAllowForceTranslate(func(ctx echo.Context) bool {
-		return GetConfig().AllowForceTranslate
+		return i18nm.GetConfig().AllowForceTranslate
 	})
 	extend.Register(`translate`, initTranslateConfig)
 	formbuilderCore.TranslateableGetter = func(ctx echo.Context) bool {
-		cfg := GetConfig()
+		cfg := i18nm.GetConfig()
 		if !cfg.On || len(cfg.Providers) == 0 {
 			return false
 		}
@@ -34,7 +34,7 @@ func init() {
 }
 
 func initTranslateConfig() interface{} {
-	return NewConfig()
+	return i18nm.NewConfig()
 }
 
 // Translate translates the given value from originalLangCode to langCode based on content type.
@@ -52,12 +52,13 @@ func initTranslateConfig() interface{} {
 //   - translated string
 //   - error if translation fails
 func Translate(ctx echo.Context, fieldName string, value string, originalValue string, contentType string, langCode string, originalLangCode string) (string, error) {
-	if com.StrIsNumeric(value) {
+	if com.StrIsNumeric(value) || len(originalValue) == 0 {
 		return value, nil
 	}
-	cfg := GetConfig()
-	if !cfg.On || len(cfg.Providers) == 0 {
-		return value, nil
+	cfg := i18nm.GetConfig()
+	err := cfg.Check()
+	if err != nil {
+		return value, err
 	}
 	translateConfig := translate.AcquireConfig()
 	translateConfig.Input = originalValue
@@ -71,7 +72,6 @@ func Translate(ctx echo.Context, fieldName string, value string, originalValue s
 		translateConfig.Format = `markdown`
 	}
 	defer translateConfig.Release()
-	var err error
 	var translatedText string
 	for _, provider := range cfg.Providers {
 		trs := translate.GetProvider(provider.Provider)

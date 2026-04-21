@@ -161,6 +161,9 @@ func ListByResource(ctx echo.Context, query ListQuery) ([]echo.H, error) {
 }
 
 func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID ...uint64) error {
+	if err := GetConfig().Check(); err != nil {
+		return err
+	}
 	cfg := DefaultSaveModelTranslationsOptions
 	if cfg.AllowForceTranslate == nil {
 		return errors.New("AllowForceTranslate function is not set in configuration")
