@@ -288,7 +288,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 				msg := ctx.T(`开始翻译“%s”...`, translateObjectMsg)
 				np.Success(msg)
 				for _, langCode := range langList {
-					msgPrefix := `[` + langCode + `]`
+					msgPrefix := `[` + langCode + `] `
 					np.Success(msgPrefix + msg)
 					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
