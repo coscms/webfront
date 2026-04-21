@@ -11,6 +11,7 @@ import (
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/db/lib/factory/pagination"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 )
 
 type ListItem struct {
@@ -211,27 +212,46 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 	smw := func(r db.Result) db.Result {
 		return r.Select(columns...).OrderBy(query.Sorts...)
 	}
+	langCfg := config.FromFile().Language
+	var langList []string
+	if len(query.Lang) > 0 {
+		if LangIsDefault(query.Lang) {
+			return ctx.NewError(code.DataNotChanged, "指定的语言是默认语言，无需翻译")
+		}
+		langList = []string{query.Lang}
+	} else {
+		for _, lang := range langCfg.AllList {
+			if LangIsDefault(lang) {
+				continue
+			}
+			langList = append(langList, lang)
+		}
+		if len(langList) == 0 {
+			return ctx.NewError(code.DataNotChanged, "没有可翻译的目标语言")
+		}
+	}
 	pr := factory.ParamPoolGet().SetContext(ctx)
 	ls := pr.SetCollection(query.Table).SetRecv(&list).NewLister()
 	offsetLister := pagination.NewOffsetLister(ls, &list, smw, cnd.And())
 	np.Reset()
+	progNLang := int64(len(langList))
+	progNRow := int64(len(langList) * len(resourceFields))
 	var initedNP bool
 	offsetLister.SetProg(func(offset, total int64) {
 		if initedNP {
 			return
 		}
-		np.Add(total)
+		np.Add(total * progNRow)
 		initedNP = true
 	})
 	tM := dbschema.NewOfficialI18nTranslation(ctx)
 	translate := cfg.Translate
-	langCfg := config.FromFile().Language
 	err = offsetLister.ChunkListNoOffset(func() (db.Compound, error) {
 		_lastID := lastID
 		for _, row := range list {
-			np.Done(1)
 			rowID := row.Uint64(`id`)
 			if rowID == 0 {
+				np.Done(progNRow)
 				continue
 			}
 			lastID = rowID
@@ -246,31 +266,25 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 					continue
 				}
 				if value == nil {
+					np.Done(progNLang)
 					continue
 				}
 				originalText, ok := value.(string)
 				if !ok {
+					np.Done(progNLang)
 					continue
 				}
 				resourceID, ok := columnsResourceID[column]
 				if !ok {
+					np.Done(progNLang)
 					continue
 				}
 				var restoreFunc func(translatedText string) string
 				if cfg.originalTextPickout != nil {
 					originalText, restoreFunc = cfg.originalTextPickout(query.Table, column, originalText)
 				}
-				var langList []string
-				if len(query.Lang) > 0 {
-					langList = []string{query.Lang}
-				} else {
-					langList = langCfg.AllList
-				}
 				np.Success(ctx.T(`开始翻译“%s”...`, originalText))
 				for _, langCode := range langList {
-					if LangIsDefault(langCode) {
-						continue
-					}
 					np.Success(ctx.T(`正在翻译成 %s ...`, langCode))
 					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
@@ -295,6 +309,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 					}
 					if affected > 0 {
 						np.Success(ctx.T(`更新成功`))
+						np.Done(1)
 						continue
 					}
 					if exists, err := tM.Exists(nil, cond); err != nil {
@@ -310,6 +325,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 					} else {
 						np.Success(ctx.T(`已存在相同翻译，跳过`))
 					}
+					np.Done(1)
 				}
 			}
 
