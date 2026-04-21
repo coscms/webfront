@@ -201,6 +201,10 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 		columns = append(columns, column)
 		columnsResourceID[column] = resourceID
 	}
+	hasContype := dbschema.DBI.Fields.ExistField(query.Table, `contype`)
+	if hasContype {
+		columns = append(columns, `contype`)
+	}
 	smw := func(r db.Result) db.Result {
 		return r.Select(columns...).OrderBy(query.Sorts...)
 	}
@@ -228,6 +232,12 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 				continue
 			}
 			lastID = rowID
+			var contype string
+			if hasContype {
+				contype = row.String(`contype`)
+			} else {
+				contype = `string`
+			}
 			for column, value := range row {
 				if column == `id` || column == `contype` {
 					continue
@@ -259,7 +269,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						continue
 					}
 					np.Success(ctx.T(`正在翻译成 %s ...`, langCode))
-					translatedText, err := translateText(ctx, `string`, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
+					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
 						np.Failure(err.Error())
 						return nil, err
