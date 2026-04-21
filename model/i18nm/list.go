@@ -7,6 +7,7 @@ import (
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/cache"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/db/lib/factory/pagination"
@@ -283,9 +284,12 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 				if cfg.originalTextPickout != nil {
 					originalText, restoreFunc = cfg.originalTextPickout(query.Table, column, originalText)
 				}
-				np.Success(ctx.T(`开始翻译“%s”...`, originalText))
+				translateObjectMsg := com.Substr(originalText, `...`, 100)
+				msg := ctx.T(`开始翻译“%s”...`, translateObjectMsg)
+				np.Success(msg)
 				for _, langCode := range langList {
-					np.Success(ctx.T(`正在翻译成 %s ...`, langCode))
+					msgPrefix := `[` + langCode + `]`
+					np.Success(msgPrefix + msg)
 					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
 						np.Failure(err.Error())
@@ -304,26 +308,26 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 						`text`: tM.Text,
 					}, cond)
 					if err != nil {
-						np.Failure(err.Error())
+						np.Failure(msgPrefix + err.Error())
 						return nil, err
 					}
 					if affected > 0 {
-						np.Success(ctx.T(`更新成功`))
+						np.Success(msgPrefix + ctx.T(`更新成功`))
 						np.Done(1)
 						continue
 					}
 					if exists, err := tM.Exists(nil, cond); err != nil {
-						np.Failure(err.Error())
+						np.Failure(msgPrefix + err.Error())
 						return nil, err
 					} else if !exists {
 						_, err = tM.Insert()
 						if err != nil {
-							np.Failure(err.Error())
+							np.Failure(msgPrefix + err.Error())
 							return nil, err
 						}
-						np.Success(ctx.T(`创建成功`))
+						np.Success(msgPrefix + ctx.T(`创建成功`))
 					} else {
-						np.Success(ctx.T(`已存在相同翻译，跳过`))
+						np.Success(msgPrefix + ctx.T(`已存在相同翻译，跳过`))
 					}
 					np.Done(1)
 				}
