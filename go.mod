@@ -65,7 +65,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.1
-	github.com/admpub/translate v0.0.0-20260421035803-709e7bb94665
+	github.com/admpub/translate v0.0.0-20260421065234-dde996480d21
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/tree v0.1.0
