@@ -33,42 +33,37 @@ import (
 type Filter func(string) bool
 
 var (
-	DefaultEngine  = atomic.NewString(`sego`) // gojieba / sego / jiebago
-	stopWords      []string
-	stopWordsMap   map[string]bool
-	Filters        []Filter
-	defaultSegment atomic.Value
-	onceSegment    once.Once
-	onceStopword   once.Once
+	DefaultEngine                 = atomic.NewString(`sego`) // gojieba / sego / jiebago
+	stopWords                     []string
+	stopWordsMap                  map[string]bool
+	Filters                       []Filter
+	defaultSegment, cancelSegment = once.OnceValues(func() (Segment, error) {
+		log.Debug("[segment]Default engine:", DefaultEngine)
+		var err error
+		seg := Get(DefaultEngine.Load())
+		return seg, err
+	})
+	onceSegment  once.Once
+	onceStopword once.Once
 )
-
-// initDefaultSegment initializes the default segmentation engine by loading it from the DefaultEngine configuration
-// and storing it in the defaultSegment variable. This function is called during package initialization.
-func initDefaultSegment() {
-	log.Debug("[segment]Default engine:", DefaultEngine)
-	defaultSegment.Store(Get(DefaultEngine.Load()))
-}
 
 // IsInitialized reports whether the default segment has been initialized.
 func IsInitialized() bool {
-	return defaultSegment.Load() != nil
+	return defaultSegment != nil
 }
 
 // Default returns the default Segment instance, initializing it if necessary.
 // The initialization is thread-safe and will only occur once.
-func Default() Segment {
-	onceSegment.Do(initDefaultSegment)
-	return defaultSegment.Load().(Segment)
+func Default() (Segment, error) {
+	return defaultSegment()
 }
 
 // ResetSegment closes the current segment if it exists and resets the segment initialization state.
 // This allows for a new segment to be created on next use.
 func ResetSegment() {
-	seg := defaultSegment.Load()
-	if seg != nil {
-		seg.(Segment).Close()
+	if cancelSegment != nil {
+		cancelSegment()
 	}
-	onceSegment.Reset()
 }
 
 // ResetStopwords resets the stopwords initialization state, allowing stopwords to be reloaded on next use.
@@ -185,9 +180,9 @@ func ApplySegmentConfig(c *config.Config) {
 		return
 	}
 	if DefaultEngine.Load() != segmentCfg.Engine {
-		seg := defaultSegment.Load()
+		seg, _ := defaultSegment()
 		if seg != nil {
-			seg.(Segment).Close()
+			defer seg.Close()
 		}
 		DefaultEngine.Store(segmentCfg.Engine)
 	}
@@ -209,6 +204,7 @@ func ApplySegmentConfig(c *config.Config) {
 			})
 			ResetSegment()
 		}
+	case `sego`:
 	default:
 	}
 }

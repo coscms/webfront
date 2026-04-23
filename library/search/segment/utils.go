@@ -40,7 +40,11 @@ func SplitWords(b []byte, args ...string) []string {
 		lastLoadedDictFile = DictFile
 		ReloadDict()
 	}
-	return Default().Segment(string(b), args...)
+	seg, err := Default()
+	if err != nil {
+		return nil
+	}
+	return seg.Segment(string(b), args...)
 }
 
 // SplitWordsBy 按模式分词
@@ -49,7 +53,11 @@ func SplitWordsBy(b []byte, mode string, args ...string) []string {
 		lastLoadedDictFile = DictFile
 		ReloadDict()
 	}
-	return Default().SegmentBy(string(b), mode, args...)
+	seg, err := Default()
+	if err != nil {
+		return nil
+	}
+	return seg.SegmentBy(string(b), mode, args...)
 }
 
 // ReloadDict 重新加载词典
@@ -58,7 +66,11 @@ func ReloadDict(dictFiles ...string) error {
 	if len(dictFiles) > 0 {
 		dictFile = dictFiles[0]
 	}
-	return Default().LoadDict(dictFile)
+	seg, err := Default()
+	if err != nil {
+		return err
+	}
+	return seg.LoadDict(dictFile)
 }
 
 // SplitWordsAsString 将分词结果作为字串返回

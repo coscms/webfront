@@ -31,11 +31,15 @@ func segmentHandler(ctx echo.Context) error {
 	}
 	args := ctx.Formx(`args`).Split(`,`).String()
 	mode := ctx.Form(`mode`)
+	seg, err := segment.Default()
+	if err != nil {
+		return err
+	}
 	var result []string
 	if len(mode) > 0 {
-		result = segment.Default().SegmentBy(text, mode, args...)
+		result = seg.SegmentBy(text, mode, args...)
 	} else {
-		result = segment.Default().Segment(text, args...)
+		result = seg.Segment(text, args...)
 	}
 	return ctx.String(strings.Join(result, ` `))
 }
