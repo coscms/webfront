@@ -7,6 +7,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webfront/library/xkv"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 )
@@ -29,7 +30,7 @@ func (c *Config) SetDefaults() {
 func (c *Config) FromStore(r echo.H) *Config {
 	prov := ProviderConfig{
 		Provider: r.String(`provider`),
-		Config:   map[string]string{},
+		Config:   com.SplitKVRows(r.String(`config`)),
 	}
 	pcfg := r.GetStore(`config`)
 	for k, v := range pcfg {
