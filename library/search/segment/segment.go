@@ -177,23 +177,25 @@ func AddFilter(filter Filter) {
 // If the engine is 'api', it will register a new API segment with the provided URL and key.
 // The function handles engine switching and cleanup of previous segment instances.
 func ApplySegmentConfig(c *config.Config) {
-	segmentCfg := c.Extend.GetStore(`segment`)
-	segmentEngine := segmentCfg.String(`engine`)
-	if len(segmentEngine) == 0 {
+	segmentCfg, ok := GetConfig(c)
+	if !ok {
 		return
 	}
-	if DefaultEngine.Load() != segmentEngine {
+	if len(segmentCfg.Engine) == 0 {
+		return
+	}
+	if DefaultEngine.Load() != segmentCfg.Engine {
 		seg := defaultSegment.Load()
 		if seg != nil {
 			seg.(Segment).Close()
 		}
-		DefaultEngine.Store(segmentEngine)
+		DefaultEngine.Store(segmentCfg.Engine)
 	}
-	switch segmentEngine {
+	switch segmentCfg.Engine {
 	case `api`:
-		segmentApiURL := segmentCfg.String(`apiURL`)
-		segmentApiKey := segmentCfg.String(`apiKey`)
-		seg := Get(segmentEngine)
+		segmentApiURL := segmentCfg.ApiURL
+		segmentApiKey := segmentCfg.ApiKey
+		seg := Get(segmentCfg.Engine)
 		reg := true
 		if !IsNop(seg) {
 			if apiSeg, ok := seg.(*apiSegment); ok {
@@ -202,7 +204,7 @@ func ApplySegmentConfig(c *config.Config) {
 		}
 		if reg {
 			a := NewAPI(segmentApiURL, segmentApiKey)
-			Register(segmentEngine, func() Segment {
+			Register(segmentCfg.Engine, func() Segment {
 				return a
 			})
 			ResetSegment()
