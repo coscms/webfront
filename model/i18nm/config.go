@@ -2,15 +2,81 @@ package i18nm
 
 import (
 	"errors"
+	"slices"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/config/extend"
+	"github.com/coscms/webfront/library/xkv"
+	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 )
+
+var _ extend.SetDefaults = (*Config)(nil)
 
 // Config 配置
 type Config struct {
 	Providers           []ProviderConfig `json:"providers"`           // 翻译提供商
 	On                  bool             `json:"on"`                  // 是否开启翻译
 	AllowForceTranslate bool             `json:"allowForceTranslate"` // 是否允许强制翻译
+}
+
+func (c *Config) SetDefaults() {
+	c.Providers = slices.DeleteFunc(c.Providers, func(pc ProviderConfig) bool {
+		return len(pc.Provider) == 0
+	})
+}
+
+func (c *Config) FromStore(r echo.H) *Config {
+	prov := ProviderConfig{
+		Provider: r.String(`provider`),
+		Config:   map[string]string{},
+	}
+	pcfg := r.GetStore(`config`)
+	for k, v := range pcfg {
+		prov.Config[k] = param.AsString(v)
+	}
+	c.Providers = []ProviderConfig{prov}
+	c.AllowForceTranslate = r.Bool(`allowForceTranslate`)
+	c.On = r.Bool(`on`)
+	return c
+}
+
+func (c *Config) IsValid() bool {
+	switch len(c.Providers) {
+	case 0:
+		return false
+	default:
+		if len(c.Providers[0].Provider) == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Config) MergeProviders(from *Config) *Config {
+	var size int
+	validA := c.IsValid()
+	if validA {
+		size = len(c.Providers)
+	}
+	validB := from.IsValid()
+	if validB {
+		size += len(from.Providers)
+	}
+	cloned := Config{
+		Providers:           make([]ProviderConfig, size),
+		On:                  c.On,
+		AllowForceTranslate: c.AllowForceTranslate,
+	}
+	if validA {
+		n := copy(cloned.Providers, c.Providers)
+		if validB {
+			copy(cloned.Providers[n:], from.Providers)
+		}
+	} else if validB {
+		copy(cloned.Providers, from.Providers)
+	}
+	return &cloned
 }
 
 var ErrTranslationOff = errors.New(`translation is turned off`)
@@ -59,10 +125,27 @@ func NewConfig() *Config {
 //			allowForceTranslate : true
 //		}
 //	}
-func GetConfig() *Config {
-	cfg, ok := config.FromFile().Extend.Get(`translate`).(*Config)
-	if !ok {
+func GetConfig(ctx echo.Context) *Config {
+	if ctx == nil {
+		return getConfig()
+	}
+	cfg, _ := xkv.GetOnce(ctx, `translate.config`, func() (*Config, error) {
+		return getConfig(), nil
+	})
+	return cfg
+}
+
+func getConfig() *Config {
+	cfgDB, okDB := config.FromDB(`thirdparty`).Get(`translate`).(*Config)
+	cfgFile, okFile := config.FromFile().Extend.Get(`translate`).(*Config)
+	if !okFile {
+		if okDB {
+			return cfgDB
+		}
 		return NewConfig()
 	}
-	return cfg
+	if okDB {
+		return cfgDB.MergeProviders(cfgFile)
+	}
+	return cfgFile
 }

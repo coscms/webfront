@@ -21,11 +21,11 @@ import (
 func init() {
 	i18nm.DefaultSaveModelTranslationsOptions.SetTranslator(Translate)
 	i18nm.DefaultSaveModelTranslationsOptions.SetAllowForceTranslate(func(ctx echo.Context) bool {
-		return i18nm.GetConfig().AllowForceTranslate
+		return i18nm.GetConfig(ctx).AllowForceTranslate
 	})
 	extend.Register(`translate`, initTranslateConfig)
 	formbuilderCore.TranslateableGetter = func(ctx echo.Context) bool {
-		cfg := i18nm.GetConfig()
+		cfg := i18nm.GetConfig(ctx)
 		if !cfg.On || len(cfg.Providers) == 0 {
 			return false
 		}
@@ -55,7 +55,7 @@ func Translate(ctx echo.Context, fieldName string, value string, originalValue s
 	if com.StrIsNumeric(value) || len(originalValue) == 0 {
 		return value, nil
 	}
-	cfg := i18nm.GetConfig()
+	cfg := i18nm.GetConfig(ctx)
 	err := cfg.Check()
 	if err != nil {
 		return value, err
