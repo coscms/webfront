@@ -9,7 +9,6 @@ import (
 	"github.com/coscms/webfront/library/xkv"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/param"
 )
 
 var _ extend.SetDefaults = (*Config)(nil)
@@ -31,10 +30,6 @@ func (c *Config) FromStore(r echo.H) *Config {
 	prov := ProviderConfig{
 		Provider: r.String(`provider`),
 		Config:   com.SplitKVRows(r.String(`config`)),
-	}
-	pcfg := r.GetStore(`config`)
-	for k, v := range pcfg {
-		prov.Config[k] = param.AsString(v)
 	}
 	c.Providers = []ProviderConfig{prov}
 	c.AllowForceTranslate = r.Bool(`allowForceTranslate`)
