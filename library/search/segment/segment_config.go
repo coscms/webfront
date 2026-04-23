@@ -9,6 +9,13 @@ func init() {
 	extend.Register(`segment`, func() interface{} {
 		return &Config{}
 	})
+	config.OnKeySetSettings(`thirdparty.segment`, func(diff config.Diff) error {
+		if !diff.IsDiff {
+			return nil
+		}
+		ApplySegmentConfig(nil)
+		return nil
+	})
 }
 
 var _ extend.Reloader = (*Config)(nil)

@@ -349,7 +349,7 @@ func (f *ShortURL) GenVisitData(t time.Time) error {
 	acceptLanguage = strings.TrimSpace(strings.SplitN(acceptLanguage, `;`, 2)[0])
 	f.Visit.Language = acceptLanguage
 	f.Visit.Referer = f.Context().Referer()
-	info, err := ip2region.IPInfo(f.Visit.Ip)
+	info, err := ip2region.IPInfo(f.Context(), f.Visit.Ip)
 	if err != nil {
 		if !ip2region.ErrIsInvalidIP(err) && !ip2region.ErrIsNotFoundXDB(err) {
 			return err
