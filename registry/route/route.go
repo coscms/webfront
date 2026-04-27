@@ -61,40 +61,40 @@ func HandlerWithRequest(handler interface{}, requests interface{}, methods ...st
 	return routeRegister.HandlerWithRequest(handler, requests, methods...)
 }
 
-func Pre(middlewares ...interface{}) {
-	routeRegister.Pre(middlewares...)
+func Pre(middlewares ...interface{}) route.IRegister {
+	return routeRegister.Pre(middlewares...)
 }
 
-func PreUse(middlewares ...interface{}) {
-	routeRegister.PreUse(middlewares...)
+func PreUse(middlewares ...interface{}) route.IRegister {
+	return routeRegister.PreUse(middlewares...)
 }
 
-func PreToGroup(groupName string, middlewares ...interface{}) {
-	routeRegister.PreToGroup(groupName, middlewares...)
+func PreToGroup(groupName string, middlewares ...interface{}) route.IRegister {
+	return routeRegister.PreToGroup(groupName, middlewares...)
 }
 
-func PreUseToGroup(groupName string, middlewares ...interface{}) {
-	routeRegister.PreUseToGroup(groupName, middlewares...)
+func PreUseToGroup(groupName string, middlewares ...interface{}) route.IRegister {
+	return routeRegister.PreUseToGroup(groupName, middlewares...)
 }
 
-func Use(middlewares ...interface{}) {
-	routeRegister.Use(middlewares...)
+func Use(middlewares ...interface{}) route.IRegister {
+	return routeRegister.Use(middlewares...)
 }
 
-func UseToGroup(groupName string, middlewares ...interface{}) {
-	routeRegister.UseToGroup(groupName, middlewares...)
+func UseToGroup(groupName string, middlewares ...interface{}) route.IRegister {
+	return routeRegister.UseToGroup(groupName, middlewares...)
 }
 
 func Host(hostName string, middlewares ...interface{}) route.Hoster {
 	return routeRegister.Host(hostName, middlewares...)
 }
 
-func Register(fn func(echo.RouteRegister)) {
-	routeRegister.Register(fn)
+func Register(fn func(echo.RouteRegister)) route.IRegister {
+	return routeRegister.Register(fn)
 }
 
-func RegisterToGroup(groupName string, fn func(echo.RouteRegister), middlewares ...interface{}) {
-	routeRegister.RegisterToGroup(groupName, fn, middlewares...)
+func RegisterToGroup(groupName string, fn func(echo.RouteRegister), middlewares ...interface{}) route.MetaSetter {
+	return routeRegister.RegisterToGroup(groupName, fn, middlewares...)
 }
 
 func Apply() {
