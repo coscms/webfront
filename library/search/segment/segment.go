@@ -175,18 +175,22 @@ func AddFilter(filter Filter) {
 func ApplySegmentConfig(c *config.Config) {
 	segmentCfg, ok := GetConfig(c)
 	if !ok {
+		log.Debug(`failed to segment.GetConfig`)
 		return
 	}
 	if len(segmentCfg.Engine) == 0 {
+		log.Debug(`segmentCfg.Engine is empty`)
 		return
 	}
 	if initialized.Load() && DefaultEngine.Load() != segmentCfg.Engine {
 		seg, _ := defaultSegment()
 		if seg != nil {
+			log.Debugf(`close segment.Engine: %v`, DefaultEngine.Load())
 			seg.Close()
 		}
 		DefaultEngine.Store(segmentCfg.Engine)
 	}
+	log.Debugf(`segmentCfg.Engine: %v`, segmentCfg.Engine)
 	switch segmentCfg.Engine {
 	case `api`:
 		segmentApiURL := segmentCfg.ApiURL
@@ -203,6 +207,7 @@ func ApplySegmentConfig(c *config.Config) {
 			Register(segmentCfg.Engine, func() Segment {
 				return a
 			})
+			log.Debugf(`reset segment.Engine`)
 			ResetSegment()
 		}
 	case `sego`:
