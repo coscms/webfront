@@ -148,5 +148,9 @@ func (s *Jieba) SegmentBy(text string, mode string, args ...string) []string {
 
 // Close implements io.Closer interface for Jieba segmenter, currently a no-op.
 func (s *Jieba) Close() error {
+	// TODO
+	// if s.segmenter != nil {
+	// 	s.segmenter.Close()
+	// }
 	return nil
 }

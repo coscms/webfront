@@ -118,5 +118,8 @@ func (s *Sego) SegmentBy(text string, mode string, args ...string) []string {
 
 // Close implements io.Closer interface to clean up resources when the Sego instance is no longer needed.
 func (s *Sego) Close() error {
+	if s.segmenter != nil {
+		s.segmenter.Close()
+	}
 	return nil
 }

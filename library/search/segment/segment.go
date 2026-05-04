@@ -37,13 +37,14 @@ var (
 	stopWords                     []string
 	stopWordsMap                  map[string]bool
 	Filters                       []Filter
+	initialized                   = atomic.Bool{}
 	defaultSegment, cancelSegment = once.OnceValues(func() (Segment, error) {
 		log.Debug("[segment]Default engine:", DefaultEngine)
 		var err error
 		seg := Get(DefaultEngine.Load())
+		initialized.Store(true)
 		return seg, err
 	})
-	onceSegment  once.Once
 	onceStopword once.Once
 )
 
@@ -179,10 +180,10 @@ func ApplySegmentConfig(c *config.Config) {
 	if len(segmentCfg.Engine) == 0 {
 		return
 	}
-	if DefaultEngine.Load() != segmentCfg.Engine {
+	if initialized.Load() && DefaultEngine.Load() != segmentCfg.Engine {
 		seg, _ := defaultSegment()
 		if seg != nil {
-			defer seg.Close()
+			seg.Close()
 		}
 		DefaultEngine.Store(segmentCfg.Engine)
 	}
