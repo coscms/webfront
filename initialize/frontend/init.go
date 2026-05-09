@@ -221,9 +221,9 @@ func addMiddleware(e *echo.Echo) {
 	captchaGoG := e.Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo)).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true)
 	captcha_go.RegisterRoute(captchaGoG)
 
-	e.Route("GET", `/qrcode`, backendLib.QrCode).SetMetaKV(httpserver.PermGuestKV())
+	e.Route("GET", `/qrcode`, backendLib.QrCode).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true)
 
-	i18nG := e.Group(`/i18n`).SetMetaKV(httpserver.PermGuestKV())
+	i18nG := e.Group(`/i18n`).SetMetaKV(httpserver.PermGuestKV()).SetMetaKV(`noAttack`, true)
 	httpserver.Frontend.I18n().Handler(i18nG, `App.i18n`)
 }
 
