@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"net/url"
+	"strings"
 
 	"github.com/webx-top/echo"
 	stdCode "github.com/webx-top/echo/code"
@@ -33,6 +34,18 @@ func (a *AuthConfig) SignRequest(ctx echo.Context, appID string) (sign string, d
 		ctx.Request().SetBody(io.NopCloser(bytes.NewBuffer(b)))
 		if len(b) > 0 {
 			data.Set(`data`, engine.Bytes2str(b))
+		}
+	default:
+		ignoreFieldsOnSign := ctx.Route().String(`ignoreFieldsOnSign`)
+		if len(ignoreFieldsOnSign) > 0 {
+			for _, field := range strings.Split(ignoreFieldsOnSign, `,`) {
+				val, ok := data[field]
+				if !ok || len(val) == 0 {
+					continue
+				}
+				ctx.Internal().Set(`sign_ignore_`+field, val[0])
+				data.Del(field)
+			}
 		}
 	}
 	data.Del(a.FormSignKey)
