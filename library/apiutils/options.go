@@ -1,58 +1,38 @@
 package apiutils
 
 import (
-	"net/url"
-
 	"github.com/admpub/null"
+	"github.com/coscms/sdk/sdk_options"
 	"github.com/coscms/webcore/library/config"
-	"github.com/coscms/webfront/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
 
-func NewOptions(ctx echo.Context, typ Type, generators ...URLValuesGenerator) *Options {
-	var generator URLValuesGenerator
+func NewOptions(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesGenerator) *Options {
+	var generator sdk_options.URLValuesGenerator
 	if len(generators) > 0 {
 		generator = generators[0]
 	}
+	base := sdk_options.New(typ, nil)
+	if generator != nil {
+		base.SetGenerator(generator)
+	}
 	return &Options{
-		ctx:       ctx,
-		generator: generator,
-		Type:      typ,
+		Options: base,
+		ctx:     ctx,
 	}
 }
 
-type AppInfo interface {
-	GetAppSecret() string
-	GetAppId() string
-	IsOfficial() bool
-}
-
 type Options struct {
-	ctx           echo.Context
-	generator     URLValuesGenerator
-	signaturer    func(url.Values) string
-	appInfoGetter func(ctx echo.Context, cond db.Cond) (appInfo AppInfo, err error)
-	applied       bool
-	accountID     null.Uint64
-	Account       *dbschema.OfficialCommonApiAccount
-	App           AppInfo
-	URLPrefix     string
-	Type          Type
-}
-
-func (o *Options) SetGenerator(g URLValuesGenerator) *Options {
-	o.generator = g
-	return o
-}
-
-func (o *Options) SetSignaturer(fn func(url.Values) string) *Options {
-	o.signaturer = fn
-	return o
+	*sdk_options.Options
+	ctx            echo.Context
+	applied        bool
+	accountID      null.Uint64
+	_appInfoGetter func(ctx echo.Context, cond db.Cond) (appInfo AppInfo, err error)
 }
 
 func (o *Options) SetAppInfoGetter(appInfoGetter func(ctx echo.Context, cond db.Cond) (appInfo AppInfo, err error)) *Options {
-	o.appInfoGetter = appInfoGetter
+	o._appInfoGetter = appInfoGetter
 	return o
 }
 
@@ -77,38 +57,6 @@ func (o *Options) ApplySetting() (err error) {
 		err = o.getApp(db.Cond{`owner_type`: `official`})
 	}
 	return
-}
-
-func (o *Options) GetAppID() string {
-	if o.Account != nil {
-		return o.Account.AppId
-	}
-	if o.App != nil {
-		return o.App.GetAppId()
-	}
-	return ``
-}
-
-func (o *Options) GetAppInfo() AppInfo {
-	if o.App != nil {
-		return o.App
-	}
-	appID := o.GetAppID()
-	if len(appID) == 0 {
-		return nil
-	}
-	o.App, _ = o.onlyGetApp(db.Cond{`app_id`: appID})
-	return o.App
-}
-
-func (o *Options) GetAppSecret() string {
-	if o.Account != nil {
-		return o.Account.AppSecret
-	}
-	if o.App != nil {
-		return o.App.GetAppSecret()
-	}
-	return ``
 }
 
 func (o *Options) Context() echo.Context {

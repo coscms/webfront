@@ -20,13 +20,16 @@ func (o *Options) getAccount(cond db.Compound) (err error) {
 		}
 		return
 	}
-	o.Account = accountM
-	if config.FromFile().Sys.IsEnv(`prod`) {
-		o.URLPrefix = accountM.Url
-	} else {
-		o.URLPrefix = accountM.UrlDev
+	gt := AppInfoFromAccount{
+		Account: accountM,
 	}
-	o.URLPrefix = strings.TrimSuffix(o.URLPrefix, `/`)
+	if config.FromFile().Sys.IsEnv(`prod`) {
+		gt.URLPrefix = accountM.Url
+	} else {
+		gt.URLPrefix = accountM.UrlDev
+	}
+	gt.URLPrefix = strings.TrimSuffix(gt.URLPrefix, `/`)
+	o.Options.SetAppInfoGetter(gt)
 	return
 }
 
@@ -41,16 +44,19 @@ func (o *Options) getApp(cond db.Cond) (err error) {
 	if err != nil {
 		return
 	}
-	o.App = appInfo
-	o.URLPrefix = xcommon.SiteURL(o.ctx)
+	gt := &AppInfoFromOpenApp{
+		App:       appInfo,
+		URLPrefix: xcommon.SiteURL(o.ctx),
+	}
+	o.Options.SetAppInfoGetter(gt)
 	return
 }
 
 func (o *Options) onlyGetApp(cond db.Cond) (appInfo AppInfo, err error) {
-	if o.appInfoGetter == nil {
+	if o._appInfoGetter == nil {
 		appInfo, err = AppInfoDefaultGetter(o.ctx, cond)
 	} else {
-		appInfo, err = o.appInfoGetter(o.ctx, cond)
+		appInfo, err = o._appInfoGetter(o.ctx, cond)
 	}
 	return
 }

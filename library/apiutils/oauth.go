@@ -7,6 +7,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/handler/oauth2"
 
+	"github.com/coscms/sdk/sdk_options"
 	"github.com/coscms/webfront/library/oauthutils"
 )
 
@@ -54,10 +55,10 @@ type OauthOption interface {
 	GetAccountID() uint64
 	ApplySetting() (err error)
 	GetAppID() string
-	OauthProvierListURL(appID string) (string, error)
+	OauthProvierListURL() (string, error)
 }
 
-var OauthOptionsCreater = func(ctx echo.Context, typ Type, generators ...URLValuesGenerator) OauthOption {
+var OauthOptionsCreater = func(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesGenerator) OauthOption {
 	return NewOptions(ctx, TypeOauth, generators...)
 }
 
@@ -74,14 +75,14 @@ func OauthProviders(ctx echo.Context) ([]*OauthProvider, error) {
 	if len(appID) == 0 {
 		return OauthProvidersFrom(oauthutils.Accounts()), nil
 	}
-	apiURL, err := apiOpt.OauthProvierListURL(appID)
+	apiURL, err := apiOpt.OauthProvierListURL()
 	if err != nil {
 		return nil, err
 	}
 	platformList := &OauthProvidersResponse{}
 	apiResp := echo.NewData(ctx)
 	apiResp.Data = platformList
-	_, err = SubmitWithRecv(ctx, apiResp, apiURL, url.Values{})
+	_, err = sdk_options.SubmitWithRecv(ctx, apiResp, apiURL, url.Values{})
 	if err == nil && apiResp.Code.Int() != 1 {
 		err = fmt.Errorf(`OauthProviders: %v`, apiResp.Info)
 	}
@@ -104,16 +105,4 @@ func GetOauthProvider(list []*OauthProvider, name string) *OauthProvider {
 		}
 	}
 	return nil
-}
-
-// OauthProvierListURL 社区登录供应商列表
-func (o *Options) OauthProvierListURL(appID string) (string, error) {
-	urlValues := url.Values{}
-	urlValues.Set(`appID`, appID)
-	o.SetGenerator(DefaultURLValuesGenerator(urlValues))
-	uri, formData, err := o.ToURL(`/open/v1/oauth/providers`)
-	if err != nil {
-		return ``, err
-	}
-	return uri + `?` + formData.Encode(), nil
 }

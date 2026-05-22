@@ -1,16 +1,14 @@
 package apiutils
 
-import "net/url"
+import (
+	"github.com/coscms/sdk/sdk_options"
+)
 
-type URLValuesGenerator interface {
-	URLValues(signGenerators ...func(url.Values) string) url.Values
-}
-
-type Type string
+type Type = sdk_options.Type
 
 const (
 	// TypeOauth 社区登录类型
-	TypeOauth Type = "oauth"
+	TypeOauth Type = sdk_options.TypeOauth
 	// TypePayment 支付类型
-	TypePayment Type = "payment"
+	TypePayment Type = sdk_options.TypePayment
 )
