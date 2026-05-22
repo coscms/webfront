@@ -68,7 +68,7 @@ require (
 	github.com/admpub/translate v0.0.0-20260423045729-679cb7e637ab
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
-	github.com/coscms/sdk v0.0.0-20260522062359-3ad53e4c8af4
+	github.com/coscms/sdk v0.0.0-20260522081019-8a284a6d90ff
 	github.com/coscms/tree v0.1.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
@@ -171,7 +171,7 @@ require (
 	github.com/coscms/session-redisstore v0.0.0-20260127080202-3c5732ae77b4 // indirect
 	github.com/coscms/session-sqlitestore v0.0.4 // indirect
 	github.com/coscms/session-sqlstore v0.0.1 // indirect
-	github.com/coscms/stdauth v0.0.0-20260522033127-12dbfa6748ec // indirect
+	github.com/coscms/stdauth v0.0.0-20260522075812-24b2e07d17b4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
