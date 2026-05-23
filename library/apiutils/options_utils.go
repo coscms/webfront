@@ -33,12 +33,12 @@ func (o *Options) getAccount(cond db.Compound) (err error) {
 	return
 }
 
-var AppInfoDefaultGetter = func(ctx echo.Context, cond db.Compound) (appInfo AppInfo, err error) {
+var AppInfoDefaultGetter AppInfoGetter = func(ctx echo.Context, cond db.Compound) (appInfo AppInfo, err error) {
 	err = ctx.NewError(code.Unsupported, `尚未设置App信息获取方式`)
 	return
 }
 
-func (o *Options) getApp(cond db.Cond) (err error) {
+func (o *Options) getApp(cond db.Compound) (err error) {
 	var appInfo AppInfo
 	appInfo, err = o.onlyGetApp(cond)
 	if err != nil {
@@ -52,7 +52,7 @@ func (o *Options) getApp(cond db.Cond) (err error) {
 	return
 }
 
-func (o *Options) onlyGetApp(cond db.Cond) (appInfo AppInfo, err error) {
+func (o *Options) onlyGetApp(cond db.Compound) (appInfo AppInfo, err error) {
 	if o._appInfoGetter == nil {
 		appInfo, err = AppInfoDefaultGetter(o.ctx, cond)
 	} else {

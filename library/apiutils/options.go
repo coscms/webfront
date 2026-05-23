@@ -23,15 +23,17 @@ func NewOptions(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesG
 	}
 }
 
+type AppInfoGetter func(ctx echo.Context, cond db.Compound) (appInfo AppInfo, err error)
+
 type Options struct {
 	*sdk_options.Options
 	ctx            echo.Context
 	applied        bool
 	accountID      null.Uint64
-	_appInfoGetter func(ctx echo.Context, cond db.Cond) (appInfo AppInfo, err error)
+	_appInfoGetter AppInfoGetter
 }
 
-func (o *Options) SetAppInfoGetter(appInfoGetter func(ctx echo.Context, cond db.Cond) (appInfo AppInfo, err error)) *Options {
+func (o *Options) SetAppInfoGetter(appInfoGetter AppInfoGetter) *Options {
 	o._appInfoGetter = appInfoGetter
 	return o
 }
