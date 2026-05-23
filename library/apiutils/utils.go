@@ -24,19 +24,7 @@ func MakeFormValueGetter(ctx echo.Context) func(string) string {
 }
 
 func GetCodeAndMsgFromAPIData(data map[string]any) (code, msg any) {
-	for _, key := range []string{`Code`, `code`} {
-		var ok bool
-		code, ok = data[key]
-		if ok {
-			break
-		}
-	}
-	for _, key := range []string{`Info`, `info`, `msg`, `message`} {
-		var ok bool
-		msg, ok = data[key]
-		if ok {
-			break
-		}
-	}
+	code = sdk_options.GetValueByKey(data, `Code`, `code`)
+	msg = sdk_options.GetValueByKey(data, `Info`, `info`, `msg`, `message`)
 	return
 }

@@ -55,7 +55,7 @@ type OauthOption interface {
 	GetAccountID() uint64
 	ApplySetting() (err error)
 	GetAppID() string
-	OauthProvierListURL() (string, error)
+	OauthProviderListURL() (string, error)
 }
 
 var OauthOptionsCreater = func(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesGenerator) OauthOption {
@@ -75,7 +75,7 @@ func OauthProviders(ctx echo.Context) ([]*OauthProvider, error) {
 	if len(appID) == 0 {
 		return OauthProvidersFrom(oauthutils.Accounts()), nil
 	}
-	apiURL, err := apiOpt.OauthProvierListURL()
+	apiURL, err := apiOpt.OauthProviderListURL()
 	if err != nil {
 		return nil, err
 	}

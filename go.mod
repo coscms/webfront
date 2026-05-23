@@ -65,20 +65,20 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.1
-	github.com/admpub/translate v0.0.0-20260423045729-679cb7e637ab
+	github.com/admpub/translate v0.0.0-20260423085846-bc812cd98a3e
 	github.com/admpub/websocket v1.0.4
 	github.com/coscms/captcha v0.2.3
-	github.com/coscms/sdk v0.0.0-20260522081019-8a284a6d90ff
+	github.com/coscms/sdk v0.0.1
 	github.com/coscms/tree v0.1.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/meilisearch/meilisearch-go v0.36.2
 	github.com/nging-plugins/dbmanager v1.9.6
-	github.com/phuslu/lru v1.0.18
+	github.com/phuslu/lru v1.0.19
 	github.com/redis/go-redis/v9 v9.19.0
-	github.com/silenceper/wechat/v2 v2.1.12
-	github.com/tdewolff/minify/v2 v2.24.12
+	github.com/silenceper/wechat/v2 v2.1.13
+	github.com/tdewolff/minify/v2 v2.24.13
 	github.com/webx-top/restyclient v0.0.6
 	go.uber.org/atomic v1.11.0
 )
@@ -88,7 +88,7 @@ require (
 	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	cloud.google.com/go/iam v1.9.0 // indirect
+	cloud.google.com/go/iam v1.11.0 // indirect
 	cloud.google.com/go/pubsub v1.50.2 // indirect
 	cloud.google.com/go/pubsub/v2 v2.6.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
@@ -152,10 +152,10 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.7 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.23 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.9 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.22 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.26 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.27 // indirect
 	github.com/aws/smithy-go v1.25.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -202,7 +202,7 @@ require (
 	github.com/gomodule/redigo v1.9.3 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.15 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.16 // indirect
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -240,7 +240,7 @@ require (
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/phuslu/iploc v1.0.20260501 // indirect
+	github.com/phuslu/iploc v1.0.20260515 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
@@ -261,8 +261,8 @@ require (
 	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tklauser/go-sysconf v0.3.16 // indirect
-	github.com/tklauser/numcpus v0.11.0 // indirect
+	github.com/tklauser/go-sysconf v0.4.0 // indirect
+	github.com/tklauser/numcpus v0.12.0 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/webx-top/captcha v0.1.0 // indirect
@@ -270,7 +270,7 @@ require (
 	github.com/webx-top/codec v0.3.0 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
-	github.com/webx-top/validator v0.3.0 // indirect
+	github.com/webx-top/validator v0.3.3 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.2.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
@@ -293,18 +293,18 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a // indirect
-	golang.org/x/image v0.40.0 // indirect
+	golang.org/x/image v0.41.0 // indirect
 	golang.org/x/mod v0.36.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
-	google.golang.org/api v0.276.0 // indirect
-	google.golang.org/genproto v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/grpc v1.80.0 // indirect
+	google.golang.org/api v0.280.0 // indirect
+	google.golang.org/genproto v0.0.0-20260523011958-0a33c5d7ca68 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260523011958-0a33c5d7ca68 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260523011958-0a33c5d7ca68 // indirect
+	google.golang.org/grpc v1.81.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -312,6 +312,6 @@ require (
 	modernc.org/libc v1.72.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.50.0 // indirect
+	modernc.org/sqlite v1.50.1 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
