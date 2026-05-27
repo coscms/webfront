@@ -11,7 +11,7 @@ import (
 	"github.com/coscms/webfront/library/oauthutils"
 )
 
-type OauthProvider struct {
+type OAuthProvider struct {
 	Name      string `json:"name" xml:"name"`
 	English   string `json:"english" xml:"english"`
 	IconClass string `json:"iconClass" xml:"iconClass"`
@@ -20,13 +20,13 @@ type OauthProvider struct {
 	LoginURL  string `json:"loginURL" xml:"loginURL"`
 }
 
-func OauthProvidersFrom(accounts []oauth2.Account) []*OauthProvider {
-	var providers []*OauthProvider
+func OAuthProvidersFrom(accounts []oauth2.Account) []*OAuthProvider {
+	var providers []*OAuthProvider
 	for _, item := range accounts {
 		if !item.On {
 			continue
 		}
-		provider := &OauthProvider{
+		provider := &OAuthProvider{
 			Name:      item.Name,
 			English:   item.Name,
 			IconClass: ``,
@@ -47,39 +47,39 @@ func OauthProvidersFrom(accounts []oauth2.Account) []*OauthProvider {
 	return providers
 }
 
-type OauthProvidersResponse struct {
-	List []*OauthProvider `json:"list"`
+type OAuthProvidersResponse struct {
+	List []*OAuthProvider `json:"list"`
 }
 
-type OauthOption interface {
+type OAuthOption interface {
 	GetAccountID() uint64
 	ApplySetting() (err error)
 	GetAppID() string
-	OauthProviderListURL() (string, error)
+	OAuthProviderListURL() (string, error)
 }
 
-var OauthOptionsCreater = func(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesGenerator) OauthOption {
-	return NewOptions(ctx, TypeOauth, generators...)
+var OAuthOptionsCreater = func(ctx echo.Context, typ Type, generators ...sdk_options.URLValuesGenerator) OAuthOption {
+	return NewOptions(ctx, TypeOAuth, generators...)
 }
 
-func OauthProviders(ctx echo.Context) ([]*OauthProvider, error) {
-	apiOpt := OauthOptionsCreater(ctx, TypeOauth)
+func OAuthProviders(ctx echo.Context) ([]*OAuthProvider, error) {
+	apiOpt := OAuthOptionsCreater(ctx, TypeOAuth)
 	accountID := apiOpt.GetAccountID()
 	if accountID <= 0 {
-		return OauthProvidersFrom(oauthutils.Accounts()), nil
+		return OAuthProvidersFrom(oauthutils.Accounts()), nil
 	}
 	if err := apiOpt.ApplySetting(); err != nil {
 		return nil, err
 	}
 	appID := apiOpt.GetAppID()
 	if len(appID) == 0 {
-		return OauthProvidersFrom(oauthutils.Accounts()), nil
+		return OAuthProvidersFrom(oauthutils.Accounts()), nil
 	}
-	apiURL, err := apiOpt.OauthProviderListURL()
+	apiURL, err := apiOpt.OAuthProviderListURL()
 	if err != nil {
 		return nil, err
 	}
-	platformList := &OauthProvidersResponse{}
+	platformList := &OAuthProvidersResponse{}
 	apiResp := echo.NewData(ctx)
 	apiResp.Data = platformList
 	_, err = sdk_options.SubmitWithRecv(ctx, apiResp, apiURL, url.Values{})
@@ -89,7 +89,7 @@ func OauthProviders(ctx echo.Context) ([]*OauthProvider, error) {
 	return platformList.List, err
 }
 
-func GetOauthProviderTitle(list []*OauthProvider, name string) string {
+func GetOAuthProviderTitle(list []*OAuthProvider, name string) string {
 	for _, v := range list {
 		if v.English == name {
 			return v.Name
@@ -98,7 +98,7 @@ func GetOauthProviderTitle(list []*OauthProvider, name string) string {
 	return ``
 }
 
-func GetOauthProvider(list []*OauthProvider, name string) *OauthProvider {
+func GetOAuthProvider(list []*OAuthProvider, name string) *OAuthProvider {
 	for _, v := range list {
 		if v.English == name {
 			return v

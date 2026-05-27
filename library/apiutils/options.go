@@ -30,6 +30,7 @@ type Options struct {
 	ctx            echo.Context
 	applied        bool
 	accountID      null.Uint64
+	appID          null.String
 	_appInfoGetter AppInfoGetter
 }
 
@@ -47,6 +48,12 @@ func (o *Options) GetAccountID() uint64 {
 	return o.accountID.Uint64
 }
 
+func (o *Options) SetAppID(appID string) *Options {
+	o.appID.Valid = true
+	o.appID.String = appID
+	return o
+}
+
 func (o *Options) ApplySetting() (err error) {
 	if o.applied {
 		return
@@ -55,6 +62,8 @@ func (o *Options) ApplySetting() (err error) {
 	accountID := o.GetAccountID()
 	if accountID > 0 {
 		err = o.getAccount(db.Cond{`id`: accountID})
+	} else if o.appID.Valid {
+		err = o.getApp(db.Cond{`app_id`: o.appID.String})
 	} else {
 		err = o.getApp(db.Cond{`owner_type`: `official`})
 	}

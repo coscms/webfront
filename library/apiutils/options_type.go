@@ -7,8 +7,8 @@ import (
 type Type = sdk_options.Type
 
 const (
-	// TypeOauth 社区登录类型
-	TypeOauth Type = sdk_options.TypeOauth
+	// TypeOAuth 社区登录类型
+	TypeOAuth Type = sdk_options.TypeOAuth
 	// TypePayment 支付类型
 	TypePayment Type = sdk_options.TypePayment
 )
