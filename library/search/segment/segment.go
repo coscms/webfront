@@ -188,8 +188,8 @@ func ApplySegmentConfig(c *config.Config) {
 			log.Debugf(`close segment.Engine: %v`, DefaultEngine.Load())
 			seg.Close()
 		}
-		DefaultEngine.Store(segmentCfg.Engine)
 	}
+	DefaultEngine.Store(segmentCfg.Engine)
 	log.Debugf(`segmentCfg.Engine: %v`, segmentCfg.Engine)
 	switch segmentCfg.Engine {
 	case `api`:
