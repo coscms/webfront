@@ -34,12 +34,13 @@ func New(clientKey, secret, callbackURL, hostURL string, scopes ...string) *Prov
 // NewCustomisedURL is similar to New(...) but can be used to set custom URLs to connect to
 func NewCustomisedURL(clientKey, secret, callbackURL, authURL, tokenURL, profileURL string, scopes ...string) *Provider {
 	p := &Provider{
-		ClientKey:    clientKey,
-		Secret:       secret,
-		CallbackURL:  callbackURL,
-		HTTPClient:   oauth2c.DefaultClient,
-		providerName: "webx",
-		profileURL:   profileURL,
+		ClientKey:         clientKey,
+		Secret:            secret,
+		CallbackURL:       callbackURL,
+		isFullCallbackURL: strings.Contains(callbackURL, `://`),
+		HTTPClient:        oauth2c.DefaultClient,
+		providerName:      "webx",
+		profileURL:        profileURL,
 	}
 	p.config = newConfig(p, authURL, tokenURL, scopes)
 	return p
@@ -47,13 +48,14 @@ func NewCustomisedURL(clientKey, secret, callbackURL, authURL, tokenURL, profile
 
 // Provider is the implementation of `goth.Provider` for accessing Github.
 type Provider struct {
-	ClientKey    string
-	Secret       string
-	CallbackURL  string
-	HTTPClient   *http.Client
-	config       *oauth2.Config
-	providerName string
-	profileURL   string
+	ClientKey         string
+	Secret            string
+	CallbackURL       string
+	isFullCallbackURL bool
+	HTTPClient        *http.Client
+	config            *oauth2.Config
+	providerName      string
+	profileURL        string
 }
 
 // Name is the name used to retrieve this provider later.
