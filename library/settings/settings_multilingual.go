@@ -2,6 +2,7 @@ package settings
 
 import (
 	"github.com/coscms/webcore/library/config"
+	"github.com/webx-top/echo"
 )
 
 type SettingsMultilingual struct {
@@ -46,4 +47,24 @@ type SettingsMultilinguals map[string]SettingsMultilingual // key is language co
 func GetBaseMultilinguals() *SettingsMultilinguals {
 	v, _ := config.FromFile().Settings().Base.Get(`multilingual`).(*SettingsMultilinguals)
 	return v
+}
+
+func GetBaseMultilingual(ctx echo.Context, key string) string {
+	if cfg := GetBaseMultilinguals(); cfg != nil {
+		v, ok := (*cfg)[ctx.Lang().Normalize()]
+		if ok {
+			return v.Get(key, config.FromFile().Settings().Base.String(key))
+		}
+	}
+	return config.FromFile().Settings().Base.String(key)
+}
+
+func GetBaseMultilingualByLang(lang, key string) string {
+	if cfg := GetBaseMultilinguals(); cfg != nil {
+		v, ok := (*cfg)[lang]
+		if ok {
+			return v.Get(key, config.FromFile().Settings().Base.String(key))
+		}
+	}
+	return config.FromFile().Settings().Base.String(key)
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/captcha/captchabiz"
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webcore/library/nsql"
 	"github.com/coscms/webcore/library/ntemplate"
@@ -162,31 +161,25 @@ func (r *RenderData) CurrencySymbol(inputCurrency ...string) template.HTML {
 }
 
 func (r *RenderData) SiteName() string {
-	return r.getBaseMultilingualSetting(`siteName`)
+	return r.BaseMultilingualSetting(`siteName`)
 }
 
 func (r *RenderData) SiteSlogan() string {
-	return r.getBaseMultilingualSetting(`siteSlogan`)
+	return r.BaseMultilingualSetting(`siteSlogan`)
 }
 
 func (r *RenderData) SiteMetaKeywords() string {
-	return r.getBaseMultilingualSetting(`siteMetaKeywords`)
+	return r.BaseMultilingualSetting(`siteMetaKeywords`)
 }
 
 func (r *RenderData) SiteMetaDescription() string {
-	return r.getBaseMultilingualSetting(`siteMetaDescription`)
+	return r.BaseMultilingualSetting(`siteMetaDescription`)
 }
 
 func (r *RenderData) SiteAnnouncement() string {
-	return r.getBaseMultilingualSetting(`siteAnnouncement`)
+	return r.BaseMultilingualSetting(`siteAnnouncement`)
 }
 
-func (r *RenderData) getBaseMultilingualSetting(key string) string {
-	if cfg := settings.GetBaseMultilinguals(); cfg != nil {
-		v, ok := (*cfg)[r.Lang().Normalize()]
-		if ok {
-			return v.Get(key, config.FromFile().Settings().Base.String(key))
-		}
-	}
-	return config.FromFile().Settings().Base.String(key)
+func (r *RenderData) BaseMultilingualSetting(key string) string {
+	return settings.GetBaseMultilingual(r.ctx, key)
 }
