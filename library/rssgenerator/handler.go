@@ -4,7 +4,7 @@ import (
 	"github.com/admpub/feeds"
 	"github.com/webx-top/echo"
 
-	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webfront/library/settings"
 )
 
 // Handle RSS handler
@@ -41,12 +41,13 @@ func Handle(ctx echo.Context) error {
 // Otherwise, it will write the RSS feed to the response and set the content type to "application/rss+xml; charset=utf-8".
 // It is useful for generating RSS feeds for different groups of items.
 func HandleWith(ctx echo.Context, f func(echo.Context, *feeds.RssFeed) error) error {
-	cfg := config.Setting(`base`)
+	siteName := settings.GetBaseMultilingual(ctx, `siteName`)
+	siteSlogan := settings.GetBaseMultilingual(ctx, `siteSlogan`)
 	feed := NewRssFeed(
-		cfg.String(`siteName`),
-		cfg.String(`siteSlogan`),
+		siteName,
+		siteSlogan,
 		ctx.Site(),
-		cfg.String(`siteName`),
+		siteName,
 	)
 	feed.Link = ctx.FullRequestURI()
 	feed.Copyright = ctx.Domain()

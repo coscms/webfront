@@ -16,6 +16,7 @@ import (
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
+	"github.com/coscms/webfront/library/settings"
 	"github.com/coscms/webfront/library/xcommon"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
@@ -80,9 +81,10 @@ func EmailSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, titl
 	expiry := now.Add(time.Duration(lifetime) * time.Minute)
 
 	siteURL := xcommon.SiteURL(ctx)
+	siteName := settings.GetBaseMultilingual(ctx, `siteName`)
 
 	//邮件内容
-	title := `[` + baseCfg.String(`siteName`) + `]` + ctx.T(`请查收验证码`)
+	title := `[` + siteName + `]` + ctx.T(`请查收验证码`)
 	content := com.Str2bytes(ctx.T(`亲爱的客户: %s，您正在进行邮箱验证，本次验证码为：%s (%d分钟内有效)。<br /><br />来自：%s<br />时间：%s`, m.Name, verifyCode, lifetime, siteURL+`/`, time.Now().Format(time.RFC3339)))
 
 	if len(titleAndMessage) > 0 {
@@ -90,7 +92,7 @@ func EmailSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, titl
 			`name`:     m.Name,
 			`code`:     verifyCode,
 			`lifeTime`: param.AsString(lifetime),
-			`siteName`: baseCfg.String(`siteName`),
+			`siteName`: siteName,
 			`siteURL`:  siteURL + `/`,
 			`now`:      time.Now().Format(time.RFC3339),
 		}

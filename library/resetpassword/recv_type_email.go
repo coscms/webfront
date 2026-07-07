@@ -25,7 +25,11 @@ func emailSend(c echo.Context, m *modelCustomer.Customer, account string) error 
 	title := `[{siteName}]` + c.T(`找回密码`)
 	resetPasswordURL := GenResetPasswordURL(c, m.Name, `email`, account)
 	c.Request().Form().Set(`email`, account)
-	message := `亲爱的客户: {name}<br />您正在找回密码，本次验证码为：<div style="font-size:30px;background-color:black;color:white;width:200px;text-align:center;border-radius:50px;margin:5px auto;padding:5px">{code}</div>您可以输入此验证码，或者点击链接开始重置密码：<a href="` + resetPasswordURL + `" target="_blank">` + resetPasswordURL + `</a> ({lifeTime}分钟内有效)。<br /><br /> 来自：{siteURL}<br />时间：{now}`
+	message := c.T(`亲爱的客户:`) + ` {name}<br />` + c.T(`您正在找回密码，本次验证码为：`) +
+		`<div style="font-size:30px;background-color:black;color:white;width:200px;text-align:center;border-radius:50px;margin:5px auto;padding:5px">{code}</div>` +
+		c.T(`您可以输入此验证码，或者点击链接开始重置密码：`) +
+		`<a href="` + resetPasswordURL + `" target="_blank">` + resetPasswordURL + `</a> (` + c.T(`%s分钟内有效`, `{lifeTime}`) + `)。<br /><br /> ` +
+		c.T(`来自：`) + `{siteURL}<br />时间：{now}`
 	return sendmsg.EmailSend(c, m, `forgot`, title, message)
 }
 

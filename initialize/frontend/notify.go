@@ -21,6 +21,7 @@ import (
 	"github.com/coscms/webcore/library/cron"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webfront/dbschema"
+	"github.com/coscms/webfront/library/settings"
 	"github.com/coscms/webfront/library/top"
 	"github.com/coscms/webfront/library/xcommon"
 )
@@ -158,7 +159,6 @@ func onSendMessageNotifyFail(m *notice.Message) {
 	if strings.HasPrefix(visitURL, `/`) {
 		visitURL = siteURL + visitURL
 	}
-	baseCfg := config.Setting().GetStore(`base`)
 	if len(mobile) > 0 {
 		notifySMSCfg := config.FromFile().Extend.GetStore(`notifySMS`)
 		if notifySMSCfg.Bool(`on`) {
@@ -169,16 +169,18 @@ func onSendMessageNotifyFail(m *notice.Message) {
 				log.Error(err)
 				return
 			}
+
+			siteName := settings.GetBaseMultilingual(ctx, `siteName`)
 			message := notifySMSCfg.String(`messageTemplateContent`)
 			if len(message) == 0 {
-				message = ctx.T(`亲爱的客户: %s，用户「%s」给你发送了站内信，请进入网站查看 %s [%s]`, username, data.String(`author`), visitURL, baseCfg.String(`siteName`))
+				message = ctx.T(`亲爱的客户: %s，用户「%s」给你发送了站内信，请进入网站查看 %s [%s]`, username, data.String(`author`), visitURL, siteName)
 			} else {
 				placeholders := map[string]string{
 					`sender`:   data.String(`author`),
 					`receiver`: username,
 					`name`:     username,
 					`url`:      visitURL,
-					`siteName`: baseCfg.String(`siteName`),
+					`siteName`: siteName,
 				}
 				for find, to := range placeholders {
 					message = strings.ReplaceAll(message, `{`+find+`}`, to)
