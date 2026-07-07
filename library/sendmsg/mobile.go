@@ -18,6 +18,7 @@ import (
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/model"
 	uploadChecker "github.com/coscms/webcore/registry/upload/checker"
+	"github.com/coscms/webfront/library/settings"
 	modelCustomer "github.com/coscms/webfront/model/official/customer"
 )
 
@@ -80,14 +81,15 @@ func MobileSend(ctx echo.Context, m *modelCustomer.Customer, purpose string, mes
 	if len(messages) > 0 {
 		message = messages[0]
 	}
+	siteName := settings.GetBaseMultilingual(ctx, `siteName`)
 	if len(message) == 0 {
-		message = ctx.T(`亲爱的客户: %s，您正在进行手机号码验证，本次验证码为：%s (%d分钟内有效) [%s]`, m.Name, verifyCode, lifetime, baseCfg.String(`siteName`))
+		message = ctx.T(`亲爱的客户: %s，您正在进行手机号码验证，本次验证码为：%s (%d分钟内有效) [%s]`, m.Name, verifyCode, lifetime, siteName)
 	} else {
 		placeholders := map[string]string{
 			`name`:     m.Name,
 			`code`:     verifyCode,
 			`lifeTime`: param.AsString(lifetime),
-			`siteName`: baseCfg.String(`siteName`),
+			`siteName`: siteName,
 		}
 		for find, to := range placeholders {
 			message = strings.ReplaceAll(message, `{`+find+`}`, to)
