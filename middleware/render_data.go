@@ -5,11 +5,13 @@ import (
 
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/captcha/captchabiz"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webcore/library/nsql"
 	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/coscms/webfront/dbschema"
 	"github.com/coscms/webfront/library/logic/articlelogic"
+	"github.com/coscms/webfront/library/settings"
 	"github.com/coscms/webfront/library/xcommon"
 	"github.com/coscms/webfront/library/xtheme"
 	"github.com/coscms/webfront/model/official"
@@ -157,4 +159,34 @@ func (r *RenderData) Currency() string {
 
 func (r *RenderData) CurrencySymbol(inputCurrency ...string) template.HTML {
 	return xcommon.HTMLCurrencySymbol(r.ctx, inputCurrency...)
+}
+
+func (r *RenderData) SiteName() string {
+	return r.getBaseMultilingualSetting(`siteName`)
+}
+
+func (r *RenderData) SiteSlogan() string {
+	return r.getBaseMultilingualSetting(`siteSlogan`)
+}
+
+func (r *RenderData) SiteMetaKeywords() string {
+	return r.getBaseMultilingualSetting(`siteMetaKeywords`)
+}
+
+func (r *RenderData) SiteMetaDescription() string {
+	return r.getBaseMultilingualSetting(`siteMetaDescription`)
+}
+
+func (r *RenderData) SiteAnnouncement() string {
+	return r.getBaseMultilingualSetting(`siteAnnouncement`)
+}
+
+func (r *RenderData) getBaseMultilingualSetting(key string) string {
+	if cfg := settings.GetBaseMultilinguals(); cfg != nil {
+		v, ok := (*cfg)[r.Lang().Normalize()]
+		if ok {
+			return v.Get(key, config.FromFile().Settings().Base.String(key))
+		}
+	}
+	return config.FromFile().Settings().Base.String(key)
 }
