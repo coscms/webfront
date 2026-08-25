@@ -155,7 +155,7 @@ func compile(tmpl string, data interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	t.Funcs(template.FuncMap(tplfunc.TplFuncMap))
+	t.Funcs(tplfunc.New())
 	_, err = t.Parse(com.Bytes2str(b))
 	if err != nil {
 		return nil, err
