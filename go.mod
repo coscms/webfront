@@ -62,7 +62,7 @@ require (
 	github.com/admpub/feeds v0.0.0-20250815085047-66c35b59a155
 	github.com/admpub/go-lock v1.3.0
 	github.com/admpub/go-zinc v0.0.8
-	github.com/admpub/goth v0.0.4
+	github.com/admpub/goth v0.0.5
 	github.com/admpub/sitemap-generator v0.0.0-20250815124033-100aac5e8486
 	github.com/admpub/sse v0.0.1
 	github.com/admpub/translate v0.0.0-20260423085846-bc812cd98a3e
