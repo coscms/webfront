@@ -162,15 +162,35 @@ func ListByResource(ctx echo.Context, query ListQuery) ([]echo.H, error) {
 	return list, err
 }
 
-func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID ...uint64) error {
+type TranslateConfig struct {
+	AutoTranslate  *bool
+	ForceTranslate *bool
+	ListQuery
+}
+
+func Batch(ctx echo.Context, query TranslateConfig, np notice.NProgressor, restartID ...uint64) error {
 	if err := GetConfig(ctx).Check(); err != nil {
 		return err
 	}
+
+	var (
+		forceTranslate bool
+		autoTranslate  bool
+	)
+
 	cfg := DefaultSaveModelTranslationsOptions
-	if cfg.AllowForceTranslate == nil {
-		return errors.New("AllowForceTranslate function is not set in configuration")
+
+	if cfg.ForceTranslate == nil {
+		if cfg.AllowForceTranslate == nil {
+			return errors.New("AllowForceTranslate function is not set in configuration")
+		}
+		forceTranslate = cfg.AllowForceTranslate(ctx)
+	} else {
+		forceTranslate = *cfg.ForceTranslate
 	}
-	forceTranslate := cfg.AllowForceTranslate(ctx)
+	if cfg.AutoTranslate != nil {
+		autoTranslate = *cfg.AutoTranslate
+	}
 	if cfg.translator == nil {
 		return errors.New("Translator function is not set in configuration")
 	}
@@ -290,7 +310,7 @@ func Batch(ctx echo.Context, query ListQuery, np notice.NProgressor, restartID .
 				for _, langCode := range langList {
 					msgPrefix := `[` + langCode + `] `
 					np.Success(msgPrefix + msg)
-					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, true, column, originalText, ``, langCode, langCfg.Default)
+					translatedText, err := translateText(ctx, contype, translate, restoreFunc, forceTranslate, autoTranslate, column, originalText, ``, langCode, langCfg.Default)
 					if err != nil {
 						np.Failure(err.Error())
 						return nil, err
