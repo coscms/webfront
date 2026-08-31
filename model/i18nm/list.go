@@ -179,17 +179,26 @@ func Batch(ctx echo.Context, query TranslateConfig, np notice.NProgressor, resta
 	)
 
 	cfg := DefaultSaveModelTranslationsOptions
-
-	if cfg.ForceTranslate == nil {
-		if cfg.AllowForceTranslate == nil {
-			return errors.New("AllowForceTranslate function is not set in configuration")
+	if query.ForceTranslate == nil {
+		if cfg.ForceTranslate == nil {
+			if cfg.AllowForceTranslate == nil {
+				return errors.New("AllowForceTranslate function is not set in configuration")
+			}
+			forceTranslate = cfg.AllowForceTranslate(ctx)
+		} else {
+			forceTranslate = *cfg.ForceTranslate
 		}
-		forceTranslate = cfg.AllowForceTranslate(ctx)
 	} else {
-		forceTranslate = *cfg.ForceTranslate
+		forceTranslate = *query.ForceTranslate
 	}
-	if cfg.AutoTranslate != nil {
-		autoTranslate = *cfg.AutoTranslate
+	if query.AutoTranslate == nil {
+		if cfg.AutoTranslate != nil {
+			autoTranslate = *cfg.AutoTranslate
+		} else {
+			autoTranslate = true
+		}
+	} else {
+		autoTranslate = *query.AutoTranslate
 	}
 	if cfg.translator == nil {
 		return errors.New("Translator function is not set in configuration")
