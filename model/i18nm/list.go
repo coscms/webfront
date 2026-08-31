@@ -363,11 +363,10 @@ func Batch(ctx echo.Context, query TranslateConfig, np notice.NProgressor, resta
 			}
 
 			if query.RowID == 0 {
-				continue
-			}
-			err = cache.Put(ctx, cacheKey, lastID, cacheExpire)
-			if err != nil {
-				return nil, err
+				err = cache.Put(ctx, cacheKey, lastID, cacheExpire)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 		if _lastID == lastID {
