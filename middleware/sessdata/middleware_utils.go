@@ -2,9 +2,9 @@ package sessdata
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
-	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/webx-top/echo"
 )
@@ -16,6 +16,8 @@ var (
 	LeftNavigateCacheKey = `customer:navigate:left:`
 	// TopNavigateCacheKey 顶部菜单缓存Key前缀
 	TopNavigateCacheKey = `customer:navigate:top:`
+	// ErrCheckPermNotFound 检查权限函数未找到错误
+	ErrCheckPermNotFound = errors.New(`CheckPerm function not found`)
 )
 
 // ClearPermissionCache 删除用户的权限缓存
@@ -32,7 +34,7 @@ func CheckPerm(ctx echo.Context, route string) error {
 	if ok {
 		return fn(route)
 	}
-	return nerrors.ErrUserNoPerm
+	return ErrCheckPermNotFound
 }
 
 func init() {
