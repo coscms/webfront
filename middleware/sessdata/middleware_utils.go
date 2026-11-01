@@ -2,8 +2,9 @@ package sessdata
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webfront/library/cache"
 	"github.com/webx-top/echo"
 )
@@ -19,15 +20,19 @@ var (
 
 // ClearPermissionCache 删除用户的权限缓存
 func ClearPermissionCache(ctx context.Context, customerID uint64) {
-	cid := fmt.Sprint(customerID)
+	cid := strconv.FormatUint(customerID, 10)
 	cache.Delete(ctx, PermissionCacheKey+cid)
-	cache.Delete(ctx, PermissionCacheKey+cid)
-	cache.Delete(ctx, PermissionCacheKey+cid)
+	cache.Delete(ctx, LeftNavigateCacheKey+cid)
+	cache.Delete(ctx, TopNavigateCacheKey+cid)
 }
 
 // CheckPerm 检查指定路由的权限
 func CheckPerm(ctx echo.Context, route string) error {
-	return ctx.GetFunc(`CheckPerm`).(func(string) error)(route)
+	fn, ok := ctx.GetFunc(`CheckPerm`).(func(string) error)
+	if ok {
+		return fn(route)
+	}
+	return nerrors.ErrUserNoPerm
 }
 
 func init() {
