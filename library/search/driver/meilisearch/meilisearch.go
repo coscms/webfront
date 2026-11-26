@@ -1,6 +1,7 @@
 package meilisearch
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -31,14 +32,14 @@ func (m *MeiliSearch) getIndex(index string) meilisearch.IndexManager {
 	return m.ServiceManager.Index(index)
 }
 
-func (m *MeiliSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
+func (m *MeiliSearch) Add(ctx context.Context, index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
 	opts := meilisearch.DocumentOptions{
 		PrimaryKey:         primaryKey,
 		SkipCreation:       false,
 		TaskCustomMetadata: "",
 	}
-	t, err := indexM.AddDocuments(docs, &opts)
+	t, err := indexM.AddDocuments(ctx, docs, &opts)
 	if err != nil {
 		return err
 	}
@@ -48,14 +49,14 @@ func (m *MeiliSearch) Add(index string, primaryKey *string, docs ...interface{})
 	return err
 }
 
-func (m *MeiliSearch) Update(index string, primaryKey *string, docs ...interface{}) error {
+func (m *MeiliSearch) Update(ctx context.Context, index string, primaryKey *string, docs ...interface{}) error {
 	indexM := m.getIndex(index)
 	opts := meilisearch.DocumentOptions{
 		PrimaryKey:         primaryKey,
 		SkipCreation:       false,
 		TaskCustomMetadata: "",
 	}
-	t, err := indexM.UpdateDocuments(docs, &opts)
+	t, err := indexM.UpdateDocuments(ctx, docs, &opts)
 	if err != nil {
 		return err
 	}
@@ -65,21 +66,21 @@ func (m *MeiliSearch) Update(index string, primaryKey *string, docs ...interface
 	return err
 }
 
-func (m *MeiliSearch) GetTask(index string, taskUID int64) error {
+func (m *MeiliSearch) GetTask(ctx context.Context, index string, taskUID int64) error {
 	indexM := m.getIndex(index)
-	task, err := indexM.GetTask(taskUID)
+	task, err := indexM.GetTask(ctx, taskUID)
 	com.Dump(task)
 	return err
 }
 
-func (m *MeiliSearch) Delete(index string, ids ...string) error {
+func (m *MeiliSearch) Delete(ctx context.Context, index string, ids ...string) error {
 	indexM := m.getIndex(index)
 	opts := meilisearch.DocumentOptions{
 		//PrimaryKey:         primaryKey,
 		SkipCreation:       false,
 		TaskCustomMetadata: "",
 	}
-	_, err := indexM.DeleteDocuments(ids, &opts)
+	_, err := indexM.DeleteDocuments(ctx, ids, &opts)
 	return err
 }
 
@@ -87,15 +88,15 @@ func (m *MeiliSearch) Flush() error {
 	return nil
 }
 
-func (m *MeiliSearch) DeleteIndex(index string) error {
-	_, err := m.ServiceManager.DeleteIndex(index)
+func (m *MeiliSearch) DeleteIndex(ctx context.Context, index string) error {
+	_, err := m.ServiceManager.DeleteIndex(ctx, index)
 	return err
 }
 
-func (m *MeiliSearch) InitIndex(cfg *search.IndexConfig) error {
+func (m *MeiliSearch) InitIndex(ctx context.Context, cfg *search.IndexConfig) error {
 	// m.DeleteIndex(cfg.Index)
-	if _, err := m.getIndex(cfg.Index).FetchInfo(); err != nil {
-		m.ServiceManager.CreateIndex(&meilisearch.IndexConfig{
+	if _, err := m.getIndex(cfg.Index).FetchInfo(ctx); err != nil {
+		m.ServiceManager.CreateIndex(ctx, &meilisearch.IndexConfig{
 			Uid:        cfg.Index,
 			PrimaryKey: cfg.PrimaryKey,
 		})
@@ -104,20 +105,21 @@ func (m *MeiliSearch) InitIndex(cfg *search.IndexConfig) error {
 		filterableAttributes := cfg.FilterableAttributes
 		index := m.getIndex(cfg.Index)
 		if len(searchableAttributes) > 0 {
-			index.UpdateSearchableAttributes(&searchableAttributes)
+			index.UpdateSearchableAttributes(ctx, &searchableAttributes)
 		}
 		if len(sortableAttributes) > 0 {
-			index.UpdateSortableAttributes(&sortableAttributes)
+			index.UpdateSortableAttributes(ctx, &sortableAttributes)
 		}
 		if len(filterableAttributes) > 0 {
-			index.UpdateFilterableAttributes(&filterableAttributes)
+			index.UpdateFilterableAttributes(ctx, &filterableAttributes)
 		}
 	}
 	return nil
 }
 
-func (m *MeiliSearch) Search(index string, keywords string, options *search.SearchRequest) (int64, []echo.H, error) {
+func (m *MeiliSearch) Search(ctx context.Context, index string, keywords string, options *search.SearchRequest) (int64, []echo.H, error) {
 	searchRes, err := m.getIndex(index).Search(
+		ctx,
 		keywords,
 		&meilisearch.SearchRequest{
 			Offset: options.Offset,

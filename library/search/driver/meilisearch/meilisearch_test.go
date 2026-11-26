@@ -1,6 +1,7 @@
 package meilisearch
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"testing"
@@ -46,7 +47,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	err = cli.InitIndex(&search.IndexConfig{
+	ctx := context.Background()
+	err = cli.InitIndex(ctx, &search.IndexConfig{
 		Index:      index,
 		PrimaryKey: `id`,
 	})
@@ -58,7 +60,8 @@ func TestMain(m *testing.M) {
 
 func TestAdd(t *testing.T) {
 	primaryKey := `id`
-	err := cli.Add(index, &primaryKey, map[string]interface{}{
+	ctx := context.Background()
+	err := cli.Add(ctx, index, &primaryKey, map[string]interface{}{
 		"title": "钢铁侠美国队长复仇者联盟",
 		"id":    id,
 	}, map[string]interface{}{
@@ -69,7 +72,8 @@ func TestAdd(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	count, result, err := cli.Search(index, `钢铁侠`, &search.SearchRequest{
+	ctx := context.Background()
+	count, result, err := cli.Search(ctx, index, `钢铁侠`, &search.SearchRequest{
 		Limit:  1000,
 		Filter: "",
 	})
@@ -80,8 +84,9 @@ func TestSearch(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	err := cli.Delete(index, fmt.Sprintf(`%d`, id))
+	ctx := context.Background()
+	err := cli.Delete(ctx, index, fmt.Sprintf(`%d`, id))
 	assert.NoError(t, err)
-	err = cli.Delete(index, fmt.Sprintf(`%d`, id+1))
+	err = cli.Delete(ctx, index, fmt.Sprintf(`%d`, id+1))
 	assert.NoError(t, err)
 }

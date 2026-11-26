@@ -1,6 +1,8 @@
 package zincsearch
 
 import (
+	"context"
+
 	"github.com/admpub/go-zinc/doc"
 	"github.com/admpub/go-zinc/doc/schemas"
 	"github.com/coscms/webfront/library/search"
@@ -24,7 +26,7 @@ type ZincSearch struct {
 	doc.ZincDocSDK
 }
 
-func (m *ZincSearch) Add(index string, primaryKey *string, docs ...interface{}) error {
+func (m *ZincSearch) Add(ctx context.Context, index string, primaryKey *string, docs ...interface{}) error {
 	var err error
 	for _, doc := range docs {
 		row := param.AsStore(doc)
@@ -37,7 +39,7 @@ func (m *ZincSearch) Add(index string, primaryKey *string, docs ...interface{}) 
 	return err
 }
 
-func (m *ZincSearch) Update(index string, primaryKey *string, docs ...interface{}) (err error) {
+func (m *ZincSearch) Update(ctx context.Context, index string, primaryKey *string, docs ...interface{}) (err error) {
 	for _, doc := range docs {
 		row := param.AsStore(doc)
 		id := row.String(*primaryKey)
@@ -49,7 +51,7 @@ func (m *ZincSearch) Update(index string, primaryKey *string, docs ...interface{
 	return err
 }
 
-func (m *ZincSearch) Delete(index string, ids ...string) error {
+func (m *ZincSearch) Delete(ctx context.Context, index string, ids ...string) error {
 	var err error
 	for _, id := range ids {
 		err = m.ZincDocSDK.DeleteDocument(index, id)
@@ -64,12 +66,12 @@ func (m *ZincSearch) Flush() error {
 	return nil
 }
 
-func (m *ZincSearch) InitIndex(cfg *search.IndexConfig) error {
+func (m *ZincSearch) InitIndex(ctx context.Context, cfg *search.IndexConfig) error {
 	property := cfg.Properties.(*schemas.IndexProperty)
 	return m.ZincDocSDK.CreateIndex(cfg.Index, property)
 }
 
-func (m *ZincSearch) Search(index string, keywords string,
+func (m *ZincSearch) Search(ctx context.Context, index string, keywords string,
 	options *search.SearchRequest) (int64, []echo.H, error) {
 	cfg := &schemas.SearchRequest{
 		SearchType: options.SearchType,

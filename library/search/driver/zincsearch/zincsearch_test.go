@@ -1,6 +1,7 @@
 package zincsearch
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -31,7 +32,8 @@ func TestMain(m *testing.M) {
 
 func TestAdd(t *testing.T) {
 	primaryKey := `id`
-	err := cli.Add(index, &primaryKey, map[string]string{
+	ctx := context.Background()
+	err := cli.Add(ctx, index, &primaryKey, map[string]string{
 		"title": "钢铁侠美国队长复仇者联盟",
 		"id":    id,
 	})
@@ -39,7 +41,8 @@ func TestAdd(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	count, result, err := cli.Search(index, `钢铁侠`, &search.SearchRequest{
+	ctx := context.Background()
+	count, result, err := cli.Search(ctx, index, `钢铁侠`, &search.SearchRequest{
 		SearchType: `matchphrase`,
 		Limit:      1000,
 	})
@@ -49,6 +52,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	err := cli.Delete(index, id)
+	ctx := context.Background()
+	err := cli.Delete(ctx, index, id)
 	assert.NoError(t, err)
 }
