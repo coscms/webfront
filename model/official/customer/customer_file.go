@@ -65,3 +65,11 @@ func (f *Customer) GetUploadConfig(customer *dbschema.OfficialCustomer) *xroleup
 	cfg, _ := CustomerRolePermissionForBehavior(f.Context(), xroleupload.BehaviorName, customer).(*xroleupload.CustomerUpload)
 	return cfg
 }
+
+func (f *Customer) MustGetUploadConfig(customer *dbschema.OfficialCustomer) *xroleupload.CustomerUpload {
+	cfg := f.GetUploadConfig(customer)
+	if cfg == nil {
+		return &xroleupload.CustomerUpload{}
+	}
+	return cfg
+}
